@@ -17,7 +17,7 @@ export function CityProvider({ children }: { children: React.ReactNode }) {
       selectedCity,
       setSelectedCity,
     }),
-    [selectedCity]
+    [selectedCity],
   );
 
   return <CityContext.Provider value={value}>{children}</CityContext.Provider>;
