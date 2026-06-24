@@ -1,65 +1,106 @@
-import Image from "next/image";
+"use client";
+
+import Link from "next/link";
+import { useCity } from "@/components/CityContext";
+import { Heart } from "lucide-react"; // حتما نصبش کن: npm install lucide-react
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
+
+const slides = [
+  {
+    title: "کنسرت بزرگ تابستان",
+    subtitle: "خرید بلیت بهترین اجراهای موسیقی با جایگاه‌های متنوع",
+    badge: "پیشنهاد ویژه",
+    href: "/events/1",
+    color: "bg-red-600",
+  },
+  {
+    title: "همایش استارتاپ‌ها",
+    subtitle: "فرصتی برای شبکه‌سازی، یادگیری و آشنایی با کسب‌وکارهای نو",
+    badge: "ظرفیت محدود",
+    href: "/events/2",
+    color: "bg-blue-700",
+  },
+];
+
+const events = [
+  { id: 1, title: "کنسرت بزرگ تابستان", date: "۲۵ تیر - ۲۸ تیر", color: "bg-gray-800" },
+  { id: 2, title: "همایش استارتاپ‌ها", date: "۱۰ مرداد", color: "bg-gray-700" },
+  { id: 3, title: "فستیوال موسیقی سنتی", date: "۱۵ شهریور", color: "bg-gray-600" },
+  { id: 4, title: "مسابقه فینال جام", date: "۲۰ مهر", color: "bg-gray-800" },
+];
 
 export default function Home() {
+  const { selectedCity } = useCity();
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <main className="mx-auto max-w-6xl px-4 py-8">
+      
+      {/* بخش اسلایدر اصلی - کمی جمع‌وجورتر */}
+      <section className="mb-12">
+        <Carousel opts={{ direction: "rtl", align: "start", loop: true }} className="relative w-full">
+          <CarouselContent>
+            {slides.map((slide) => (
+              <CarouselItem key={slide.title}>
+                <div className={`relative overflow-hidden rounded-3xl ${slide.color} px-8 py-10 text-white shadow-lg md:px-12`}>
+                  <div className="absolute left-6 top-6 rounded-full bg-white/20 px-3 py-1 text-xs backdrop-blur">
+                    {slide.badge}
+                  </div>
+                  <div className="max-w-xl">
+                    <h1 className="text-2xl font-black md:text-4xl">{slide.title}</h1>
+                    <p className="mt-3 text-white/90">
+                      {slide.subtitle} در <span className="font-bold underline">{selectedCity}</span>
+                    </p>
+                    <Link href={slide.href} className="mt-6 inline-block rounded-full bg-white px-6 py-2 text-sm font-bold text-gray-900 transition hover:bg-gray-100">
+                      خرید بلیت
+                    </Link>
+                  </div>
+                </div>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+          <CarouselPrevious className="left-4 bg-white/80" />
+          <CarouselNext className="right-4 bg-white/80" />
+        </Carousel>
+      </section>
+
+      {/* بخش رویدادهای محبوب (StubHub Style) */}
+      <section>
+        <div className="mb-6">
+          <h2 className="text-2xl font-black text-gray-900">رویدادهای محبوب در {selectedCity}</h2>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        {/* گرید کارت‌ها */}
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+          {events.map((event) => (
+            <Link
+              key={event.id}
+              href={`/events/${event.id}`}
+              className="group block overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition hover:shadow-lg"
+            >
+              {/* تصویر رویداد با آیکون قلب */}
+              <div className={`relative h-60 w-full ${event.color} overflow-hidden`}>
+                <button className="absolute right-3 top-3 rounded-full bg-white/20 p-2 text-white backdrop-blur transition hover:bg-white/40">
+                  <Heart className="h-5 w-5" />
+                </button>
+              </div>
+
+              {/* متن کارت */}
+              <div className="p-4">
+                <h3 className="font-bold text-gray-900 group-hover:text-red-600 transition-colors">
+                  {event.title}
+                </h3>
+                <p className="mt-1 text-sm text-gray-500">{event.date}</p>
+              </div>
+            </Link>
+          ))}
         </div>
-      </main>
-    </div>
+      </section>
+    </main>
   );
 }
