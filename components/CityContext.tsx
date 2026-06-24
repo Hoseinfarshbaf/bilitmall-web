@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useMemo, useState } from "react";
 
 type CityContextType = {
   selectedCity: string;
@@ -12,11 +12,15 @@ const CityContext = createContext<CityContextType | undefined>(undefined);
 export function CityProvider({ children }: { children: React.ReactNode }) {
   const [selectedCity, setSelectedCity] = useState("تهران");
 
-  return (
-    <CityContext.Provider value={{ selectedCity, setSelectedCity }}>
-      {children}
-    </CityContext.Provider>
+  const value = useMemo(
+    () => ({
+      selectedCity,
+      setSelectedCity,
+    }),
+    [selectedCity]
   );
+
+  return <CityContext.Provider value={value}>{children}</CityContext.Provider>;
 }
 
 export function useCity() {
