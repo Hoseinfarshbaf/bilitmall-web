@@ -1,3 +1,5 @@
+//  کارت رویداد 
+
 import { CalendarDays, MapPin } from "lucide-react";
 import type { EventItem } from "@/data/events";
 

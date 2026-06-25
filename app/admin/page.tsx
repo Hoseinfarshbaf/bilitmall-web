@@ -1,12 +1,11 @@
 export default function AdminPage() {
     return (
-      <main className="min-h-screen bg-slate-100 px-4 py-10">
+      <main className="min-h-screen bg-slate-100 px-4 py-5">
         <section className="mx-auto max-w-6xl">
           <div className="mb-8 flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold">پنل مدیریت</h1>
               <p className="mt-2 text-slate-600">
-                مدیریت رویدادها، بلیت‌ها و سفارش‌ها
               </p>
             </div>
   
@@ -14,7 +13,7 @@ export default function AdminPage() {
               href="/"
               className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm"
             >
-              صفحه اصلی
+              مشاهده سایت
             </a>
           </div>
   
