@@ -1,4 +1,4 @@
-// کروسل رویدادهای محبوب
+// رویداد های محبوب
 "use client";
 
 import Link from "next/link";
@@ -18,7 +18,6 @@ export default function PopularEvents() {
   const fallbackEvents = events.filter((event) => event.city === "تهران");
   const data = cityEvents.length > 0 ? cityEvents : fallbackEvents;
 
-  // چهار بار تکرار برای اطمینان از پر شدن کل فضای صفحه
   const repeatedData = [...data, ...data, ...data, ...data];
 
   useEffect(() => {
@@ -28,15 +27,11 @@ export default function PopularEvents() {
     posRef.current = 0;
 
     const step = () => {
-      // حرکت به چپ (منفی برای RTL)
       posRef.current -= 0.5;
-
       const onePartWidth = track.scrollWidth / 4;
-
       if (Math.abs(posRef.current) >= onePartWidth) {
         posRef.current = 0;
       }
-
       track.style.transform = `translateX(${posRef.current}px)`;
       animRef.current = requestAnimationFrame(step);
     };
@@ -83,7 +78,7 @@ export default function PopularEvents() {
             </p>
           </div>
           <Link
-            href={`/events/${selectedCity}`}
+            href="/events/category/کنسرت"
             className="flex items-center gap-2 rounded-full bg-neutral-900 px-4 py-2 text-sm font-bold text-white transition-transform hover:scale-105"
           >
             <span>مشاهده همه</span>
@@ -95,15 +90,12 @@ export default function PopularEvents() {
           className="relative w-full overflow-hidden"
           onMouseEnter={pauseAnim}
           onMouseLeave={resumeAnim}
-          style={{ direction: "ltr" }} // جهت container برای کارکرد صحیح translateX
+          style={{ direction: "ltr" }}
         >
           <div
             ref={trackRef}
             className="flex gap-3"
-            style={{
-              width: "max-content",
-              willChange: "transform",
-            }}
+            style={{ width: "max-content", willChange: "transform" }}
           >
             {repeatedData.map((event, index) => (
               <div key={`${event.id}-${index}`} className="flex-shrink-0 w-fit">

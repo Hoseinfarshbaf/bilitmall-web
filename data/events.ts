@@ -159,7 +159,7 @@ export const events: EventItem[] = [
   {
     id: 13,
     title: "نمایش خنده‌دار",
-    city: "مشهد",
+    city: "تهران",
     category: "تئاتر",
     date: "1404/05/16",
     time: "20:00",
@@ -170,7 +170,7 @@ export const events: EventItem[] = [
   {
     id: 14,
     title: "تئاتر یک روز بارانی",
-    city: "مشهد",
+    city: "تهران",
     category: "تئاتر",
     date: "1404/05/18",
     time: "18:30",
@@ -181,7 +181,7 @@ export const events: EventItem[] = [
   {
     id: 15,
     title: "نمایش نامه‌های قدیمی",
-    city: "مشهد",
+    city: "تهران",
     category: "تئاتر",
     date: "1404/05/20",
     time: "19:30",

@@ -1,11 +1,9 @@
-//  صفحه مخصوص شهر 
-
 "use client";
 import React, { useState, useMemo, useRef, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { events } from "@/data/events";
 import EventCard from "@/components/EventCard";
-import { Search, ArrowRight, MapPin, ChevronDown, Home } from "lucide-react";
+import { Search, MapPin, ChevronDown, Home } from "lucide-react";
 import Link from "next/link";
 
 const CATEGORIES = [
@@ -28,7 +26,6 @@ export default function DiscoveryPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isCityOpen, setIsCityOpen] = useState(false);
 
-  // بستن دراپ‌داون با کلیک بیرون
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -50,12 +47,9 @@ export default function DiscoveryPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20 font-sans" dir="rtl">
-      {/* هدر صفحه */}
       <div className="bg-white border-b sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-4 py-6">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-            
-            {/* سمت راست: عنوان و اطلاعات شهر */}
             <div className="flex items-center gap-5">
               <Link 
                 href="/" 
@@ -84,7 +78,6 @@ export default function DiscoveryPage() {
               </div>
             </div>
 
-            {/* سمت چپ: انتخاب شهر داینامیک */}
             <div className="relative" ref={dropdownRef}>
               <button 
                 onClick={() => setIsCityOpen(!isCityOpen)}
@@ -98,7 +91,7 @@ export default function DiscoveryPage() {
               </button>
 
               {isCityOpen && (
-                <div className="absolute left-0 mt-2 w-56 bg-white border border-gray-100 rounded-2xl shadow-2xl p-2 z-[60] animate-in fade-in zoom-in duration-150">
+                <div className="absolute left-0 mt-2 w-56 bg-white border border-gray-100 rounded-2xl shadow-2xl p-2 z-[60]">
                   <div className="grid grid-cols-1 gap-1">
                     {ALL_CITIES.map(city => (
                       <button
@@ -122,9 +115,7 @@ export default function DiscoveryPage() {
             </div>
           </div>
 
-          {/* نوار ابزار: جستجو و فیلترها */}
           <div className="mt-8 flex flex-col md:flex-row items-center gap-4 bg-gray-50 p-3 rounded-[2rem] border border-gray-100">
-            {/* باکس جستجو */}
             <div className="relative w-full md:w-80">
               <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
@@ -138,7 +129,6 @@ export default function DiscoveryPage() {
 
             <div className="hidden md:block w-px h-8 bg-gray-200 mx-1"></div>
 
-            {/* فیلترها (Chips) */}
             <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-hide w-full">
               {CATEGORIES.map((cat) => (
                 <button
@@ -158,7 +148,6 @@ export default function DiscoveryPage() {
         </div>
       </div>
 
-      {/* لیست کارت‌ها */}
       <div className="max-w-6xl mx-auto px-4 mt-12">
         {filteredEvents.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
