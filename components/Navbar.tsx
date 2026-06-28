@@ -56,7 +56,7 @@ export default function Navbar() {
               href={`/events/${selectedCity}/ورزش و تفریح`}
               className="text-sm font-bold text-gray-600 transition hover:text-red-600"
             >
-              ورزشی | تفریحی
+             ورزشی
             </Link>
           </nav>
         </div>

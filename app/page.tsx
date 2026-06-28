@@ -16,7 +16,7 @@ export default function Home() {
 
   const concerts = displayEvents.filter((e) => e.category === "کنسرت");
   const theaters = displayEvents.filter((e) => e.category === "تئاتر");
-  const sports = displayEvents.filter((e) => e.category === " ورزشی | تفریحی");
+  const sports = displayEvents.filter((e) => e.category === "ورزشی");
 
   return (
     <main className="min-h-screen bg-neutral-50 pb-20">
@@ -53,10 +53,10 @@ export default function Home() {
 
           {sports.length > 0 && (
             <CategorySlider 
-              title=" ورزشی | تفریحی" 
+              title="ورزشی" 
               cityName={selectedCity}
               data={sports} 
-              categoryLink={`/events/${selectedCity}/ ورزشی | تفریحی`} 
+              categoryLink={`/events/${selectedCity}/ورزشی`} 
             />
           )}
           

@@ -10,7 +10,7 @@ const CATEGORIES = [
   { id: "all", label: "همه", value: "همه" },
   { id: "concert", label: "کنسرت", value: "کنسرت" },
   { id: "theater", label: "تئاتر", value: "تئاتر" },
-  { id: "sport", label: "ورزش و تفریح", value: "ورزش و تفریح" },
+  { id: "sport", label: "ورزشی", value: "ورزشی" },
 ];
 
 const ALL_CITIES = ["تهران", "اصفهان", "شیراز", "تبریز", "مشهد", "کیش", "کرج", "اهواز", "رشت", "کرمان"];
