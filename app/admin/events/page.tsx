@@ -33,7 +33,7 @@ function EventScheduleCell({ event }: { event: EventItem }) {
   const schedule = getUpcomingEventSchedule(event);
 
   if (schedule.length === 0) {
-    return <span className="text-xs text-slate-400">—</span>;
+    return <span className="text-xs text-slate-400 dark:text-slate-500">—</span>;
   }
 
   const totalSessions = schedule.reduce(
@@ -48,24 +48,24 @@ function EventScheduleCell({ event }: { event: EventItem }) {
         return (
           <div
             key={day.date}
-            className="rounded-lg border border-slate-100 bg-slate-50/60 px-2.5 py-2"
+            className="rounded-lg border border-slate-100 bg-slate-50/60 px-2.5 py-2 dark:border-slate-700 dark:bg-slate-800/60"
           >
             <div className="flex items-center justify-between gap-2">
-              <span className="text-xs font-bold text-slate-800">{day.date}</span>
+              <span className="text-xs font-bold text-slate-800 dark:text-slate-100">{day.date}</span>
               <span
                 className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
                   daysUntil === 0
-                    ? "bg-red-100 text-red-700"
+                    ? "bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-300"
                     : daysUntil <= 3
-                      ? "bg-amber-100 text-amber-700"
-                      : "bg-blue-50 text-blue-700"
+                      ? "bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300"
+                      : "bg-blue-50 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300"
                 }`}
               >
                 {formatDaysUntilLabel(day.date)}
               </span>
             </div>
             <div className="mt-1.5 flex flex-wrap items-center gap-1">
-              <span className="text-[10px] font-bold text-slate-400">
+              <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500">
                 {day.sessions.length.toLocaleString("fa-IR")} سانس:
               </span>
               {day.sessions.map((session, index) => (
@@ -73,8 +73,8 @@ function EventScheduleCell({ event }: { event: EventItem }) {
                   key={`${day.date}-${session.time}-${index}`}
                   className={`rounded-md px-2 py-0.5 text-[11px] font-medium ring-1 ${
                     session.purchaseUrl
-                      ? "bg-green-50 text-green-700 ring-green-200"
-                      : "bg-white text-slate-600 ring-slate-200"
+                      ? "bg-green-50 text-green-700 ring-green-200 dark:bg-green-500/15 dark:text-green-300 dark:ring-green-500/30"
+                      : "bg-white text-slate-600 ring-slate-200 dark:bg-slate-900 dark:text-slate-300 dark:ring-slate-700"
                   }`}
                   title={session.purchaseUrl ? "لینک خرید ثبت شده" : "بدون لینک خرید"}
                 >
@@ -87,7 +87,7 @@ function EventScheduleCell({ event }: { event: EventItem }) {
         );
       })}
       {schedule.length > 1 ? (
-        <p className="text-[11px] font-medium text-slate-500">
+        <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
           مجموعاً {schedule.length.toLocaleString("fa-IR")} روز ·{" "}
           {totalSessions.toLocaleString("fa-IR")} سانس
         </p>
@@ -232,18 +232,21 @@ export default function AdminEventsPage() {
   };
 
   return (
-    <main className="min-h-screen bg-slate-50 p-4 md:p-8" dir="rtl">
+    <main
+      className="min-h-screen bg-slate-50 p-4 text-slate-900 md:p-8 dark:bg-slate-950 dark:text-slate-100"
+      dir="rtl"
+    >
       <div className="mx-auto max-w-6xl">
         <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <Link
               href="/admin"
-              className="mb-2 inline-block text-sm font-bold text-blue-600 hover:text-blue-700"
+              className="mb-2 inline-block text-sm font-bold text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
             >
               ← بازگشت به پنل
             </Link>
-            <h1 className="text-3xl font-black text-slate-800">مدیریت رویدادها</h1>
-            <p className="mt-1 text-sm text-slate-500">
+            <h1 className="text-3xl font-black text-slate-800 dark:text-slate-100">مدیریت رویدادها</h1>
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
               تعریف، ویرایش، فیلتر و انتشار رویدادها
             </p>
           </div>
@@ -261,16 +264,16 @@ export default function AdminEventsPage() {
 
         {view === "list" ? (
           <div className="space-y-5">
-            <div className="rounded-3xl bg-white p-5 shadow-sm">
+            <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
               <div className="grid grid-cols-1 gap-3 md:grid-cols-3 lg:grid-cols-6">
                 <input
                   type="text"
                   placeholder="جستجو..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-blue-500"
+                  className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
                 />
-                <div className="rounded-xl border border-slate-200 p-2 focus-within:border-blue-500">
+                <div className="rounded-xl border border-slate-200 p-2 focus-within:border-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:[&_input]:text-slate-100">
                   <DatePicker
                     value={dateFilter}
                     onChange={(date) => setDateFilter((date as DateObject) ?? null)}
@@ -278,7 +281,7 @@ export default function AdminEventsPage() {
                     locale={persian_fa}
                     calendarPosition="bottom-right"
                     format="YYYY/MM/DD"
-                    inputClass="w-full outline-none p-1.5 text-sm"
+                    inputClass="w-full outline-none p-1.5 text-sm bg-transparent"
                     placeholder="فیلتر تاریخ"
                   />
                 </div>
@@ -286,12 +289,12 @@ export default function AdminEventsPage() {
                   value={cityFilter}
                   includeAll
                   onChange={setCityFilter}
-                  className="rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-blue-500"
+                  className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
                 />
                 <select
                   value={categoryFilter}
                   onChange={(e) => setCategoryFilter(e.target.value)}
-                  className="rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-blue-500"
+                  className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
                 >
                   <option value="همه">همه دسته‌ها</option>
                   {EVENT_CATEGORIES.map((category) => (
@@ -305,7 +308,7 @@ export default function AdminEventsPage() {
                   onChange={(e) =>
                     setHighlightFilter(e.target.value as HighlightFilter)
                   }
-                  className="rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-blue-500"
+                  className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
                 >
                   <option value="همه">همه نمایش‌ها</option>
                   <option value="popular">فقط محبوب</option>
@@ -315,7 +318,7 @@ export default function AdminEventsPage() {
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
-                  className="rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-blue-500"
+                  className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
                 >
                   <option value="همه">همه وضعیت‌ها</option>
                   <option value="active">{EVENT_STATUS_LABELS.active}</option>
@@ -328,24 +331,24 @@ export default function AdminEventsPage() {
                 <button
                   type="button"
                   onClick={() => setDateFilter(null)}
-                  className="mt-3 text-xs font-bold text-blue-600 hover:text-blue-700"
+                  className="mt-3 text-xs font-bold text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
                 >
                   حذف فیلتر تاریخ
                 </button>
               ) : null}
             </div>
 
-            <div className="overflow-hidden rounded-3xl bg-white shadow-sm">
+            <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
               {loading ? (
-                <p className="p-8 text-center text-slate-500">در حال بارگذاری...</p>
+                <p className="p-8 text-center text-slate-500 dark:text-slate-400">در حال بارگذاری...</p>
               ) : error ? (
-                <p className="p-8 text-center text-red-500">{error}</p>
+                <p className="p-8 text-center text-red-500 dark:text-red-400">{error}</p>
               ) : filteredEvents.length === 0 ? (
-                <p className="p-8 text-center text-slate-500">رویدادی یافت نشد.</p>
+                <p className="p-8 text-center text-slate-500 dark:text-slate-400">رویدادی یافت نشد.</p>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="min-w-full text-sm">
-                    <thead className="bg-slate-50 text-slate-600">
+                    <thead className="bg-slate-50 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
                       <tr>
                         <th className="px-4 py-3 text-right font-bold">رویداد</th>
                         <th className="px-4 py-3 text-right font-bold">شهر</th>
@@ -366,7 +369,7 @@ export default function AdminEventsPage() {
                         );
 
                         return (
-                          <tr key={event.id} className="border-t border-slate-100">
+                          <tr key={event.id} className="border-t border-slate-100 dark:border-slate-800">
                             <td className="px-4 py-4">
                               <div className="flex items-center gap-3">
                                 <div
@@ -374,8 +377,8 @@ export default function AdminEventsPage() {
                                   style={getEventImageStyle(event.image)}
                                 />
                                 <div>
-                                  <div className="font-bold text-slate-800">{event.title}</div>
-                                  <div className="mt-1 text-xs text-slate-500">
+                                  <div className="font-bold text-slate-800 dark:text-slate-100">{event.title}</div>
+                                  <div className="mt-1 text-xs text-slate-500 dark:text-slate-400">
                                     {event.place} • {sessionCount} سانس
                                   </div>
                                 </div>
@@ -388,20 +391,20 @@ export default function AdminEventsPage() {
                             </td>
                             <td className="px-4 py-4">
                               {event.popular ? (
-                                <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-700">
+                                <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-700 dark:bg-amber-500/20 dark:text-amber-300">
                                   محبوب
                                 </span>
                               ) : (
-                                <span className="text-xs text-slate-400">—</span>
+                                <span className="text-xs text-slate-400 dark:text-slate-500">—</span>
                               )}
                             </td>
                             <td className="px-4 py-4">
                               {event.featured ? (
-                                <span className="rounded-full bg-red-100 px-3 py-1 text-xs font-bold text-red-700">
+                                <span className="rounded-full bg-red-100 px-3 py-1 text-xs font-bold text-red-700 dark:bg-red-500/20 dark:text-red-300">
                                   ویژه
                                 </span>
                               ) : (
-                                <span className="text-xs text-slate-400">—</span>
+                                <span className="text-xs text-slate-400 dark:text-slate-500">—</span>
                               )}
                             </td>
                             <td className="px-4 py-4">
@@ -412,20 +415,20 @@ export default function AdminEventsPage() {
                                 <button
                                   type="button"
                                   onClick={() => openEdit(event)}
-                                  className="rounded-lg bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-200"
+                                  className="rounded-lg bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
                                 >
                                   ویرایش
                                 </button>
                                 <Link
                                   href={getEventUrl(event)}
-                                  className="rounded-lg bg-blue-50 px-3 py-1.5 text-xs font-bold text-blue-700 hover:bg-blue-100"
+                                  className="rounded-lg bg-blue-50 px-3 py-1.5 text-xs font-bold text-blue-700 hover:bg-blue-100 dark:bg-blue-500/15 dark:text-blue-300 dark:hover:bg-blue-500/25"
                                 >
                                   مشاهده
                                 </Link>
                                 <button
                                   type="button"
                                   onClick={() => handleDelete(event)}
-                                  className="rounded-lg bg-red-50 px-3 py-1.5 text-xs font-bold text-red-600 hover:bg-red-100"
+                                  className="rounded-lg bg-red-50 px-3 py-1.5 text-xs font-bold text-red-600 hover:bg-red-100 dark:bg-red-500/15 dark:text-red-300 dark:hover:bg-red-500/25"
                                 >
                                   حذف کامل
                                 </button>
@@ -441,8 +444,8 @@ export default function AdminEventsPage() {
             </div>
           </div>
         ) : (
-          <div className="rounded-3xl bg-white p-6 shadow-sm md:p-8">
-            <h2 className="mb-6 text-2xl font-bold text-slate-800">
+          <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8 dark:border-slate-800 dark:bg-slate-900">
+            <h2 className="mb-6 text-2xl font-bold text-slate-800 dark:text-slate-100">
               {view === "create" ? "تعریف رویداد جدید" : "ویرایش رویداد"}
             </h2>
             <EventForm

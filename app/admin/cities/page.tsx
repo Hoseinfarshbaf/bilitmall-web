@@ -113,33 +113,36 @@ export default function AdminCitiesPage() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-50 p-4 md:p-8" dir="rtl">
+    <main
+      className="min-h-screen bg-slate-50 p-4 text-slate-900 md:p-8 dark:bg-slate-950 dark:text-slate-100"
+      dir="rtl"
+    >
       <div className="mx-auto max-w-4xl">
-        <Link href="/admin" className="mb-4 inline-block text-sm font-bold text-blue-600">
+        <Link href="/admin" className="mb-4 inline-block text-sm font-bold text-blue-600 dark:text-blue-400">
           ← پنل ادمین
         </Link>
-        <h1 className="text-3xl font-black text-slate-800">مدیریت شهرها</h1>
-        <p className="mt-2 text-sm text-slate-500">
+        <h1 className="text-3xl font-black text-slate-800 dark:text-slate-100">مدیریت شهرها</h1>
+        <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
           شهرهای فعال در ثبت رویداد، سالن، جستجو، نوبار سایت و استودیو برگزارکننده نمایش داده
           می‌شوند.
         </p>
 
         <form
           onSubmit={handleAdd}
-          className="mt-8 rounded-3xl bg-white p-6 shadow-sm"
+          className="mt-8 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900"
         >
-          <h2 className="text-lg font-black text-slate-800">افزودن شهر جدید</h2>
+          <h2 className="text-lg font-black text-slate-800 dark:text-slate-100">افزودن شهر جدید</h2>
           <div className="mt-4 flex flex-wrap items-end gap-3">
             <div className="min-w-0 flex-1">
-              <label className="mb-1.5 block text-sm font-bold text-slate-600">نام شهر</label>
+              <label className="mb-1.5 block text-sm font-bold text-slate-600 dark:text-slate-300">نام شهر</label>
               <input
                 value={newCityName}
                 onChange={(e) => setNewCityName(e.target.value)}
                 placeholder="مثلاً: یزد"
-                className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm outline-none focus:border-blue-500"
+                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
               />
             </div>
-            <label className="flex items-center gap-2 pb-2.5 text-sm font-bold text-slate-600">
+            <label className="flex items-center gap-2 pb-2.5 text-sm font-bold text-slate-600 dark:text-slate-300">
               <input
                 type="checkbox"
                 checked={newCityPopular}
@@ -159,19 +162,19 @@ export default function AdminCitiesPage() {
         </form>
 
         {message ? (
-          <p className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+          <p className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-300">
             {message}
           </p>
         ) : null}
 
-        <div className="mt-8 overflow-hidden rounded-3xl bg-white shadow-sm">
+        <div className="mt-8 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
           {loading ? (
-            <p className="p-8 text-center text-slate-500">در حال بارگذاری...</p>
+            <p className="p-8 text-center text-slate-500 dark:text-slate-400">در حال بارگذاری...</p>
           ) : cities.length === 0 ? (
-            <p className="p-8 text-center text-slate-500">شهری ثبت نشده.</p>
+            <p className="p-8 text-center text-slate-500 dark:text-slate-400">شهری ثبت نشده.</p>
           ) : (
             <table className="min-w-full text-sm">
-              <thead className="bg-slate-50 text-slate-600">
+              <thead className="bg-slate-50 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
                 <tr>
                   <th className="px-4 py-3 text-right font-bold">شهر</th>
                   <th className="px-4 py-3 text-right font-bold">اسلاگ</th>
@@ -181,17 +184,17 @@ export default function AdminCitiesPage() {
                   <th className="px-4 py-3 text-right font-bold">عملیات</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                 {cities.map((city) => (
-                  <tr key={city.id} className="hover:bg-slate-50/80">
-                    <td className="px-4 py-3 font-bold text-slate-800">{city.name}</td>
-                    <td className="px-4 py-3 font-mono text-xs text-slate-500" dir="ltr">
+                  <tr key={city.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50">
+                    <td className="px-4 py-3 font-bold text-slate-800 dark:text-slate-100">{city.name}</td>
+                    <td className="px-4 py-3 font-mono text-xs text-slate-500 dark:text-slate-400" dir="ltr">
                       {city.slug}
                     </td>
-                    <td className="px-4 py-3 text-slate-600">
+                    <td className="px-4 py-3 text-slate-600 dark:text-slate-300">
                       {city.eventCount.toLocaleString("fa-IR")}
                     </td>
-                    <td className="px-4 py-3 text-slate-600">
+                    <td className="px-4 py-3 text-slate-600 dark:text-slate-300">
                       {city.venueCount.toLocaleString("fa-IR")}
                     </td>
                     <td className="px-4 py-3">
@@ -207,8 +210,8 @@ export default function AdminCitiesPage() {
                         }
                         className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-bold transition-colors ${
                           city.isPopular
-                            ? "bg-amber-100 text-amber-800 hover:bg-amber-200"
-                            : "bg-slate-100 text-slate-500 hover:bg-slate-200"
+                            ? "bg-amber-100 text-amber-800 hover:bg-amber-200 dark:bg-amber-500/20 dark:text-amber-300 dark:hover:bg-amber-500/30"
+                            : "bg-slate-100 text-slate-500 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700"
                         }`}
                       >
                         <span
@@ -223,7 +226,7 @@ export default function AdminCitiesPage() {
                       <button
                         type="button"
                         onClick={() => void handleDelete(city)}
-                        className="rounded-lg bg-red-50 px-3 py-1 text-xs font-bold text-red-700 hover:bg-red-100"
+                        className="rounded-lg bg-red-50 px-3 py-1 text-xs font-bold text-red-700 hover:bg-red-100 dark:bg-red-500/15 dark:text-red-300 dark:hover:bg-red-500/25"
                       >
                         حذف
                       </button>

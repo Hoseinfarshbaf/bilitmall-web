@@ -16,10 +16,13 @@ export default function MyEventLandingPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#0a1210] text-white" dir="rtl">
+    <div
+      className="min-h-screen bg-neutral-50 text-neutral-900 dark:bg-[#0a1210] dark:text-white"
+      dir="rtl"
+    >
       <MyEventHeader />
       <div className="mx-auto max-w-5xl px-4 py-16">
-        <div className="mb-10 flex items-center gap-2 text-emerald-400">
+        <div className="mb-10 flex items-center gap-2 text-emerald-600 dark:text-emerald-400">
           <Sparkles className="h-8 w-8" />
           <span className="text-2xl font-black">{MY_EVENT_STUDIO}</span>
         </div>
@@ -27,7 +30,7 @@ export default function MyEventLandingPage() {
         <h1 className="max-w-3xl text-4xl font-black leading-tight sm:text-5xl">
           صفحه اختصاصی رویداد خودت را بساز و لینکش را برای خریداران بفرست
         </h1>
-        <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-300">
+        <p className="mt-6 max-w-2xl text-lg leading-8 text-neutral-600 dark:text-slate-300">
           {MY_EVENT_BRAND} پلتفرم جدا از بلیت‌مال برای برگزارکنندگان است — با
           ساب‌دامین اختصاصی، کاور برند و صفحه یک‌صفحه‌ای.
         </p>
@@ -36,7 +39,7 @@ export default function MyEventLandingPage() {
           {loggedIn === null ? null : loggedIn ? (
             <Link
               href="/my-event/dashboard"
-              className="rounded-2xl bg-emerald-600 px-6 py-4 text-sm font-black hover:bg-emerald-500"
+              className="rounded-2xl bg-emerald-600 px-6 py-4 text-sm font-black text-white hover:bg-emerald-500"
             >
               رفتن به داشبورد
             </Link>
@@ -44,13 +47,13 @@ export default function MyEventLandingPage() {
             <>
               <Link
                 href="/my-event/register"
-                className="rounded-2xl bg-emerald-600 px-6 py-4 text-sm font-black hover:bg-emerald-500"
+                className="rounded-2xl bg-emerald-600 px-6 py-4 text-sm font-black text-white hover:bg-emerald-500"
               >
                 ساخت حساب برگزارکننده
               </Link>
               <Link
                 href="/my-event/login"
-                className="rounded-2xl border border-emerald-500/30 px-6 py-4 text-sm font-black hover:bg-emerald-500/10"
+                className="rounded-2xl border border-emerald-500/40 px-6 py-4 text-sm font-black text-emerald-700 hover:bg-emerald-500/10 dark:border-emerald-500/30 dark:text-white"
               >
                 ورود
               </Link>
@@ -59,24 +62,24 @@ export default function MyEventLandingPage() {
         </div>
 
         <div className="mt-16 grid gap-4 sm:grid-cols-3">
-          <div className="rounded-3xl border border-emerald-500/10 bg-emerald-500/5 p-6">
-            <Globe className="mb-3 h-6 w-6 text-emerald-300" />
+          <div className="rounded-3xl border border-emerald-500/20 bg-emerald-500/5 p-6 dark:border-emerald-500/10">
+            <Globe className="mb-3 h-6 w-6 text-emerald-600 dark:text-emerald-300" />
             <h2 className="font-black">ساب‌دامین اختصاصی</h2>
-            <p className="mt-2 text-sm text-slate-400">
+            <p className="mt-2 text-sm text-neutral-500 dark:text-slate-400">
               مثلاً <span dir="ltr">https://{MY_EVENT_URL_EXAMPLE}</span>
             </p>
           </div>
-          <div className="rounded-3xl border border-emerald-500/10 bg-emerald-500/5 p-6">
-            <Layers className="mb-3 h-6 w-6 text-emerald-300" />
+          <div className="rounded-3xl border border-emerald-500/20 bg-emerald-500/5 p-6 dark:border-emerald-500/10">
+            <Layers className="mb-3 h-6 w-6 text-emerald-600 dark:text-emerald-300" />
             <h2 className="font-black">صفحه یک‌صفحه‌ای</h2>
-            <p className="mt-2 text-sm text-slate-400">
+            <p className="mt-2 text-sm text-neutral-500 dark:text-slate-400">
               فقط رویداد و برند شما — بدون شلوغی بلیت‌مال
             </p>
           </div>
-          <div className="rounded-3xl border border-emerald-500/10 bg-emerald-500/5 p-6">
-            <Sparkles className="mb-3 h-6 w-6 text-emerald-300" />
+          <div className="rounded-3xl border border-emerald-500/20 bg-emerald-500/5 p-6 dark:border-emerald-500/10">
+            <Sparkles className="mb-3 h-6 w-6 text-emerald-600 dark:text-emerald-300" />
             <h2 className="font-black">انتشار در بلیت‌مال</h2>
-            <p className="mt-2 text-sm text-slate-400">
+            <p className="mt-2 text-sm text-neutral-500 dark:text-slate-400">
               در صورت تمایل، رویدادتان پس از تأیید ادمین در مارکت‌پلیس هم دیده می‌شود
             </p>
           </div>
@@ -84,7 +87,7 @@ export default function MyEventLandingPage() {
 
         <a
           href="/"
-          className="mt-12 inline-flex items-center gap-2 text-sm font-bold text-slate-400 hover:text-white"
+          className="mt-12 inline-flex items-center gap-2 text-sm font-bold text-neutral-500 hover:text-neutral-900 dark:text-slate-400 dark:hover:text-white"
         >
           <ArrowLeft className="h-4 w-4" />
           بازدید از سایت بلیت‌مال

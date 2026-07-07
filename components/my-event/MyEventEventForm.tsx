@@ -6,7 +6,7 @@ import DatePicker, { DateObject } from "react-multi-date-picker";
 import persian from "react-date-object/calendars/persian";
 import persian_fa from "react-date-object/locales/persian_fa";
 import { Upload, X } from "lucide-react";
-import CitySelect from "@/components/CitySelect";
+import CityAutocomplete from "@/components/CityAutocomplete";
 import {
   type EventDay,
 } from "@/lib/events/types";
@@ -60,7 +60,7 @@ type MyEventEventFormProps = {
 export const emptyMyEventFormValues: MyEventEventFormValues = {
   title: "",
   publicEventSlug: "",
-  city: "تهران",
+  city: "",
   category: "",
   place: "",
   venueTemplateId: null,
@@ -74,8 +74,8 @@ export const emptyMyEventFormValues: MyEventEventFormValues = {
 };
 
 const inputClass =
-  "w-full rounded-xl border border-white/10 bg-slate-900 px-4 py-3 outline-none focus:border-emerald-500";
-const labelClass = "mb-2 block text-sm font-bold text-slate-300";
+  "w-full rounded-xl border border-neutral-300 bg-white px-4 py-3 text-neutral-900 outline-none focus:border-emerald-500 dark:border-white/10 dark:bg-slate-900 dark:text-white";
+const labelClass = "mb-2 block text-sm font-bold text-neutral-700 dark:text-slate-300";
 
 export default function MyEventEventForm({
   organizerSlug,
@@ -281,10 +281,10 @@ export default function MyEventEventForm({
 
   if (!formData.category) {
     return (
-      <div className="max-w-2xl space-y-6 rounded-3xl border border-white/10 bg-white/5 p-6">
+      <div className="max-w-2xl space-y-6 rounded-3xl border border-neutral-200 bg-white p-6 dark:border-white/10 dark:bg-white/5">
         <div>
-          <h2 className="text-xl font-black text-white">نوع رویداد چیست؟</h2>
-          <p className="mt-2 text-sm text-slate-400">
+          <h2 className="text-xl font-black text-neutral-900 dark:text-white">نوع رویداد چیست؟</h2>
+          <p className="mt-2 text-sm text-neutral-500 dark:text-slate-400">
             ابتدا دسته را انتخاب کنید تا نمونه‌های مناسب در فرم پیشنهاد شود.
           </p>
         </div>
@@ -296,11 +296,11 @@ export default function MyEventEventForm({
                 key={cat}
                 type="button"
                 onClick={() => setFormData({ ...emptyMyEventFormValues, category: cat })}
-                className="rounded-2xl border border-white/10 bg-slate-900 p-5 text-right transition hover:border-emerald-500/50 hover:bg-emerald-500/5"
+                className="rounded-2xl border border-neutral-200 bg-neutral-50 p-5 text-right transition hover:border-emerald-500/50 hover:bg-emerald-500/5 dark:border-white/10 dark:bg-slate-900"
               >
-                <p className="text-lg font-black text-emerald-400">{cat}</p>
+                <p className="text-lg font-black text-emerald-600 dark:text-emerald-400">{cat}</p>
                 {ex ? (
-                  <p className="mt-2 text-xs leading-6 text-slate-500">
+                  <p className="mt-2 text-xs leading-6 text-neutral-400 dark:text-slate-500">
                     مثال: {ex.title}
                   </p>
                 ) : null}
@@ -321,17 +321,17 @@ export default function MyEventEventForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className="max-w-2xl space-y-5 rounded-3xl border border-white/10 bg-white/5 p-6"
+      className="max-w-2xl space-y-5 rounded-3xl border border-neutral-200 bg-white p-6 dark:border-white/10 dark:bg-white/5"
     >
       <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-3">
         <div>
-          <p className="text-xs text-emerald-300">دسته انتخاب‌شده</p>
-          <p className="font-black text-white">{formData.category}</p>
+          <p className="text-xs text-emerald-700 dark:text-emerald-300">دسته انتخاب‌شده</p>
+          <p className="font-black text-neutral-900 dark:text-white">{formData.category}</p>
         </div>
         <button
           type="button"
           onClick={() => setFormData({ ...emptyMyEventFormValues })}
-          className="text-xs font-bold text-slate-400 hover:text-white"
+          className="text-xs font-bold text-neutral-500 hover:text-neutral-900 dark:text-slate-400 dark:hover:text-white"
         >
           تغییر دسته
         </button>
@@ -340,7 +340,7 @@ export default function MyEventEventForm({
       <div>
         <label className={labelClass}>نام رویداد</label>
         {examples?.titleHint ? (
-          <p className="mb-2 text-xs text-slate-500">{examples.titleHint}</p>
+          <p className="mb-2 text-xs text-neutral-400 dark:text-slate-500">{examples.titleHint}</p>
         ) : null}
         <input
           type="text"
@@ -363,9 +363,9 @@ export default function MyEventEventForm({
 
       <div>
         <label className={labelClass}>
-          نام انگلیسی لینک رویداد <span className="text-red-400">*</span>
+          نام انگلیسی لینک رویداد <span className="text-red-500 dark:text-red-400">*</span>
         </label>
-        <p className="mb-2 text-xs text-slate-500">
+        <p className="mb-2 text-xs text-neutral-400 dark:text-slate-500">
           فقط حروف کوچک انگلیسی، عدد و خط تیره. اگر خودکار درست نشد، خودتان بنویسید.
         </p>
         <input
@@ -384,13 +384,13 @@ export default function MyEventEventForm({
           className={`${inputClass} font-mono`}
         />
         <div className="mt-3 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3">
-          <p className="text-xs font-bold text-emerald-300">پیش‌نمایش لینک صفحه اختصاصی</p>
-          <p className="mt-1 font-mono text-sm text-white" dir="ltr">
+          <p className="text-xs font-bold text-emerald-700 dark:text-emerald-300">پیش‌نمایش لینک صفحه اختصاصی</p>
+          <p className="mt-1 font-mono text-sm text-neutral-900 dark:text-white" dir="ltr">
             {linkPreview}
           </p>
-          <p className="mt-2 text-xs text-slate-500">
+          <p className="mt-2 text-xs text-neutral-400 dark:text-slate-500">
             فعلاً روی لوکال:{" "}
-            <span className="text-slate-400">
+            <span className="text-neutral-500 dark:text-slate-400">
               localhost:3000/sites/{organizerSlug}/
               {formData.publicEventSlug || "..."}
             </span>
@@ -401,9 +401,10 @@ export default function MyEventEventForm({
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
           <label className={labelClass}>شهر</label>
-          <CitySelect
+          <CityAutocomplete
+            required
             value={formData.city}
-            className={inputClass}
+            className="w-full rounded-xl border border-neutral-300 bg-white py-3 pr-10 pl-9 text-neutral-900 outline-none focus:border-emerald-500 dark:border-white/10 dark:bg-slate-900 dark:text-white"
             onChange={(city) =>
               setFormData((prev) => ({
                 ...prev,
@@ -445,7 +446,7 @@ export default function MyEventEventForm({
 
       <div>
         <label className={labelClass}>
-          تصویر رویداد <span className="text-red-400">*</span>
+          تصویر رویداد <span className="text-red-500 dark:text-red-400">*</span>
         </label>
         <div className="mb-4 flex flex-wrap items-center gap-3">
           <input
@@ -459,7 +460,7 @@ export default function MyEventEventForm({
             type="button"
             onClick={() => fileInputRef.current?.click()}
             disabled={imageProcessing}
-            className="inline-flex items-center gap-2 rounded-xl border border-dashed border-white/20 bg-slate-900 px-4 py-3 text-sm font-bold text-slate-200 transition hover:border-emerald-500/50 disabled:opacity-60"
+            className="inline-flex items-center gap-2 rounded-xl border border-dashed border-neutral-300 bg-neutral-50 px-4 py-3 text-sm font-bold text-neutral-700 transition hover:border-emerald-500/50 disabled:opacity-60 dark:border-white/20 dark:bg-slate-900 dark:text-slate-200"
           >
             <Upload className="h-4 w-4" />
             {imageProcessing ? "در حال پردازش تصویر..." : "آپلود از کامپیوتر"}
@@ -471,21 +472,21 @@ export default function MyEventEventForm({
                 handleImageSelect(null);
                 if (fileInputRef.current) fileInputRef.current.value = "";
               }}
-              className="inline-flex items-center gap-1 text-sm font-bold text-red-400 hover:text-red-300"
+              className="inline-flex items-center gap-1 text-sm font-bold text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300"
             >
               <X className="h-4 w-4" />
               حذف فایل
             </button>
           ) : null}
         </div>
-        <p className="mb-3 text-xs leading-6 text-slate-500">{EVENT_IMAGE_RECOMMENDED_TEXT}</p>
+        <p className="mb-3 text-xs leading-6 text-neutral-400 dark:text-slate-500">{EVENT_IMAGE_RECOMMENDED_TEXT}</p>
         {previewImageUrl ? (
           <EventImagePreviews
             imageUrl={previewImageUrl}
             title={formData.title || "نام رویداد"}
           />
         ) : (
-          <div className="flex h-40 items-center justify-center rounded-2xl bg-slate-900 text-sm text-slate-500">
+          <div className="flex h-40 items-center justify-center rounded-2xl bg-neutral-100 text-sm text-neutral-400 dark:bg-slate-900 dark:text-slate-500">
             تصویری انتخاب نشده
           </div>
         )}
@@ -494,7 +495,7 @@ export default function MyEventEventForm({
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
           <label className={labelClass}>از تاریخ</label>
-          <div className="rounded-xl border border-white/10 bg-slate-900 p-2 focus-within:border-emerald-500">
+          <div className="rounded-xl border border-neutral-300 bg-white p-2 focus-within:border-emerald-500 dark:border-white/10 dark:bg-slate-900">
             <DatePicker
               value={startPickerValue}
               onChange={(date) => setStartPickerValue(date as DateObject)}
@@ -502,14 +503,14 @@ export default function MyEventEventForm({
               locale={persian_fa}
               calendarPosition="bottom-right"
               format="YYYY/MM/DD"
-              inputClass="w-full bg-transparent p-2 text-white outline-none"
+              inputClass="w-full bg-transparent p-2 text-neutral-900 outline-none dark:text-white"
               placeholder="انتخاب تاریخ شروع"
             />
           </div>
         </div>
         <div>
           <label className={labelClass}>تا تاریخ</label>
-          <div className="rounded-xl border border-white/10 bg-slate-900 p-2 focus-within:border-emerald-500">
+          <div className="rounded-xl border border-neutral-300 bg-white p-2 focus-within:border-emerald-500 dark:border-white/10 dark:bg-slate-900">
             <DatePicker
               value={endPickerValue}
               onChange={(date) => setEndPickerValue(date as DateObject)}
@@ -517,40 +518,40 @@ export default function MyEventEventForm({
               locale={persian_fa}
               calendarPosition="bottom-right"
               format="YYYY/MM/DD"
-              inputClass="w-full bg-transparent p-2 text-white outline-none"
+              inputClass="w-full bg-transparent p-2 text-neutral-900 outline-none dark:text-white"
               placeholder="انتخاب تاریخ پایان"
             />
           </div>
         </div>
       </div>
 
-      <div className="space-y-4 rounded-2xl border border-white/10 bg-slate-900/50 p-4">
-        <h2 className="text-lg font-bold text-slate-200">زمان‌بندی سانس‌ها</h2>
+      <div className="space-y-4 rounded-2xl border border-neutral-200 bg-neutral-50 p-4 dark:border-white/10 dark:bg-slate-900/50">
+        <h2 className="text-lg font-bold text-neutral-800 dark:text-slate-200">زمان‌بندی سانس‌ها</h2>
         {formData.days.length === 0 ? (
-          <p className="text-sm text-slate-500">ابتدا بازه تاریخ را از تقویم شمسی انتخاب کنید.</p>
+          <p className="text-sm text-neutral-400 dark:text-slate-500">ابتدا بازه تاریخ را از تقویم شمسی انتخاب کنید.</p>
         ) : null}
         {formData.days.map((day, dayIndex) => (
           <div
             key={day.date}
-            className="relative space-y-3 rounded-xl border border-white/10 bg-slate-900 p-4"
+            className="relative space-y-3 rounded-xl border border-neutral-200 bg-white p-4 dark:border-white/10 dark:bg-slate-900"
           >
             <button
               type="button"
               onClick={() => removeDay(dayIndex)}
-              className="absolute left-3 top-3 text-red-400 hover:text-red-300"
+              className="absolute left-3 top-3 text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300"
               title="حذف این روز"
             >
               ✕
             </button>
             <div className="flex flex-wrap items-center gap-4">
-              <span className="text-sm font-bold text-slate-300">تاریخ:</span>
-              <span className="rounded-lg bg-slate-800 px-3 py-2 text-sm text-slate-200" dir="ltr">
+              <span className="text-sm font-bold text-neutral-700 dark:text-slate-300">تاریخ:</span>
+              <span className="rounded-lg bg-neutral-100 px-3 py-2 text-sm text-neutral-700 dark:bg-slate-800 dark:text-slate-200" dir="ltr">
                 {day.date}
               </span>
               <button
                 type="button"
                 onClick={() => addSession(dayIndex)}
-                className="mr-auto text-xs font-bold text-emerald-400 hover:text-emerald-300"
+                className="mr-auto text-xs font-bold text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300"
               >
                 + اضافه کردن سانس
               </button>
@@ -559,9 +560,9 @@ export default function MyEventEventForm({
               {day.sessions.map((session, sessionIndex) => (
                 <div
                   key={`${day.date}-${sessionIndex}`}
-                  className="flex items-center gap-3 rounded-lg bg-slate-800/80 p-3"
+                  className="flex items-center gap-3 rounded-lg bg-neutral-100 p-3 dark:bg-slate-800/80"
                 >
-                  <span className="text-xs font-bold text-slate-400">
+                  <span className="text-xs font-bold text-neutral-500 dark:text-slate-400">
                     سانس {sessionIndex + 1}
                   </span>
                   <input
@@ -571,14 +572,14 @@ export default function MyEventEventForm({
                     onChange={(e) =>
                       updateSessionTime(dayIndex, sessionIndex, e.target.value)
                     }
-                    className="rounded-lg border border-white/10 bg-slate-900 px-3 py-2 text-sm text-white outline-none focus:border-emerald-500"
+                    className="rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 outline-none focus:border-emerald-500 dark:border-white/10 dark:bg-slate-900 dark:text-white"
                     dir="ltr"
                   />
                   {day.sessions.length > 1 ? (
                     <button
                       type="button"
                       onClick={() => removeSession(dayIndex, sessionIndex)}
-                      className="text-xs font-bold text-red-400 hover:text-red-300"
+                      className="text-xs font-bold text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300"
                     >
                       حذف
                     </button>
@@ -599,7 +600,7 @@ export default function MyEventEventForm({
             className={`rounded-xl px-4 py-2 text-sm font-bold transition ${
               formData.hasAssignedSeating === true
                 ? "bg-emerald-600 text-white"
-                : "border border-white/10 bg-slate-900 text-slate-300"
+                : "border border-neutral-300 bg-white text-neutral-700 dark:border-white/10 dark:bg-slate-900 dark:text-slate-300"
             }`}
           >
             بله، صندلی مشخص
@@ -610,7 +611,7 @@ export default function MyEventEventForm({
             className={`rounded-xl px-4 py-2 text-sm font-bold transition ${
               formData.hasAssignedSeating === false
                 ? "bg-emerald-600 text-white"
-                : "border border-white/10 bg-slate-900 text-slate-300"
+                : "border border-neutral-300 bg-white text-neutral-700 dark:border-white/10 dark:bg-slate-900 dark:text-slate-300"
             }`}
           >
             خیر، بدون صندلی ثابت
@@ -619,13 +620,13 @@ export default function MyEventEventForm({
         {formData.hasAssignedSeating === true ? (
           <div className="mt-4 rounded-xl border border-violet-500/30 bg-violet-500/10 p-4">
             {usesLinkedVenue ? (
-              <p className="text-sm leading-7 text-emerald-200">
+              <p className="text-sm leading-7 text-emerald-700 dark:text-emerald-200">
                 {MY_EVENT_LINKED_VENUE_SEATING_HINT}
               </p>
             ) : eventId && eventApproved ? (
               <div className="space-y-3">
                 {hasSeatingPlan ? (
-                  <p className="text-sm font-bold text-emerald-300">
+                  <p className="text-sm font-bold text-emerald-700 dark:text-emerald-300">
                     ✓ صحنه و نقشه صندلی‌ها تعریف شده است.
                   </p>
                 ) : null}
@@ -637,7 +638,7 @@ export default function MyEventEventForm({
                 </Link>
               </div>
             ) : (
-              <p className="text-sm leading-7 text-violet-200">
+              <p className="text-sm leading-7 text-violet-700 dark:text-violet-200">
                 {MY_EVENT_SEATING_AFTER_APPROVAL_HINT}
               </p>
             )}
@@ -647,15 +648,15 @@ export default function MyEventEventForm({
 
       <div>
         <p className={labelClass}>کانال‌های انتشار</p>
-        <p className="mb-3 text-xs text-slate-500">
+        <p className="mb-3 text-xs text-neutral-400 dark:text-slate-500">
           می‌توانید هر دو را با هم انتخاب کنید. هر کانال پس از تأیید جداگانه ادمین فعال می‌شود.
         </p>
         <div className="space-y-2">
           <label className="flex cursor-not-allowed items-center gap-3 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3">
             <input type="checkbox" checked readOnly className="h-4 w-4 accent-emerald-500" />
-            <span className="text-sm font-bold text-emerald-200">صفحه اختصاصی My Event</span>
+            <span className="text-sm font-bold text-emerald-700 dark:text-emerald-200">صفحه اختصاصی My Event</span>
           </label>
-          <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-white/10 bg-slate-900 px-4 py-3 hover:border-emerald-500/30">
+          <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-neutral-300 bg-white px-4 py-3 hover:border-emerald-500/40 dark:border-white/10 dark:bg-slate-900 dark:hover:border-emerald-500/30">
             <input
               type="checkbox"
               checked={formData.listOnBilitmall}
@@ -664,7 +665,7 @@ export default function MyEventEventForm({
               }
               className="h-4 w-4 accent-emerald-500"
             />
-            <span className="text-sm font-bold text-slate-200">انتشار در سایت بلیت‌مال</span>
+            <span className="text-sm font-bold text-neutral-700 dark:text-slate-200">انتشار در سایت بلیت‌مال</span>
           </label>
         </div>
       </div>
@@ -683,7 +684,7 @@ export default function MyEventEventForm({
       <button
         type="submit"
         disabled={loading}
-        className="w-full rounded-xl bg-emerald-600 py-3 font-black hover:bg-emerald-500 disabled:opacity-60"
+        className="w-full rounded-xl bg-emerald-600 py-3 font-black text-white hover:bg-emerald-500 disabled:opacity-60"
       >
         {loading ? "در حال ذخیره..." : submitLabel}
       </button>

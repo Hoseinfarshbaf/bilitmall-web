@@ -50,7 +50,7 @@ const BILITMALL_FILTER_OPTIONS: { value: BilitmallFilter; label: string }[] = [
 ];
 
 const inputClass =
-  "w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm outline-none focus:border-emerald-500";
+  "w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 outline-none focus:border-emerald-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100";
 
 function matchesEventStatusFilter(event: EventRow, filter: EventStatusFilter): boolean {
   if (filter === "all") return true;
@@ -238,19 +238,22 @@ export default function AdminMyEventEventsPage() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-50 p-4 md:p-8" dir="rtl">
+    <main
+      className="min-h-screen bg-slate-50 p-4 text-slate-900 md:p-8 dark:bg-slate-950 dark:text-slate-100"
+      dir="rtl"
+    >
       <div className="mx-auto max-w-6xl">
-        <Link href="/admin/my-event" className="mb-4 inline-block text-sm font-bold text-emerald-600">
+        <Link href="/admin/my-event" className="mb-4 inline-block text-sm font-bold text-emerald-600 dark:text-emerald-400">
           ← برگزارکنندگان
         </Link>
-        <h1 className="text-3xl font-black text-slate-800">رویدادهای My Event</h1>
-        <p className="mt-2 text-sm text-slate-500">
+        <h1 className="text-3xl font-black text-slate-800 dark:text-slate-100">رویدادهای My Event</h1>
+        <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
           تأیید صفحه اختصاصی و/یا انتشار در بلیت‌مال — هر کانال جداگانه
         </p>
 
-        <div className="mt-6 grid gap-3 rounded-2xl bg-white p-4 shadow-sm md:grid-cols-3">
+        <div className="mt-6 grid gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm md:grid-cols-3 dark:border-slate-800 dark:bg-slate-900">
           <div className="md:col-span-3">
-            <label className="mb-1 block text-xs font-bold text-slate-500">جستجو</label>
+            <label className="mb-1 block text-xs font-bold text-slate-500 dark:text-slate-400">جستجو</label>
             <input
               type="search"
               value={search}
@@ -260,7 +263,7 @@ export default function AdminMyEventEventsPage() {
             />
           </div>
           <div>
-            <label className="mb-1 block text-xs font-bold text-slate-500">وضعیت رویداد</label>
+            <label className="mb-1 block text-xs font-bold text-slate-500 dark:text-slate-400">وضعیت رویداد</label>
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value as EventStatusFilter)}
@@ -274,7 +277,7 @@ export default function AdminMyEventEventsPage() {
             </select>
           </div>
           <div>
-            <label className="mb-1 block text-xs font-bold text-slate-500">انتشار در بلیت‌مال</label>
+            <label className="mb-1 block text-xs font-bold text-slate-500 dark:text-slate-400">انتشار در بلیت‌مال</label>
             <select
               value={bilitmallFilter}
               onChange={(e) => setBilitmallFilter(e.target.value as BilitmallFilter)}
@@ -289,22 +292,22 @@ export default function AdminMyEventEventsPage() {
           </div>
         </div>
 
-        <p className="mt-3 text-xs text-slate-500">
+        <p className="mt-3 text-xs text-slate-500 dark:text-slate-400">
           {loading
             ? "در حال بارگذاری..."
             : `${filteredEvents.length} از ${events.length} رویداد`}
         </p>
 
-        <div className="mt-4 overflow-x-auto rounded-3xl bg-white shadow-sm">
+        <div className="mt-4 overflow-x-auto rounded-3xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
           {loading ? (
-            <p className="p-8 text-center text-slate-500">در حال بارگذاری...</p>
+            <p className="p-8 text-center text-slate-500 dark:text-slate-400">در حال بارگذاری...</p>
           ) : events.length === 0 ? (
-            <p className="p-8 text-center text-slate-500">رویدادی ثبت نشده.</p>
+            <p className="p-8 text-center text-slate-500 dark:text-slate-400">رویدادی ثبت نشده.</p>
           ) : filteredEvents.length === 0 ? (
-            <p className="p-8 text-center text-slate-500">نتیجه‌ای با این فیلتر یافت نشد.</p>
+            <p className="p-8 text-center text-slate-500 dark:text-slate-400">نتیجه‌ای با این فیلتر یافت نشد.</p>
           ) : (
             <table className="min-w-full text-sm">
-              <thead className="bg-slate-50 text-slate-600">
+              <thead className="bg-slate-50 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
                 <tr>
                   <th className="px-4 py-3 text-right font-bold">رویداد</th>
                   <th className="px-4 py-3 text-right font-bold">برگزارکننده</th>
@@ -316,19 +319,19 @@ export default function AdminMyEventEventsPage() {
               </thead>
               <tbody>
                 {filteredEvents.map((event) => (
-                  <tr key={event.id} className="border-t border-slate-100">
+                  <tr key={event.id} className="border-t border-slate-100 dark:border-slate-800">
                     <td className="px-4 py-4">
                       <div className="font-bold">{event.title}</div>
-                      <div className="text-xs text-slate-500">{event.city}</div>
+                      <div className="text-xs text-slate-500 dark:text-slate-400">{event.city}</div>
                     </td>
                     <td className="px-4 py-4">
                       {event.organizer ? (
                         <>
                           <div className="font-bold">{event.organizer.displayName}</div>
-                          <div className="text-xs text-slate-500" dir="ltr">
+                          <div className="text-xs text-slate-500 dark:text-slate-400" dir="ltr">
                             {event.organizer.phone ?? "—"}
                           </div>
-                          <div className="text-xs text-slate-400">
+                          <div className="text-xs text-slate-400 dark:text-slate-500">
                             {MY_EVENT_STATUS_LABELS[event.organizer.status] ?? event.organizer.status}
                           </div>
                         </>
@@ -336,12 +339,12 @@ export default function AdminMyEventEventsPage() {
                         "—"
                       )}
                     </td>
-                    <td className="px-4 py-4 text-xs text-slate-600 whitespace-nowrap">
+                    <td className="px-4 py-4 text-xs text-slate-600 whitespace-nowrap dark:text-slate-400">
                       {formatAdminDateTime(event.createdAt)}
                     </td>
                     <td className="px-4 py-4 text-xs">
                       <div>صفحه اختصاصی ✓</div>
-                      <div className={event.listOnBilitmallRequested ? "text-amber-700" : "text-slate-400"}>
+                      <div className={event.listOnBilitmallRequested ? "text-amber-700 dark:text-amber-400" : "text-slate-400 dark:text-slate-500"}>
                         بلیت‌مال:{" "}
                         {event.listOnBilitmallRequested
                           ? event.listOnBilitmallApproved
@@ -354,10 +357,10 @@ export default function AdminMyEventEventsPage() {
                       <span
                         className={`rounded-full px-2 py-1 text-xs font-bold ${
                           event.status === "active"
-                            ? "bg-green-100 text-green-700"
+                            ? "bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-300"
                             : event.status === "pending"
-                              ? "bg-amber-100 text-amber-700"
-                              : "bg-red-100 text-red-700"
+                              ? "bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300"
+                              : "bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-300"
                         }`}
                       >
                         {MY_EVENT_EVENT_STATUS_LABELS[event.status] ?? event.status}
@@ -370,14 +373,14 @@ export default function AdminMyEventEventsPage() {
                             <button
                               type="button"
                               onClick={() => openApproveModal(event)}
-                              className="rounded-lg bg-green-50 px-3 py-1 text-xs font-bold text-green-700"
+                              className="rounded-lg bg-green-50 px-3 py-1 text-xs font-bold text-green-700 dark:bg-green-500/15 dark:text-green-300"
                             >
                               تأیید / انتخاب کانال
                             </button>
                             <button
                               type="button"
                               onClick={() => handleReject(event.id)}
-                              className="rounded-lg bg-red-50 px-3 py-1 text-xs font-bold text-red-700"
+                              className="rounded-lg bg-red-50 px-3 py-1 text-xs font-bold text-red-700 dark:bg-red-500/15 dark:text-red-300"
                             >
                               رد
                             </button>
@@ -389,7 +392,7 @@ export default function AdminMyEventEventsPage() {
                           <button
                             type="button"
                             onClick={() => approveBilitmallOnly(event.id)}
-                            className="rounded-lg bg-red-50 px-3 py-1 text-xs font-bold text-red-700"
+                            className="rounded-lg bg-red-50 px-3 py-1 text-xs font-bold text-red-700 dark:bg-red-500/15 dark:text-red-300"
                           >
                             تأیید بلیت‌مال
                           </button>
@@ -402,7 +405,7 @@ export default function AdminMyEventEventsPage() {
                             )}
                             target="_blank"
                             rel="noreferrer"
-                            className="rounded-lg bg-slate-50 px-3 py-1 text-xs font-bold text-slate-700"
+                            className="rounded-lg bg-slate-50 px-3 py-1 text-xs font-bold text-slate-700 dark:bg-slate-800 dark:text-slate-200"
                           >
                             مشاهده لینک
                           </a>
@@ -411,7 +414,7 @@ export default function AdminMyEventEventsPage() {
                           <button
                             type="button"
                             onClick={() => handleRemoveFromBilitmall(event.id)}
-                            className="rounded-lg bg-amber-50 px-3 py-1 text-xs font-bold text-amber-800"
+                            className="rounded-lg bg-amber-50 px-3 py-1 text-xs font-bold text-amber-800 dark:bg-amber-500/15 dark:text-amber-300"
                           >
                             حذف از بلیت‌مال
                           </button>
@@ -420,7 +423,7 @@ export default function AdminMyEventEventsPage() {
                           <button
                             type="button"
                             onClick={() => handleDeleteEvent(event.id)}
-                            className="rounded-lg bg-red-50 px-3 py-1 text-xs font-bold text-red-700"
+                            className="rounded-lg bg-red-50 px-3 py-1 text-xs font-bold text-red-700 dark:bg-red-500/15 dark:text-red-300"
                           >
                             حذف کامل رویداد
                           </button>
@@ -439,12 +442,12 @@ export default function AdminMyEventEventsPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
           <form
             onSubmit={submitApprove}
-            className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl"
+            className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl dark:bg-slate-900 dark:text-slate-100"
           >
             <h2 className="text-lg font-black">تأیید «{approving.title}»</h2>
-            <p className="mt-2 text-xs text-slate-500">کانال‌هایی که می‌خواهید فعال شوند:</p>
+            <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">کانال‌هایی که می‌خواهید فعال شوند:</p>
             <div className="mt-4 space-y-3">
-              <label className="flex items-center gap-3 rounded-xl border border-slate-200 p-3">
+              <label className="flex items-center gap-3 rounded-xl border border-slate-200 p-3 dark:border-slate-700">
                 <input
                   type="checkbox"
                   checked={approvePage}
@@ -454,7 +457,7 @@ export default function AdminMyEventEventsPage() {
                 <span className="text-sm font-bold">صفحه اختصاصی (لینک My Event)</span>
               </label>
               {approving.listOnBilitmallRequested ? (
-                <label className="flex items-center gap-3 rounded-xl border border-slate-200 p-3">
+                <label className="flex items-center gap-3 rounded-xl border border-slate-200 p-3 dark:border-slate-700">
                   <input
                     type="checkbox"
                     checked={approveBilitmall}
@@ -464,7 +467,7 @@ export default function AdminMyEventEventsPage() {
                   <span className="text-sm font-bold">انتشار در سایت بلیت‌مال</span>
                 </label>
               ) : (
-                <p className="text-xs text-slate-400">درخواست انتشار در بلیت‌مال ثبت نشده.</p>
+                <p className="text-xs text-slate-400 dark:text-slate-500">درخواست انتشار در بلیت‌مال ثبت نشده.</p>
               )}
             </div>
             <div className="mt-6 flex gap-2">
@@ -478,7 +481,7 @@ export default function AdminMyEventEventsPage() {
               <button
                 type="button"
                 onClick={() => setApproving(null)}
-                className="rounded-xl border border-slate-200 px-4 py-2 text-sm font-bold"
+                className="rounded-xl border border-slate-200 px-4 py-2 text-sm font-bold dark:border-slate-700"
               >
                 انصراف
               </button>

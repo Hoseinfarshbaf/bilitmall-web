@@ -84,8 +84,6 @@ const CategorySlider = ({
     el.scrollLeft = -(sectionWidth * 2);
   }, [visibleData, isInfiniteDesktop]);
 
-  if (!visibleData || visibleData.length === 0) return null;
-
   const handleScroll = () => {
     const el = scrollRef.current;
     if (!el || !isInfiniteDesktop) return;
@@ -115,6 +113,8 @@ const CategorySlider = ({
     el.style.scrollBehavior = "smooth";
     el.scrollBy({ left: direction === "left" ? -cardWidth : cardWidth });
   }, []);
+
+  if (!visibleData || visibleData.length === 0) return null;
 
   const displayTitle = buildDisplayTitle(categoryLabel, variant);
   const subtitle = buildSubtitle(cityName, categoryLabel, variant);

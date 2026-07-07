@@ -64,24 +64,27 @@ export default function AdminBilitmallListingsPage() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-50 p-4 md:p-8" dir="rtl">
+    <main
+      className="min-h-screen bg-slate-50 p-4 text-slate-900 md:p-8 dark:bg-slate-950 dark:text-slate-100"
+      dir="rtl"
+    >
       <div className="mx-auto max-w-6xl">
-        <Link href="/admin" className="mb-4 inline-block text-sm font-bold text-blue-600">
+        <Link href="/admin" className="mb-4 inline-block text-sm font-bold text-blue-600 dark:text-blue-400">
           ← بازگشت به پنل
         </Link>
-        <h1 className="text-3xl font-black text-slate-800">درخواست انتشار در بلیت‌مال</h1>
-        <p className="mt-2 text-sm text-slate-500">
+        <h1 className="text-3xl font-black text-slate-800 dark:text-slate-100">درخواست انتشار در بلیت‌مال</h1>
+        <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
           رویدادهایی که برگزارکننده خواسته در مارکت‌پلیس بلیت‌مال نمایش داده شوند
         </p>
 
-        <div className="mt-8 overflow-hidden rounded-3xl bg-white shadow-sm">
+        <div className="mt-8 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
           {loading ? (
-            <p className="p-8 text-center text-slate-500">در حال بارگذاری...</p>
+            <p className="p-8 text-center text-slate-500 dark:text-slate-400">در حال بارگذاری...</p>
           ) : events.length === 0 ? (
-            <p className="p-8 text-center text-slate-500">درخواستی ثبت نشده.</p>
+            <p className="p-8 text-center text-slate-500 dark:text-slate-400">درخواستی ثبت نشده.</p>
           ) : (
             <table className="min-w-full text-sm">
-              <thead className="bg-slate-50 text-slate-600">
+              <thead className="bg-slate-50 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
                 <tr>
                   <th className="px-4 py-3 text-right font-bold">رویداد</th>
                   <th className="px-4 py-3 text-right font-bold">برگزارکننده</th>
@@ -92,16 +95,16 @@ export default function AdminBilitmallListingsPage() {
               </thead>
               <tbody>
                 {events.map((event) => (
-                  <tr key={event.id} className="border-t border-slate-100">
+                  <tr key={event.id} className="border-t border-slate-100 dark:border-slate-800">
                     <td className="px-4 py-4">
                       <div className="font-bold">{event.title}</div>
-                      <div className="text-xs text-slate-500">
+                      <div className="text-xs text-slate-500 dark:text-slate-400">
                         {event.category} — {event.city}
                       </div>
                     </td>
                     <td className="px-4 py-4">
                       <div className="font-bold">{event.organizer?.displayName ?? "—"}</div>
-                      <div className="text-xs text-slate-500" dir="ltr">
+                      <div className="text-xs text-slate-500 dark:text-slate-400" dir="ltr">
                         {event.organizer?.phone ?? ""}
                       </div>
                     </td>
@@ -112,8 +115,8 @@ export default function AdminBilitmallListingsPage() {
                       <span
                         className={`rounded-full px-2 py-1 text-xs font-bold ${
                           event.listOnBilitmallApproved
-                            ? "bg-green-100 text-green-700"
-                            : "bg-amber-100 text-amber-700"
+                            ? "bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-300"
+                            : "bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300"
                         }`}
                       >
                         {event.listOnBilitmallApproved
@@ -128,7 +131,7 @@ export default function AdminBilitmallListingsPage() {
                             type="button"
                             onClick={() => handleAction(event.id, "approve")}
                             disabled={event.status !== "active" || !event.published}
-                            className="rounded-lg bg-green-50 px-3 py-1 text-xs font-bold text-green-700 disabled:opacity-40"
+                            className="rounded-lg bg-green-50 px-3 py-1 text-xs font-bold text-green-700 disabled:opacity-40 dark:bg-green-500/15 dark:text-green-300"
                             title={
                               event.status !== "active"
                                 ? "ابتدا رویداد در My Event تأیید شود"
@@ -140,13 +143,13 @@ export default function AdminBilitmallListingsPage() {
                           <button
                             type="button"
                             onClick={() => handleAction(event.id, "reject")}
-                            className="rounded-lg bg-red-50 px-3 py-1 text-xs font-bold text-red-700"
+                            className="rounded-lg bg-red-50 px-3 py-1 text-xs font-bold text-red-700 dark:bg-red-500/15 dark:text-red-300"
                           >
                             رد
                           </button>
                         </div>
                       ) : (
-                        <span className="text-xs text-green-600">منتشر شده</span>
+                        <span className="text-xs text-green-600 dark:text-green-400">منتشر شده</span>
                       )}
                     </td>
                   </tr>

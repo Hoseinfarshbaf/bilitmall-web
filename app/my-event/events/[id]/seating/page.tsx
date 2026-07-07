@@ -79,7 +79,7 @@ export default function MyEventSeatingPage({
   if (loading) {
     return (
       <MyEventShell>
-        <p className="text-slate-400">در حال بارگذاری نقشه سالن...</p>
+        <p className="text-neutral-500 dark:text-slate-400">در حال بارگذاری نقشه سالن...</p>
       </MyEventShell>
     );
   }
@@ -88,10 +88,10 @@ export default function MyEventSeatingPage({
     return (
       <MyEventShell title="ساخت صحنه">
         <div className="max-w-xl space-y-4 rounded-3xl border border-violet-500/30 bg-violet-500/10 p-6">
-          <p className="text-sm leading-7 text-violet-200">{blocked}</p>
+          <p className="text-sm leading-7 text-violet-700 dark:text-violet-200">{blocked}</p>
           <Link
             href="/my-event/dashboard"
-            className="inline-block rounded-xl bg-emerald-600 px-4 py-2 text-sm font-bold"
+            className="inline-block rounded-xl bg-emerald-600 px-4 py-2 text-sm font-bold text-white"
           >
             بازگشت به داشبورد
           </Link>
@@ -103,7 +103,7 @@ export default function MyEventSeatingPage({
   if (!layout) {
     return (
       <MyEventShell>
-        <p className="text-slate-400">خطا در بارگذاری نقشه سالن.</p>
+        <p className="text-neutral-500 dark:text-slate-400">خطا در بارگذاری نقشه سالن.</p>
       </MyEventShell>
     );
   }
@@ -111,21 +111,21 @@ export default function MyEventSeatingPage({
   return (
     <MyEventShell title={`ساخت صحنه — ${eventTitle}`}>
       {hasSeatingPlan ? (
-        <p className="mb-4 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm font-bold text-emerald-200">
+        <p className="mb-4 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm font-bold text-emerald-700 dark:text-emerald-200">
           ✓ صحنه تعریف شده — برای تغییر نقشه، ویرایش کنید و دوباره ذخیره بزنید.
         </p>
       ) : null}
       {message ? (
-        <p className="mb-4 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200">
+        <p className="mb-4 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-700 dark:text-emerald-200">
           {message}
         </p>
       ) : null}
-      <p className="mb-6 text-sm text-slate-400">
+      <p className="mb-6 text-sm text-neutral-500 dark:text-slate-400">
         روی «ورود به استودیو طراحی» کلیک کنید تا صحنه، بالکن‌ها و صندلی‌ها را با شماره ردیف مشخص
         طراحی کنید.
       </p>
       {linkedVenue && !hasSeatingPlan ? (
-        <p className="mb-4 rounded-xl border border-blue-500/30 bg-blue-500/10 px-4 py-3 text-sm text-blue-200">
+        <p className="mb-4 rounded-xl border border-blue-500/30 bg-blue-500/10 px-4 py-3 text-sm text-blue-700 dark:text-blue-200">
           نقشه اولیه از سالن «{linkedVenue.name}» بارگذاری شده — در صورت نیاز می‌توانید ویرایش کنید.
         </p>
       ) : null}
@@ -136,7 +136,7 @@ export default function MyEventSeatingPage({
       />
       <Link
         href={eventId != null ? `/my-event/events/${eventId}/edit` : "/my-event/dashboard"}
-        className="mt-6 inline-block text-sm font-bold text-slate-400 hover:text-white"
+        className="mt-6 inline-block text-sm font-bold text-neutral-500 hover:text-neutral-900 dark:text-slate-400 dark:hover:text-white"
       >
         ← بازگشت به ویرایش رویداد
       </Link>

@@ -59,7 +59,7 @@ export default function MyEventDashboardPage() {
   if (loading) {
     return (
       <MyEventShell>
-        <p className="text-slate-400">در حال بارگذاری...</p>
+        <p className="text-neutral-500 dark:text-slate-400">در حال بارگذاری...</p>
       </MyEventShell>
     );
   }
@@ -74,8 +74,8 @@ export default function MyEventDashboardPage() {
     <MyEventShell title={`سلام، ${profile.displayName}`}>
       {profile.status === "pending" ? (
         <div className="mb-6 rounded-3xl border border-amber-500/30 bg-amber-500/10 p-5">
-          <p className="font-bold text-amber-200">حساب شما در انتظار تأیید ادمین است</p>
-          <p className="mt-2 text-sm text-slate-300">
+          <p className="font-bold text-amber-700 dark:text-amber-200">حساب شما در انتظار تأیید ادمین است</p>
+          <p className="mt-2 text-sm text-neutral-600 dark:text-slate-300">
             پس از تأیید می‌توانید رویداد ثبت کنید.
           </p>
         </div>
@@ -83,19 +83,19 @@ export default function MyEventDashboardPage() {
 
       {isOrganizerLive ? (
         <div className="mb-8 rounded-3xl border border-emerald-500/30 bg-emerald-500/10 p-6">
-          <p className="text-sm font-bold text-emerald-200">لینک صفحه شما</p>
+          <p className="text-sm font-bold text-emerald-700 dark:text-emerald-200">لینک صفحه شما</p>
           <a
             href={publicUrl}
             target="_blank"
             rel="noreferrer"
-            className="mt-2 block text-lg font-black text-white"
+            className="mt-2 block text-lg font-black text-neutral-900 dark:text-white"
             dir="ltr"
           >
             {publicUrl}
           </a>
         </div>
       ) : (
-        <div className="mb-8 rounded-3xl border border-white/10 bg-white/5 p-5 text-sm text-slate-400">
+        <div className="mb-8 rounded-3xl border border-neutral-200 bg-white p-5 text-sm text-neutral-500 dark:border-white/10 dark:bg-white/5 dark:text-slate-400">
           لینک صفحه پس از تأیید حساب توسط ادمین فعال می‌شود.
         </div>
       )}
@@ -104,25 +104,25 @@ export default function MyEventDashboardPage() {
         {canCreateEvents ? (
           <Link
             href="/my-event/events/new"
-            className="rounded-xl bg-emerald-600 px-5 py-3 text-sm font-black hover:bg-emerald-500"
+            className="rounded-xl bg-emerald-600 px-5 py-3 text-sm font-black text-white hover:bg-emerald-500"
           >
             + رویداد جدید
           </Link>
         ) : (
-          <span className="rounded-xl bg-white/5 px-5 py-3 text-sm font-bold text-slate-500">
+          <span className="rounded-xl bg-neutral-100 px-5 py-3 text-sm font-bold text-neutral-500 dark:bg-white/5 dark:text-slate-500">
             ثبت رویداد پس از تأیید حساب
           </span>
         )}
         <Link
           href="/my-event/profile"
-          className="rounded-xl border border-white/15 px-5 py-3 text-sm font-black hover:bg-white/5"
+          className="rounded-xl border border-neutral-200 px-5 py-3 text-sm font-black hover:bg-neutral-100 dark:border-white/15 dark:hover:bg-white/5"
         >
           ویرایش پروفایل
         </Link>
         <button
           type="button"
           onClick={handleLogout}
-          className="rounded-xl border border-white/15 px-5 py-3 text-sm font-bold text-slate-300 hover:bg-white/5"
+          className="rounded-xl border border-neutral-200 px-5 py-3 text-sm font-bold text-neutral-600 hover:bg-neutral-100 dark:border-white/15 dark:text-slate-300 dark:hover:bg-white/5"
         >
           خروج
         </button>
@@ -131,7 +131,7 @@ export default function MyEventDashboardPage() {
       <div className="space-y-4">
         <h2 className="text-xl font-black">رویدادهای شما</h2>
         {events.length === 0 ? (
-          <p className="rounded-2xl border border-white/10 bg-white/5 p-6 text-slate-400">
+          <p className="rounded-2xl border border-neutral-200 bg-white p-6 text-neutral-500 dark:border-white/10 dark:bg-white/5 dark:text-slate-400">
             هنوز رویدادی ثبت نکرده‌اید.
           </p>
         ) : (
@@ -142,22 +142,22 @@ export default function MyEventDashboardPage() {
             return (
               <div
                 key={event.id}
-                className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-white/10 bg-white/5 p-5"
+                className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-neutral-200 bg-white p-5 dark:border-white/10 dark:bg-white/5"
               >
                 <div>
-                  <h3 className="font-black text-white">{event.title}</h3>
-                  <p className="mt-1 text-sm text-slate-400">
+                  <h3 className="font-black text-neutral-900 dark:text-white">{event.title}</h3>
+                  <p className="mt-1 text-sm text-neutral-500 dark:text-slate-400">
                     {event.category} — {event.place} — {event.city}
                   </p>
-                  <p className="mt-1 text-xs text-slate-500">
+                  <p className="mt-1 text-xs text-neutral-400 dark:text-slate-500">
                     {event.hasAssignedSeating ? "صندلی مشخص" : "بدون صندلی ثابت"}
                     {event.hasAssignedSeating && usesLinkedVenue ? (
-                      <span className="text-emerald-400"> · صحنه از سالن تأییدشده</span>
+                      <span className="text-emerald-600 dark:text-emerald-400"> · صحنه از سالن تأییدشده</span>
                     ) : event.hasAssignedSeating && event.hasSeatingPlan ? (
-                      <span className="text-emerald-400"> · صحنه تعریف شده</span>
+                      <span className="text-emerald-600 dark:text-emerald-400"> · صحنه تعریف شده</span>
                     ) : null}
                     {event.hasAssignedSeating && !isApproved && !usesLinkedVenue ? (
-                      <span className="text-violet-400"> · طراحی صحنه پس از تأیید</span>
+                      <span className="text-violet-600 dark:text-violet-400"> · طراحی صحنه پس از تأیید</span>
                     ) : null}
                     {" · "}
                     {event.listOnBilitmallRequested
@@ -169,10 +169,10 @@ export default function MyEventDashboardPage() {
                   <span
                     className={`mt-2 inline-block rounded-full px-2 py-0.5 text-xs font-bold ${
                       event.status === "active"
-                        ? "bg-green-500/20 text-green-300"
+                        ? "bg-green-500/20 text-green-700 dark:text-green-300"
                         : event.status === "pending"
-                          ? "bg-amber-500/20 text-amber-300"
-                          : "bg-red-500/20 text-red-300"
+                          ? "bg-amber-500/20 text-amber-700 dark:text-amber-300"
+                          : "bg-red-500/20 text-red-700 dark:text-red-300"
                     }`}
                   >
                     {MY_EVENT_EVENT_STATUS_LABELS[event.status] ?? event.status}
@@ -182,7 +182,7 @@ export default function MyEventDashboardPage() {
                   {canDesignSeating ? (
                     <Link
                       href={`/my-event/events/${event.id}/seating`}
-                      className="rounded-xl bg-violet-600 px-4 py-2 text-sm font-bold hover:bg-violet-500"
+                      className="rounded-xl bg-violet-600 px-4 py-2 text-sm font-bold text-white hover:bg-violet-500"
                     >
                       {event.hasSeatingPlan ? "ویرایش صحنه" : "ساخت صحنه"}
                     </Link>
@@ -195,12 +195,12 @@ export default function MyEventDashboardPage() {
                       )}
                       target="_blank"
                       rel="noreferrer"
-                      className="rounded-xl bg-white/10 px-4 py-2 text-sm font-bold hover:bg-white/15"
+                      className="rounded-xl bg-neutral-100 px-4 py-2 text-sm font-bold hover:bg-neutral-200 dark:bg-white/10 dark:hover:bg-white/15"
                     >
                       مشاهده صفحه
                     </a>
                   ) : (
-                    <span className="max-w-xs rounded-xl bg-white/5 px-4 py-2 text-xs leading-6 text-slate-500">
+                    <span className="max-w-xs rounded-xl bg-neutral-100 px-4 py-2 text-xs leading-6 text-neutral-500 dark:bg-white/5 dark:text-slate-500">
                       {event.hasAssignedSeating && usesLinkedVenue
                         ? MY_EVENT_LINKED_VENUE_SEATING_HINT
                         : event.hasAssignedSeating
@@ -210,14 +210,14 @@ export default function MyEventDashboardPage() {
                   )}
                   <Link
                     href={`/my-event/events/${event.id}/edit`}
-                    className="rounded-xl border border-white/15 px-4 py-2 text-sm font-bold hover:bg-white/5"
+                    className="rounded-xl border border-neutral-200 px-4 py-2 text-sm font-bold hover:bg-neutral-100 dark:border-white/15 dark:hover:bg-white/5"
                   >
                     ویرایش
                   </Link>
                   <button
                     type="button"
                     onClick={() => handleDelete(event.id, event.title)}
-                    className="rounded-xl border border-red-500/30 px-4 py-2 text-sm font-bold text-red-300 hover:bg-red-500/10"
+                    className="rounded-xl border border-red-500/30 px-4 py-2 text-sm font-bold text-red-600 hover:bg-red-500/10 dark:text-red-300"
                   >
                     حذف
                   </button>

@@ -66,7 +66,12 @@ function buildVenueTemplateWhere(filters?: VenueListFilters, adminOnly?: boolean
 function parseVenueLayout(record: { name: string; layout: string }): SeatingLayout {
   let parsed = parseSeatingLayoutJson(record.layout);
   if (!parsed || parsed.cells.length === 0) {
-    const meta = parsed ?? { rows: 8, cols: 12, stagePosition: "top" as const };
+    const meta = parsed ?? {
+      rows: 8,
+      cols: 12,
+      stagePosition: "top" as const,
+      defaultPriceRial: 350_000,
+    };
     parsed = createEmptyLayout(
       record.name,
       meta.rows,

@@ -5,7 +5,7 @@ import DatePicker, { DateObject } from "react-multi-date-picker";
 import persian from "react-date-object/calendars/persian";
 import persian_fa from "react-date-object/locales/persian_fa";
 import { Upload, X } from "lucide-react";
-import CitySelect from "@/components/CitySelect";
+import CityAutocomplete from "@/components/CityAutocomplete";
 import {
   ADMIN_EVENT_STATUSES,
   EVENT_CATEGORIES,
@@ -23,7 +23,7 @@ import VenuePlaceAutocomplete from "@/components/venues/VenuePlaceAutocomplete";
 
 const emptyForm = (): EventFormData => ({
   title: "",
-  city: "تهران",
+  city: "",
   category: "کنسرت",
   place: "",
   placeAddress: "",
@@ -243,21 +243,21 @@ export default function EventForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       {isPastDate ? (
-        <div className="rounded-2xl border border-slate-300 bg-slate-100 px-4 py-3 text-sm text-slate-700">
+        <div className="rounded-2xl border border-slate-300 bg-slate-100 px-4 py-3 text-sm text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200">
           <span className="font-bold">تاریخ گذشته</span>
           <span className="mr-2">—</span>
           این رویداد در سایت عمومی (بنر، لیست‌ها و جستجو) نمایش داده نمی‌شود.
         </div>
       ) : null}
       <div>
-        <label className="mb-2 block text-sm font-medium text-slate-700">
+        <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
           نام رویداد
         </label>
         <input
           type="text"
           required
           value={formData.title}
-          className="w-full rounded-xl border border-slate-200 p-3 outline-none focus:border-blue-500"
+          className="w-full rounded-xl border border-slate-200 bg-white p-3 text-slate-900 outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
           placeholder="مثلاً: کنسرت همایون شجریان"
           onChange={(e) => setFormData({ ...formData, title: e.target.value })}
         />
@@ -265,10 +265,11 @@ export default function EventForm({
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div>
-          <label className="mb-2 block text-sm font-medium text-slate-700">
+          <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
             شهر
           </label>
-          <CitySelect
+          <CityAutocomplete
+            required
             value={formData.city}
             onChange={(city) =>
               setFormData({
@@ -282,11 +283,11 @@ export default function EventForm({
         </div>
 
         <div>
-          <label className="mb-2 block text-sm font-medium text-slate-700">
+          <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
             دسته‌بندی
           </label>
           <select
-            className="w-full rounded-xl border border-slate-200 p-3 outline-none focus:border-blue-500"
+            className="w-full rounded-xl border border-slate-200 bg-white p-3 text-slate-900 outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
             value={formData.category}
             onChange={(e) =>
               setFormData({ ...formData, category: e.target.value })
@@ -299,7 +300,7 @@ export default function EventForm({
             ))}
           </select>
           {formData.category === EVENT_CATEGORY_EVENT ? (
-            <p className="mt-2 text-xs text-slate-500">
+            <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
               ایونت‌ها با تیکتینگ داخلی (QR) مدیریت می‌شوند؛ کنسرت و تئاتر به لینک خارجی متصل می‌مانند.
             </p>
           ) : null}
@@ -308,7 +309,7 @@ export default function EventForm({
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div>
-          <label className="mb-2 block text-sm font-medium text-slate-700">
+          <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
             مکان برگزاری
           </label>
           <VenuePlaceAutocomplete
@@ -321,20 +322,20 @@ export default function EventForm({
               setFormData({ ...formData, place, venueTemplateId, placeAddress })
             }
             placeholder="مثلاً: سالن میلاد"
-            className="w-full rounded-xl border border-slate-200 p-3 outline-none focus:border-blue-500"
+            className="w-full rounded-xl border border-slate-200 bg-white p-3 text-slate-900 outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
             required
           />
         </div>
 
         <div>
-          <label className="mb-2 block text-sm font-medium text-slate-700">
+          <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
             قیمت
           </label>
           <input
             type="text"
             required
             value={formData.price}
-            className="w-full rounded-xl border border-slate-200 p-3 outline-none focus:border-blue-500"
+            className="w-full rounded-xl border border-slate-200 bg-white p-3 text-slate-900 outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
             placeholder="مثلاً: از ۳۵۰ هزار تومان"
             onChange={(e) => setFormData({ ...formData, price: e.target.value })}
           />
@@ -343,24 +344,24 @@ export default function EventForm({
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div>
-          <label className="mb-2 block text-sm font-medium text-slate-700">
+          <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
             برچسب (اختیاری)
           </label>
           <input
             type="text"
             value={formData.badge}
-            className="w-full rounded-xl border border-slate-200 p-3 outline-none focus:border-blue-500"
+            className="w-full rounded-xl border border-slate-200 bg-white p-3 text-slate-900 outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
             placeholder="مثلاً: پرفروش"
             onChange={(e) => setFormData({ ...formData, badge: e.target.value })}
           />
         </div>
 
         <div>
-          <label className="mb-2 block text-sm font-medium text-slate-700">
+          <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
             وضعیت
           </label>
           <select
-            className="w-full rounded-xl border border-slate-200 p-3 outline-none focus:border-blue-500"
+            className="w-full rounded-xl border border-slate-200 bg-white p-3 text-slate-900 outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
             value={formData.status}
             onChange={(e) =>
               setFormData({
@@ -379,7 +380,7 @@ export default function EventForm({
       </div>
 
       <div>
-        <label className="mb-3 block text-sm font-medium text-slate-700">
+        <label className="mb-3 block text-sm font-medium text-slate-700 dark:text-slate-300">
           تصویر رویداد <span className="text-red-500">*</span>
         </label>
 
@@ -395,7 +396,7 @@ export default function EventForm({
             type="button"
             onClick={() => fileInputRef.current?.click()}
             disabled={imageProcessing}
-            className="inline-flex items-center gap-2 rounded-xl border border-dashed border-slate-300 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-700 transition hover:border-blue-400 hover:bg-blue-50 disabled:opacity-60"
+            className="inline-flex items-center gap-2 rounded-xl border border-dashed border-slate-300 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-700 transition hover:border-blue-400 hover:bg-blue-50 disabled:opacity-60 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:border-blue-500 dark:hover:bg-slate-700"
           >
             <Upload className="h-4 w-4" />
             {imageProcessing ? "در حال پردازش تصویر..." : "آپلود از کامپیوتر"}
@@ -414,11 +415,11 @@ export default function EventForm({
             </button>
           ) : null}
           {imageFile ? (
-            <span className="text-xs text-slate-500">{imageFile.name}</span>
+            <span className="text-xs text-slate-500 dark:text-slate-400">{imageFile.name}</span>
           ) : null}
         </div>
 
-        <p className="mb-3 text-xs leading-6 text-slate-500">
+        <p className="mb-3 text-xs leading-6 text-slate-500 dark:text-slate-400">
           {EVENT_IMAGE_RECOMMENDED_TEXT}
         </p>
 
@@ -428,7 +429,7 @@ export default function EventForm({
             title={formData.title || "نام رویداد"}
           />
         ) : (
-          <div className="flex h-40 items-center justify-center rounded-2xl bg-slate-100 text-sm text-slate-500">
+          <div className="flex h-40 items-center justify-center rounded-2xl bg-slate-100 text-sm text-slate-500 dark:bg-slate-800 dark:text-slate-400">
             تصویری انتخاب نشده
           </div>
         )}
@@ -436,10 +437,10 @@ export default function EventForm({
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div>
-          <label className="mb-2 block text-sm font-medium text-slate-700">
+          <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
             از تاریخ
           </label>
-          <div className="rounded-xl border border-slate-200 p-2 focus-within:border-blue-500">
+          <div className="rounded-xl border border-slate-200 p-2 focus-within:border-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:[&_input]:text-slate-100">
             <DatePicker
               value={startPickerValue}
               onChange={(date) => setStartPickerValue(date as DateObject)}
@@ -447,17 +448,17 @@ export default function EventForm({
               locale={persian_fa}
               calendarPosition="bottom-right"
               format="YYYY/MM/DD"
-              inputClass="w-full outline-none p-2"
+              inputClass="w-full outline-none p-2 bg-transparent"
               placeholder="انتخاب تاریخ شروع"
             />
           </div>
         </div>
 
         <div>
-          <label className="mb-2 block text-sm font-medium text-slate-700">
+          <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
             تا تاریخ
           </label>
-          <div className="rounded-xl border border-slate-200 p-2 focus-within:border-blue-500">
+          <div className="rounded-xl border border-slate-200 p-2 focus-within:border-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:[&_input]:text-slate-100">
             <DatePicker
               value={endPickerValue}
               onChange={(date) => setEndPickerValue(date as DateObject)}
@@ -465,18 +466,18 @@ export default function EventForm({
               locale={persian_fa}
               calendarPosition="bottom-right"
               format="YYYY/MM/DD"
-              inputClass="w-full outline-none p-2"
+              inputClass="w-full outline-none p-2 bg-transparent"
               placeholder="انتخاب تاریخ پایان"
             />
           </div>
         </div>
       </div>
 
-      <div className="space-y-4 rounded-2xl bg-slate-100 p-4">
-        <h2 className="text-lg font-semibold text-slate-700">زمان‌بندی سانس‌ها</h2>
+      <div className="space-y-4 rounded-2xl bg-slate-100 p-4 dark:bg-slate-800/60">
+        <h2 className="text-lg font-semibold text-slate-700 dark:text-slate-200">زمان‌بندی سانس‌ها</h2>
 
         {formData.days.length === 0 && (
-          <p className="text-sm text-slate-500">
+          <p className="text-sm text-slate-500 dark:text-slate-400">
             ابتدا بازه تاریخ را از تقویم شمسی انتخاب کن.
           </p>
         )}
@@ -484,7 +485,7 @@ export default function EventForm({
         {formData.days.map((day, dayIndex) => (
           <div
             key={day.date}
-            className="relative space-y-3 rounded-xl bg-white p-4 shadow-sm"
+            className="relative space-y-3 rounded-xl bg-white p-4 shadow-sm dark:bg-slate-900"
           >
             <button
               type="button"
@@ -496,14 +497,14 @@ export default function EventForm({
             </button>
 
             <div className="flex items-center gap-4">
-              <label className="text-sm font-bold text-slate-700">تاریخ:</label>
-              <div className="rounded-lg bg-slate-100 px-3 py-2 text-sm text-slate-700">
+              <label className="text-sm font-bold text-slate-700 dark:text-slate-200">تاریخ:</label>
+              <div className="rounded-lg bg-slate-100 px-3 py-2 text-sm text-slate-700 dark:bg-slate-800 dark:text-slate-200">
                 {day.date}
               </div>
               <button
                 type="button"
                 onClick={() => addSession(dayIndex)}
-                className="mr-auto text-xs font-bold text-green-600 hover:text-green-700"
+                className="mr-auto text-xs font-bold text-green-600 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300"
               >
                 + اضافه کردن سانس
               </button>
@@ -513,16 +514,16 @@ export default function EventForm({
               {day.sessions.map((session, sessionIndex) => (
                 <div
                   key={`${day.date}-${sessionIndex}`}
-                  className="rounded-lg bg-slate-50 p-3"
+                  className="rounded-lg bg-slate-50 p-3 dark:bg-slate-800"
                 >
                   <div className="mb-2 flex items-center gap-2">
-                    <span className="whitespace-nowrap text-xs font-bold text-slate-600">
+                    <span className="whitespace-nowrap text-xs font-bold text-slate-600 dark:text-slate-300">
                       سانس {sessionIndex + 1}
                     </span>
                     <input
                       type="text"
                       placeholder="20:00"
-                      className="w-24 rounded border border-slate-200 p-1.5 text-center text-sm outline-none focus:border-blue-500"
+                      className="w-24 rounded border border-slate-200 bg-white p-1.5 text-center text-sm text-slate-900 outline-none focus:border-blue-500 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
                       value={session.time}
                       onChange={(e) =>
                         updateSessionTime(dayIndex, sessionIndex, e.target.value)
@@ -537,14 +538,14 @@ export default function EventForm({
                     </button>
                   </div>
                   <div>
-                    <label className="mb-1 block text-[11px] font-medium text-slate-500">
+                    <label className="mb-1 block text-[11px] font-medium text-slate-500 dark:text-slate-400">
                       لینک صفحه خرید این سانس
                     </label>
                     <input
                       type="url"
                       dir="ltr"
                       placeholder="https://example.com/buy/..."
-                      className="w-full rounded border border-slate-200 p-2 text-left text-sm outline-none focus:border-blue-500"
+                      className="w-full rounded border border-slate-200 bg-white p-2 text-left text-sm text-slate-900 outline-none focus:border-blue-500 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
                       value={session.purchaseUrl ?? ""}
                       onChange={(e) =>
                         updateSessionPurchaseUrl(
@@ -562,8 +563,8 @@ export default function EventForm({
         ))}
       </div>
 
-      <div className="space-y-3 rounded-2xl border border-slate-200 bg-slate-50 p-4">
-        <label className="flex cursor-pointer items-center gap-3 text-sm font-medium text-slate-700">
+      <div className="space-y-3 rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-800/60">
+        <label className="flex cursor-pointer items-center gap-3 text-sm font-medium text-slate-700 dark:text-slate-200">
           <input
             type="checkbox"
             checked={formData.published}
@@ -575,7 +576,7 @@ export default function EventForm({
           انتشار در سایت (نمایش در شهر و دسته مربوطه)
         </label>
 
-        <label className="flex cursor-pointer items-center gap-3 text-sm font-medium text-slate-700">
+        <label className="flex cursor-pointer items-center gap-3 text-sm font-medium text-slate-700 dark:text-slate-200">
           <input
             type="checkbox"
             checked={formData.popular}
@@ -587,7 +588,7 @@ export default function EventForm({
           نمایش در بخش «رویدادهای محبوب» صفحه اصلی
         </label>
 
-        <label className="flex cursor-pointer items-center gap-3 text-sm font-medium text-slate-700">
+        <label className="flex cursor-pointer items-center gap-3 text-sm font-medium text-slate-700 dark:text-slate-200">
           <input
             type="checkbox"
             checked={formData.featured}
@@ -604,7 +605,7 @@ export default function EventForm({
         <button
           type="button"
           onClick={onCancel}
-          className="flex-1 rounded-xl border border-slate-200 py-4 font-bold text-slate-700 transition hover:bg-slate-50"
+          className="flex-1 rounded-xl border border-slate-200 py-4 font-bold text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
         >
           انصراف
         </button>

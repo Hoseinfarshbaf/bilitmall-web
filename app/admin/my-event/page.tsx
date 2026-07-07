@@ -28,7 +28,7 @@ const STATUS_FILTER_OPTIONS: { value: StatusFilter; label: string }[] = [
 ];
 
 const inputClass =
-  "w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm outline-none focus:border-emerald-500";
+  "w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 outline-none focus:border-emerald-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100";
 
 export default function AdminMyEventPage() {
   const [organizers, setOrganizers] = useState<MyEventOrganizerRow[]>([]);
@@ -150,13 +150,16 @@ export default function AdminMyEventPage() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-50 p-4 md:p-8" dir="rtl">
+    <main
+      className="min-h-screen bg-slate-50 p-4 text-slate-900 md:p-8 dark:bg-slate-950 dark:text-slate-100"
+      dir="rtl"
+    >
       <div className="mx-auto max-w-6xl">
-        <Link href="/admin" className="mb-4 inline-block text-sm font-bold text-emerald-600">
+        <Link href="/admin" className="mb-4 inline-block text-sm font-bold text-emerald-600 dark:text-emerald-400">
           ← بازگشت به پنل
         </Link>
-        <h1 className="text-3xl font-black text-slate-800">برگزارکنندگان My Event</h1>
-        <p className="mt-2 text-sm text-slate-500">
+        <h1 className="text-3xl font-black text-slate-800 dark:text-slate-100">برگزارکنندگان My Event</h1>
+        <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
           حساب‌های جدا از کاربران بلیت‌مال
         </p>
 
@@ -169,9 +172,9 @@ export default function AdminMyEventPage() {
           </Link>
         </div>
 
-        <div className="mt-6 grid gap-3 rounded-2xl bg-white p-4 shadow-sm md:grid-cols-[1fr_auto] md:items-end">
+        <div className="mt-6 grid gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm md:grid-cols-[1fr_auto] md:items-end dark:border-slate-800 dark:bg-slate-900">
           <div>
-            <label className="mb-1 block text-xs font-bold text-slate-500">جستجو</label>
+            <label className="mb-1 block text-xs font-bold text-slate-500 dark:text-slate-400">جستجو</label>
             <input
               type="search"
               value={search}
@@ -181,7 +184,7 @@ export default function AdminMyEventPage() {
             />
           </div>
           <div className="min-w-[200px]">
-            <label className="mb-1 block text-xs font-bold text-slate-500">فیلتر وضعیت</label>
+            <label className="mb-1 block text-xs font-bold text-slate-500 dark:text-slate-400">فیلتر وضعیت</label>
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value as StatusFilter)}
@@ -196,22 +199,22 @@ export default function AdminMyEventPage() {
           </div>
         </div>
 
-        <p className="mt-3 text-xs text-slate-500">
+        <p className="mt-3 text-xs text-slate-500 dark:text-slate-400">
           {loading
             ? "در حال بارگذاری..."
             : `${filteredOrganizers.length} از ${organizers.length} برگزارکننده`}
         </p>
 
-        <div className="mt-4 overflow-x-auto rounded-3xl bg-white shadow-sm">
+        <div className="mt-4 overflow-x-auto rounded-3xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
           {loading ? (
-            <p className="p-8 text-center text-slate-500">در حال بارگذاری...</p>
+            <p className="p-8 text-center text-slate-500 dark:text-slate-400">در حال بارگذاری...</p>
           ) : organizers.length === 0 ? (
-            <p className="p-8 text-center text-slate-500">هنوز برگزارکننده‌ای ثبت نشده.</p>
+            <p className="p-8 text-center text-slate-500 dark:text-slate-400">هنوز برگزارکننده‌ای ثبت نشده.</p>
           ) : filteredOrganizers.length === 0 ? (
-            <p className="p-8 text-center text-slate-500">نتیجه‌ای با این فیلتر یافت نشد.</p>
+            <p className="p-8 text-center text-slate-500 dark:text-slate-400">نتیجه‌ای با این فیلتر یافت نشد.</p>
           ) : (
             <table className="min-w-full text-sm">
-              <thead className="bg-slate-50 text-slate-600">
+              <thead className="bg-slate-50 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
                 <tr>
                   <th className="px-4 py-3 text-right font-bold">نام برند</th>
                   <th className="px-4 py-3 text-right font-bold">شماره موبایل</th>
@@ -224,19 +227,19 @@ export default function AdminMyEventPage() {
               </thead>
               <tbody>
                 {filteredOrganizers.map((org) => (
-                  <tr key={org.id} className="border-t border-slate-100">
+                  <tr key={org.id} className="border-t border-slate-100 dark:border-slate-800">
                     <td className="px-4 py-4">
-                      <div className="font-bold text-slate-800">{org.displayName}</div>
+                      <div className="font-bold text-slate-800 dark:text-slate-100">{org.displayName}</div>
                       {org.email ? (
-                        <div className="text-xs text-slate-500" dir="ltr">
+                        <div className="text-xs text-slate-500 dark:text-slate-400" dir="ltr">
                           {org.email}
                         </div>
                       ) : null}
                     </td>
-                    <td className="px-4 py-4 font-mono text-slate-700" dir="ltr">
+                    <td className="px-4 py-4 font-mono text-slate-700 dark:text-slate-300" dir="ltr">
                       {org.phone ?? "—"}
                     </td>
-                    <td className="px-4 py-4 text-xs text-slate-600 whitespace-nowrap">
+                    <td className="px-4 py-4 text-xs text-slate-600 whitespace-nowrap dark:text-slate-400">
                       {formatAdminDateTime(org.createdAt)}
                     </td>
                     <td className="px-4 py-4">
@@ -245,13 +248,13 @@ export default function AdminMyEventPage() {
                           href={getMyEventPublicUrl(org.slug)}
                           target="_blank"
                           rel="noreferrer"
-                          className="text-xs font-bold text-emerald-600"
+                          className="text-xs font-bold text-emerald-600 dark:text-emerald-400"
                           dir="ltr"
                         >
                           {getMyEventPublicUrl(org.slug)}
                         </a>
                       ) : (
-                        <span className="text-xs text-slate-400" dir="ltr">
+                        <span className="text-xs text-slate-400 dark:text-slate-500" dir="ltr">
                           پس از تأیید فعال می‌شود
                         </span>
                       )}
@@ -261,10 +264,10 @@ export default function AdminMyEventPage() {
                       <span
                         className={`rounded-full px-3 py-1 text-xs font-bold ${
                           org.status === "active"
-                            ? "bg-green-100 text-green-700"
+                            ? "bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-300"
                             : org.status === "suspended"
-                              ? "bg-red-100 text-red-700"
-                              : "bg-amber-100 text-amber-700"
+                              ? "bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-300"
+                              : "bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300"
                         }`}
                       >
                         {MY_EVENT_STATUS_LABELS[org.status] ?? org.status}
@@ -275,14 +278,14 @@ export default function AdminMyEventPage() {
                         <button
                           type="button"
                           onClick={() => openEdit(org)}
-                          className="rounded-lg bg-blue-50 px-3 py-1 text-xs font-bold text-blue-700"
+                          className="rounded-lg bg-blue-50 px-3 py-1 text-xs font-bold text-blue-700 dark:bg-blue-500/15 dark:text-blue-300"
                         >
                           ویرایش
                         </button>
                         <button
                           type="button"
                           onClick={() => handleDelete(org)}
-                          className="rounded-lg bg-red-50 px-3 py-1 text-xs font-bold text-red-700"
+                          className="rounded-lg bg-red-50 px-3 py-1 text-xs font-bold text-red-700 dark:bg-red-500/15 dark:text-red-300"
                         >
                           حذف
                         </button>
@@ -290,7 +293,7 @@ export default function AdminMyEventPage() {
                           <button
                             type="button"
                             onClick={() => updateStatus(org.id, "active")}
-                            className="rounded-lg bg-green-50 px-3 py-1 text-xs font-bold text-green-700"
+                            className="rounded-lg bg-green-50 px-3 py-1 text-xs font-bold text-green-700 dark:bg-green-500/15 dark:text-green-300"
                           >
                             تأیید حساب
                           </button>
@@ -299,7 +302,7 @@ export default function AdminMyEventPage() {
                           <button
                             type="button"
                             onClick={() => updateStatus(org.id, "suspended")}
-                            className="rounded-lg bg-red-50 px-3 py-1 text-xs font-bold text-red-700"
+                            className="rounded-lg bg-red-50 px-3 py-1 text-xs font-bold text-red-700 dark:bg-red-500/15 dark:text-red-300"
                           >
                             مسدود
                           </button>
@@ -318,7 +321,7 @@ export default function AdminMyEventPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
           <form
             onSubmit={handleSaveEdit}
-            className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl"
+            className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl dark:bg-slate-900 dark:text-slate-100"
           >
             <h2 className="text-lg font-black">ویرایش برگزارکننده</h2>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
@@ -327,7 +330,7 @@ export default function AdminMyEventPage() {
                 value={form.displayName}
                 onChange={(e) => setForm({ ...form, displayName: e.target.value })}
                 placeholder="نام برند"
-                className="rounded-xl border border-slate-200 px-4 py-2 sm:col-span-2"
+                className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-slate-900 sm:col-span-2 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
               />
               <input
                 required
@@ -335,12 +338,12 @@ export default function AdminMyEventPage() {
                 onChange={(e) => setForm({ ...form, slug: e.target.value })}
                 placeholder="slug"
                 dir="ltr"
-                className="rounded-xl border border-slate-200 px-4 py-2"
+                className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
               />
               <select
                 value={form.status}
                 onChange={(e) => setForm({ ...form, status: e.target.value })}
-                className="rounded-xl border border-slate-200 px-4 py-2"
+                className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
               >
                 <option value="pending">در انتظار تأیید</option>
                 <option value="active">فعال</option>
@@ -351,14 +354,14 @@ export default function AdminMyEventPage() {
                 onChange={(e) => setForm({ ...form, phone: e.target.value })}
                 placeholder="موبایل"
                 dir="ltr"
-                className="rounded-xl border border-slate-200 px-4 py-2"
+                className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
               />
               <input
                 value={form.email}
                 onChange={(e) => setForm({ ...form, email: e.target.value })}
                 placeholder="ایمیل"
                 dir="ltr"
-                className="rounded-xl border border-slate-200 px-4 py-2"
+                className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
               />
             </div>
             <div className="mt-6 flex gap-2">
@@ -372,7 +375,7 @@ export default function AdminMyEventPage() {
               <button
                 type="button"
                 onClick={() => setEditing(null)}
-                className="rounded-xl border border-slate-200 px-4 py-2 text-sm font-bold"
+                className="rounded-xl border border-slate-200 px-4 py-2 text-sm font-bold dark:border-slate-700"
               >
                 انصراف
               </button>

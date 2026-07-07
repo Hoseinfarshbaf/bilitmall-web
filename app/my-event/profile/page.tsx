@@ -19,8 +19,8 @@ async function uploadImage(file: File): Promise<string> {
 }
 
 const inputClass =
-  "w-full rounded-xl border border-white/10 bg-slate-900 px-4 py-3 outline-none focus:border-emerald-500";
-const labelClass = "mb-2 block text-sm font-bold text-slate-300";
+  "w-full rounded-xl border border-neutral-300 bg-white px-4 py-3 text-neutral-900 outline-none focus:border-emerald-500 dark:border-white/10 dark:bg-slate-900 dark:text-white";
+const labelClass = "mb-2 block text-sm font-bold text-neutral-700 dark:text-slate-300";
 
 export default function MyEventProfilePage() {
   const router = useRouter();
@@ -35,7 +35,6 @@ export default function MyEventProfilePage() {
   const [email, setEmail] = useState("");
   const [coverImage, setCoverImage] = useState("");
   const [logoImage, setLogoImage] = useState("");
-  const [avatarImage, setAvatarImage] = useState("");
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -43,8 +42,7 @@ export default function MyEventProfilePage() {
     "idle"
   );
   const [saving, setSaving] = useState(false);
-  const [uploading, setUploading] = useState<"avatar" | "logo" | "cover" | null>(null);
-  const avatarInputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState<"logo" | "cover" | null>(null);
   const logoInputRef = useRef<HTMLInputElement>(null);
   const coverInputRef = useRef<HTMLInputElement>(null);
 
@@ -71,7 +69,6 @@ export default function MyEventProfilePage() {
       setEmail(org.email ?? "");
       setCoverImage(org.coverImage);
       setLogoImage(org.logoImage);
-      setAvatarImage(org.avatarImage ?? "");
     }
 
     void load();
@@ -106,15 +103,11 @@ export default function MyEventProfilePage() {
     return () => clearTimeout(timer);
   }, [slug, originalSlug, organizerId]);
 
-  async function handleImageUpload(
-    file: File | null,
-    kind: "avatar" | "logo" | "cover"
-  ) {
+  async function handleImageUpload(file: File | null, kind: "logo" | "cover") {
     if (!file) return;
     setUploading(kind);
     try {
       const url = await uploadImage(file);
-      if (kind === "avatar") setAvatarImage(url);
       if (kind === "logo") setLogoImage(url);
       if (kind === "cover") setCoverImage(url);
     } catch (error) {
@@ -158,7 +151,6 @@ export default function MyEventProfilePage() {
           email,
           coverImage,
           logoImage,
-          avatarImage,
           ...(newPassword
             ? { currentPassword, newPassword }
             : {}),
@@ -180,12 +172,11 @@ export default function MyEventProfilePage() {
   if (organizerId == null) {
     return (
       <MyEventShell>
-        <p className="text-slate-400">در حال بارگذاری...</p>
+        <p className="text-neutral-500 dark:text-slate-400">در حال بارگذاری...</p>
       </MyEventShell>
     );
   }
 
-  const avatarPreview = hasUploadedImage(avatarImage) ? avatarImage : "";
   const logoPreview = hasUploadedImage(logoImage) ? logoImage : "";
   const coverPreview = hasUploadedImage(coverImage) ? coverImage : "";
 
@@ -193,10 +184,10 @@ export default function MyEventProfilePage() {
     <MyEventShell title="پروفایل برگزارکننده">
       <form
         onSubmit={handleSubmit}
-        className="max-w-2xl space-y-8 rounded-3xl border border-white/10 bg-white/5 p-6"
+        className="max-w-2xl space-y-8 rounded-3xl border border-neutral-200 bg-white p-6 dark:border-white/10 dark:bg-white/5"
       >
         <section className="space-y-4">
-          <h2 className="text-lg font-black text-white">اطلاعات شخصی</h2>
+          <h2 className="text-lg font-black text-neutral-900 dark:text-white">اطلاعات شخصی</h2>
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
               <label className={labelClass}>نام</label>
@@ -242,7 +233,7 @@ export default function MyEventProfilePage() {
         </section>
 
         <section className="space-y-4">
-          <h2 className="text-lg font-black text-white">برند و لینک صفحه</h2>
+          <h2 className="text-lg font-black text-neutral-900 dark:text-white">برند و لینک صفحه</h2>
           <div>
             <label className={labelClass}>نام برند / مجموعه</label>
             <input
@@ -255,7 +246,7 @@ export default function MyEventProfilePage() {
           </div>
           <div>
             <label className={labelClass}>آدرس انگلیسی صفحه (نام کاربری)</label>
-            <p className="mb-2 text-xs text-slate-500">
+            <p className="mb-2 text-xs text-neutral-400 dark:text-slate-500">
               فقط حروف کوچک انگلیسی، عدد و خط تیره. هر نام فقط یک‌بار قابل ثبت است.
             </p>
             <input
@@ -267,21 +258,21 @@ export default function MyEventProfilePage() {
               placeholder="coferoze"
             />
             {slugStatus === "checking" ? (
-              <p className="mt-2 text-xs text-slate-400">در حال بررسی...</p>
+              <p className="mt-2 text-xs text-neutral-400 dark:text-slate-400">در حال بررسی...</p>
             ) : null}
             {slugStatus === "ok" && slug !== originalSlug ? (
-              <p className="mt-2 text-xs text-emerald-400">این آدرس آزاد است.</p>
+              <p className="mt-2 text-xs text-emerald-600 dark:text-emerald-400">این آدرس آزاد است.</p>
             ) : null}
             {slugStatus === "taken" ? (
-              <p className="mt-2 text-xs text-red-400">این آدرس قبلاً ثبت شده است.</p>
+              <p className="mt-2 text-xs text-red-500 dark:text-red-400">این آدرس قبلاً ثبت شده است.</p>
             ) : null}
             {slugStatus === "invalid" && slugInput.trim() ? (
-              <p className="mt-2 text-xs text-red-400">فرمت آدرس معتبر نیست.</p>
+              <p className="mt-2 text-xs text-red-500 dark:text-red-400">فرمت آدرس معتبر نیست.</p>
             ) : null}
             {previewUrl ? (
               <div className="mt-3 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3">
-                <p className="text-xs font-bold text-emerald-300">پیش‌نمایش لینک صفحه</p>
-                <p className="mt-1 font-mono text-sm text-white" dir="ltr">
+                <p className="text-xs font-bold text-emerald-700 dark:text-emerald-300">پیش‌نمایش لینک صفحه</p>
+                <p className="mt-1 font-mono text-sm text-neutral-900 dark:text-white" dir="ltr">
                   {previewUrl}
                 </p>
               </div>
@@ -299,52 +290,14 @@ export default function MyEventProfilePage() {
         </section>
 
         <section className="space-y-4">
-          <h2 className="text-lg font-black text-white">تصاویر</h2>
+          <h2 className="text-lg font-black text-neutral-900 dark:text-white">تصاویر</h2>
 
-          <div className="rounded-2xl border border-white/10 bg-slate-900/50 p-4">
-            <label className={labelClass}>عکس کاربری</label>
-            <div className="flex flex-wrap items-center gap-4">
-              <div
-                className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-full border border-white/10 bg-slate-800 bg-cover bg-center text-xs text-slate-500"
-                style={avatarPreview ? getEventImageStyle(avatarPreview) : undefined}
-              >
-                {!avatarPreview ? "بدون عکس" : null}
-              </div>
-              <input
-                ref={avatarInputRef}
-                type="file"
-                accept="image/jpeg,image/png,image/webp,image/gif"
-                className="hidden"
-                onChange={(e) => handleImageUpload(e.target.files?.[0] ?? null, "avatar")}
-              />
-              <button
-                type="button"
-                onClick={() => avatarInputRef.current?.click()}
-                disabled={uploading === "avatar"}
-                className="inline-flex items-center gap-2 rounded-xl border border-dashed border-white/20 px-4 py-2 text-sm font-bold text-slate-200 hover:border-emerald-500/50 disabled:opacity-60"
-              >
-                <Upload className="h-4 w-4" />
-                {uploading === "avatar" ? "در حال آپلود..." : "آپلود عکس کاربری"}
-              </button>
-              {avatarPreview ? (
-                <button
-                  type="button"
-                  onClick={() => setAvatarImage("")}
-                  className="inline-flex items-center gap-1 text-sm font-bold text-red-400"
-                >
-                  <X className="h-4 w-4" />
-                  حذف
-                </button>
-              ) : null}
-            </div>
-          </div>
-
-          <div className="rounded-2xl border border-white/10 bg-slate-900/50 p-4">
+          <div className="rounded-2xl border border-neutral-200 bg-neutral-50 p-4 dark:border-white/10 dark:bg-slate-900/50">
             <label className={labelClass}>لوگوی برند</label>
-            <p className="mb-3 text-xs text-slate-500">در صفحه عمومی رویدادها نمایش داده می‌شود.</p>
+            <p className="mb-3 text-xs text-neutral-400 dark:text-slate-500">در صفحه عمومی رویدادها نمایش داده می‌شود.</p>
             <div className="flex flex-wrap items-center gap-4">
               <div
-                className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-2xl border border-white/10 bg-slate-800 bg-cover bg-center text-xs text-slate-500"
+                className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-2xl border border-neutral-200 bg-neutral-200 bg-cover bg-center text-xs text-neutral-400 dark:border-white/10 dark:bg-slate-800 dark:text-slate-500"
                 style={logoPreview ? getEventImageStyle(logoPreview) : undefined}
               >
                 {!logoPreview ? "لوگو" : null}
@@ -360,7 +313,7 @@ export default function MyEventProfilePage() {
                 type="button"
                 onClick={() => logoInputRef.current?.click()}
                 disabled={uploading === "logo"}
-                className="inline-flex items-center gap-2 rounded-xl border border-dashed border-white/20 px-4 py-2 text-sm font-bold text-slate-200 hover:border-emerald-500/50 disabled:opacity-60"
+                className="inline-flex items-center gap-2 rounded-xl border border-dashed border-neutral-300 px-4 py-2 text-sm font-bold text-neutral-700 hover:border-emerald-500/50 disabled:opacity-60 dark:border-white/20 dark:text-slate-200"
               >
                 <Upload className="h-4 w-4" />
                 {uploading === "logo" ? "در حال آپلود..." : "آپلود لوگو"}
@@ -378,12 +331,12 @@ export default function MyEventProfilePage() {
             </div>
           </div>
 
-          <div className="rounded-2xl border border-white/10 bg-slate-900/50 p-4">
+          <div className="rounded-2xl border border-neutral-200 bg-neutral-50 p-4 dark:border-white/10 dark:bg-slate-900/50">
             <label className={labelClass}>تصویر کاور صفحه (اختیاری)</label>
             <div className="space-y-3">
               {coverPreview ? (
                 <div
-                  className="h-32 w-full rounded-xl border border-white/10 bg-cover bg-center"
+                  className="h-32 w-full rounded-xl border border-neutral-200 bg-cover bg-center dark:border-white/10"
                   style={getEventImageStyle(coverPreview)}
                 />
               ) : null}
@@ -398,7 +351,7 @@ export default function MyEventProfilePage() {
                 type="button"
                 onClick={() => coverInputRef.current?.click()}
                 disabled={uploading === "cover"}
-                className="inline-flex items-center gap-2 rounded-xl border border-dashed border-white/20 px-4 py-2 text-sm font-bold text-slate-200 hover:border-emerald-500/50 disabled:opacity-60"
+                className="inline-flex items-center gap-2 rounded-xl border border-dashed border-neutral-300 px-4 py-2 text-sm font-bold text-neutral-700 hover:border-emerald-500/50 disabled:opacity-60 dark:border-white/20 dark:text-slate-200"
               >
                 <Upload className="h-4 w-4" />
                 {uploading === "cover" ? "در حال آپلود..." : "آپلود کاور"}
@@ -407,9 +360,9 @@ export default function MyEventProfilePage() {
           </div>
         </section>
 
-        <section className="space-y-4 rounded-2xl border border-white/10 bg-slate-900/50 p-4">
-          <h2 className="text-lg font-black text-white">تغییر رمز عبور</h2>
-          <p className="text-xs text-slate-500">اگر نمی‌خواهید رمز را عوض کنید، این بخش را خالی بگذارید.</p>
+        <section className="space-y-4 rounded-2xl border border-neutral-200 bg-neutral-50 p-4 dark:border-white/10 dark:bg-slate-900/50">
+          <h2 className="text-lg font-black text-neutral-900 dark:text-white">تغییر رمز عبور</h2>
+          <p className="text-xs text-neutral-400 dark:text-slate-500">اگر نمی‌خواهید رمز را عوض کنید، این بخش را خالی بگذارید.</p>
           <div>
             <label className={labelClass}>رمز فعلی</label>
             <input
@@ -449,7 +402,7 @@ export default function MyEventProfilePage() {
         <button
           type="submit"
           disabled={saving || slugStatus === "taken" || slugStatus === "invalid"}
-          className="w-full rounded-xl bg-emerald-600 py-3 font-black hover:bg-emerald-500 disabled:opacity-60"
+          className="w-full rounded-xl bg-emerald-600 py-3 font-black text-white hover:bg-emerald-500 disabled:opacity-60"
         >
           {saving ? "در حال ذخیره..." : "ذخیره پروفایل"}
         </button>

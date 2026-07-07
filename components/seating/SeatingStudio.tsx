@@ -57,16 +57,27 @@ const TOOLS: { value: StudioTool; label: string; icon: typeof Armchair }[] = [
 function cellClass(cell: SeatCell, selected: boolean, activeZoneId: string | null): string {
   const base =
     "relative flex h-8 w-8 items-center justify-center rounded text-[9px] font-bold transition sm:h-9 sm:w-9 ";
-  if (selected) return base + "z-10 ring-2 ring-amber-400 ring-offset-1 ring-offset-slate-950 ";
+  if (selected)
+    return (
+      base +
+      "z-10 ring-2 ring-amber-400 ring-offset-1 ring-offset-white dark:ring-offset-slate-950 "
+    );
   if (cell.type === "stage") return base + "bg-violet-600 text-white cursor-pointer hover:bg-violet-500 ";
-  if (cell.type === "blocked") return base + "bg-red-900/70 text-red-200 cursor-pointer ";
-  if (cell.type === "aisle") return base + "bg-slate-700/80 text-slate-500 cursor-pointer ";
-  if (cell.type === "empty") return base + "bg-slate-900/30 text-transparent cursor-pointer hover:bg-slate-800/50 ";
-  if (!cell.available) return base + "bg-slate-700 text-slate-500 line-through cursor-pointer ";
+  if (cell.type === "blocked")
+    return base + "bg-red-200 text-red-800 cursor-pointer dark:bg-red-900/70 dark:text-red-200 ";
+  if (cell.type === "aisle")
+    return base + "bg-slate-300 text-slate-400 cursor-pointer dark:bg-slate-700/80 dark:text-slate-500 ";
+  if (cell.type === "empty")
+    return (
+      base +
+      "bg-slate-200/70 text-transparent cursor-pointer hover:bg-slate-300/70 dark:bg-slate-900/30 dark:hover:bg-slate-800/50 "
+    );
+  if (!cell.available)
+    return base + "bg-slate-300 text-slate-500 line-through cursor-pointer dark:bg-slate-700 ";
   if (activeZoneId && cell.zoneId === activeZoneId) {
     return base + "bg-sky-600 text-white hover:bg-sky-500 cursor-pointer ";
   }
-  return base + "bg-emerald-700/90 text-white hover:bg-emerald-600 cursor-pointer ";
+  return base + "bg-emerald-600 text-white hover:bg-emerald-500 cursor-pointer dark:bg-emerald-700/90 dark:hover:bg-emerald-600 ";
 }
 
 export default function SeatingStudio({
@@ -238,11 +249,11 @@ export default function SeatingStudio({
   }));
 
   return (
-    <div className="fixed inset-0 z-[100] flex flex-col bg-slate-950 text-white" dir="rtl">
-      <header className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-white/10 bg-slate-900 px-4 py-3">
+    <div className="fixed inset-0 z-100 flex flex-col bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-white" dir="rtl">
+      <header className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-slate-200 bg-white px-4 py-3 dark:border-white/10 dark:bg-slate-900">
         <div className="min-w-0">
           <p className="truncate text-lg font-black">{normalized.name || "استودیو طراحی سالن"}</p>
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-slate-500 dark:text-slate-400">
             {bookableCount.toLocaleString("fa-IR")} صندلی · {normalized.rows} ردیف × {normalized.cols} ستون
           </p>
         </div>
@@ -251,7 +262,7 @@ export default function SeatingStudio({
             type="button"
             disabled={saving}
             onClick={onSave}
-            className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2 text-sm font-black hover:bg-emerald-500 disabled:opacity-60"
+            className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2 text-sm font-black text-white hover:bg-emerald-500 disabled:opacity-60"
           >
             <Save className="h-4 w-4" />
             {saving ? "در حال ذخیره..." : "ذخیره"}
@@ -259,7 +270,7 @@ export default function SeatingStudio({
           <button
             type="button"
             onClick={onClose}
-            className="inline-flex items-center gap-2 rounded-xl border border-white/15 px-4 py-2 text-sm font-bold hover:bg-white/5"
+            className="inline-flex items-center gap-2 rounded-xl border border-slate-300 px-4 py-2 text-sm font-bold hover:bg-slate-100 dark:border-white/15 dark:hover:bg-white/5"
           >
             <X className="h-4 w-4" />
             بستن
@@ -268,8 +279,8 @@ export default function SeatingStudio({
       </header>
 
       <div className="flex min-h-0 flex-1 overflow-hidden">
-        <aside className="w-64 shrink-0 overflow-y-auto border-l border-white/10 bg-slate-900/80 p-4">
-          <p className="mb-2 text-xs font-bold text-slate-400">ابزارها</p>
+        <aside className="w-64 shrink-0 overflow-y-auto border-l border-slate-200 bg-white p-4 dark:border-white/10 dark:bg-slate-900/80">
+          <p className="mb-2 text-xs font-bold text-slate-500 dark:text-slate-400">ابزارها</p>
           <div className="space-y-1">
             {TOOLS.map(({ value, label, icon: Icon }) => (
               <button
@@ -277,7 +288,9 @@ export default function SeatingStudio({
                 type="button"
                 onClick={() => setTool(value)}
                 className={`flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-bold ${
-                  tool === value ? "bg-emerald-600 text-white" : "hover:bg-white/5 text-slate-300"
+                  tool === value
+                    ? "bg-emerald-600 text-white"
+                    : "text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-white/5"
                 }`}
               >
                 <Icon className="h-4 w-4" />
@@ -286,12 +299,12 @@ export default function SeatingStudio({
             ))}
           </div>
 
-          <p className="mb-2 mt-6 text-xs font-bold text-slate-400">صحنه یکپارچه</p>
-          <div className="space-y-2 rounded-xl border border-white/10 bg-slate-950/60 p-3">
+          <p className="mb-2 mt-6 text-xs font-bold text-slate-500 dark:text-slate-400">صحنه یکپارچه</p>
+          <div className="space-y-2 rounded-xl border border-slate-200 bg-slate-100 p-3 dark:border-white/10 dark:bg-slate-950/60">
             <input
               value={normalized.stageLabel}
               onChange={(e) => update({ ...normalized, stageLabel: e.target.value })}
-              className="w-full rounded-lg border border-white/10 bg-slate-900 px-2 py-1.5 text-xs"
+              className="w-full rounded-lg border border-slate-300 bg-white px-2 py-1.5 text-xs text-slate-900 outline-none focus:border-emerald-500 dark:border-white/10 dark:bg-slate-900 dark:text-white"
               placeholder="برچسب صحنه"
             />
             <select
@@ -301,7 +314,7 @@ export default function SeatingStudio({
                   applyStagePosition(normalized, e.target.value as StagePosition)
                 )
               }
-              className="w-full rounded-lg border border-white/10 bg-slate-900 px-2 py-1.5 text-xs"
+              className="w-full rounded-lg border border-slate-300 bg-white px-2 py-1.5 text-xs text-slate-900 outline-none focus:border-emerald-500 dark:border-white/10 dark:bg-slate-900 dark:text-white"
             >
               {STAGE_OPTIONS.map((o) => (
                 <option key={o.value} value={o.value}>
@@ -313,28 +326,28 @@ export default function SeatingStudio({
               <button
                 type="button"
                 onClick={() => expandStage("rows", 1)}
-                className="rounded bg-white/10 py-1 font-bold"
+                className="rounded bg-slate-200 py-1 font-bold dark:bg-white/10"
               >
                 + ردیف صحنه
               </button>
               <button
                 type="button"
                 onClick={() => expandStage("rows", -1)}
-                className="rounded bg-white/10 py-1 font-bold"
+                className="rounded bg-slate-200 py-1 font-bold dark:bg-white/10"
               >
                 − ردیف صحنه
               </button>
               <button
                 type="button"
                 onClick={() => expandStage("cols", 1)}
-                className="rounded bg-white/10 py-1 font-bold"
+                className="rounded bg-slate-200 py-1 font-bold dark:bg-white/10"
               >
                 + عرض صحنه
               </button>
               <button
                 type="button"
                 onClick={() => expandStage("cols", -1)}
-                className="rounded bg-white/10 py-1 font-bold"
+                className="rounded bg-slate-200 py-1 font-bold dark:bg-white/10"
               >
                 − عرض صحنه
               </button>
@@ -349,13 +362,13 @@ export default function SeatingStudio({
                   )
                 )
               }
-              className="w-full rounded-lg border border-violet-500/40 py-1.5 text-[10px] font-bold text-violet-300"
+              className="w-full rounded-lg border border-violet-400/60 py-1.5 text-[10px] font-bold text-violet-600 dark:border-violet-500/40 dark:text-violet-300"
             >
               بازنشانی صحنه
             </button>
           </div>
 
-          <p className="mb-2 mt-6 flex items-center gap-1 text-xs font-bold text-slate-400">
+          <p className="mb-2 mt-6 flex items-center gap-1 text-xs font-bold text-slate-500 dark:text-slate-400">
             <Layers className="h-3.5 w-3.5" />
             جایگاه‌ها و بالکن‌ها
           </p>
@@ -366,7 +379,7 @@ export default function SeatingStudio({
                 className={`rounded-xl border p-2 text-xs ${
                   activeZoneId === zone.id
                     ? "border-sky-500 bg-sky-500/10"
-                    : "border-white/10 bg-slate-950/40"
+                    : "border-slate-200 bg-slate-100 dark:border-white/10 dark:bg-slate-950/40"
                 }`}
               >
                 <button
@@ -375,7 +388,7 @@ export default function SeatingStudio({
                   className="w-full text-right font-bold"
                 >
                   {zone.name}
-                  <span className="mt-0.5 block text-[10px] font-normal text-slate-400">
+                  <span className="mt-0.5 block text-[10px] font-normal text-slate-500 dark:text-slate-400">
                     {zone.type === "balcony" ? "بالکن" : zone.type === "vip" ? "VIP" : "سالن"} ·
                     ردیف {zone.rowStart + 1}–{zone.rowEnd + 1}
                   </span>
@@ -394,13 +407,13 @@ export default function SeatingStudio({
             <button
               type="button"
               onClick={addBalcony}
-              className="w-full rounded-xl border border-dashed border-white/20 py-2 text-xs font-bold text-slate-400 hover:border-white/40"
+              className="w-full rounded-xl border border-dashed border-slate-300 py-2 text-xs font-bold text-slate-500 hover:border-slate-400 dark:border-white/20 dark:text-slate-400 dark:hover:border-white/40"
             >
               + افزودن بالکن
             </button>
           </div>
 
-          <p className="mb-2 mt-6 text-xs font-bold text-slate-400">ابعاد شبکه</p>
+          <p className="mb-2 mt-6 text-xs font-bold text-slate-500 dark:text-slate-400">ابعاد شبکه</p>
           <div className="flex gap-2">
             <label className="flex-1 text-[10px]">
               ردیف
@@ -412,7 +425,7 @@ export default function SeatingStudio({
                 onChange={(e) =>
                   update(resizeLayout(normalized, Number(e.target.value), normalized.cols))
                 }
-                className="mt-1 w-full rounded-lg border border-white/10 bg-slate-900 px-2 py-1"
+                className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-2 py-1 text-slate-900 outline-none focus:border-emerald-500 dark:border-white/10 dark:bg-slate-900 dark:text-white"
                 dir="ltr"
               />
             </label>
@@ -426,7 +439,7 @@ export default function SeatingStudio({
                 onChange={(e) =>
                   update(resizeLayout(normalized, normalized.rows, Number(e.target.value)))
                 }
-                className="mt-1 w-full rounded-lg border border-white/10 bg-slate-900 px-2 py-1"
+                className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-2 py-1 text-slate-900 outline-none focus:border-emerald-500 dark:border-white/10 dark:bg-slate-900 dark:text-white"
                 dir="ltr"
               />
             </label>
@@ -436,7 +449,7 @@ export default function SeatingStudio({
             onClick={() =>
               update(createEmptyLayout(normalized.name, normalized.rows, normalized.cols))
             }
-            className="mt-2 w-full rounded-lg border border-white/15 py-1.5 text-[10px] font-bold"
+            className="mt-2 w-full rounded-lg border border-slate-300 py-1.5 text-[10px] font-bold dark:border-white/15"
           >
             بازنشانی کل شبکه
           </button>
@@ -445,7 +458,7 @@ export default function SeatingStudio({
         <main className="relative min-w-0 flex-1 overflow-auto p-4">
           <div className="mx-auto max-w-5xl">
             <div
-              className="relative inline-grid gap-0.5 rounded-2xl border border-white/10 bg-slate-900/50 p-4"
+              className="relative inline-grid gap-0.5 rounded-2xl border border-slate-200 bg-white p-4 dark:border-white/10 dark:bg-slate-900/50"
               style={{
                 gridTemplateColumns: `2.5rem repeat(${normalized.cols}, minmax(2rem, 2.25rem))`,
                 gridTemplateRows: `1.75rem repeat(${normalized.rows}, minmax(2rem, 2.25rem))`,
@@ -456,7 +469,7 @@ export default function SeatingStudio({
               {Array.from({ length: normalized.cols }, (_, col) => (
                 <div
                   key={`col-${col}`}
-                  className="flex items-center justify-center text-[10px] font-bold text-slate-500"
+                  className="flex items-center justify-center text-[10px] font-bold text-slate-400 dark:text-slate-500"
                   style={{ gridColumn: col + 2, gridRow: 1 }}
                 >
                   {col + 1}
@@ -478,7 +491,7 @@ export default function SeatingStudio({
               {Array.from({ length: normalized.rows }, (_, row) => (
                 <div key={`row-wrap-${row}`} className="contents">
                   <div
-                    className="flex items-center justify-center text-[11px] font-black text-amber-400/90"
+                    className="flex items-center justify-center text-[11px] font-black text-amber-600 dark:text-amber-400/90"
                     style={{ gridColumn: 1, gridRow: row + 2 }}
                   >
                     {rowLabel(row)}
@@ -529,24 +542,24 @@ export default function SeatingStudio({
           </div>
         </main>
 
-        <aside className="w-72 shrink-0 overflow-y-auto border-r border-white/10 bg-slate-900/80 p-4">
+        <aside className="w-72 shrink-0 overflow-y-auto border-r border-slate-200 bg-white p-4 dark:border-white/10 dark:bg-slate-900/80">
           {selected && selected.type === "seat" ? (
             <div>
-              <p className="font-bold text-amber-200">صندلی {selected.label}</p>
-              <p className="mt-1 text-xs text-slate-400">
+              <p className="font-bold text-amber-600 dark:text-amber-200">صندلی {selected.label}</p>
+              <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
                 ردیف {rowLabel(selected.row)} · ستون {selected.col + 1}
               </p>
               <div className="mt-4 space-y-3">
                 <div>
-                  <label className="mb-1 block text-[10px] text-slate-400">برچسب</label>
+                  <label className="mb-1 block text-[10px] text-slate-500 dark:text-slate-400">برچسب</label>
                   <input
                     value={selected.label}
                     onChange={(e) => updateSelected({ label: e.target.value })}
-                    className="w-full rounded-lg border border-white/10 bg-slate-900 px-2 py-1.5 text-sm"
+                    className="w-full rounded-lg border border-slate-300 bg-white px-2 py-1.5 text-sm text-slate-900 outline-none focus:border-emerald-500 dark:border-white/10 dark:bg-slate-900 dark:text-white"
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-[10px] text-slate-400">قیمت (ریال)</label>
+                  <label className="mb-1 block text-[10px] text-slate-500 dark:text-slate-400">قیمت (ریال)</label>
                   <input
                     value={selected.priceRial}
                     onChange={(e) =>
@@ -554,7 +567,7 @@ export default function SeatingStudio({
                         priceRial: Number(e.target.value.replace(/\D/g, "") || 0),
                       })
                     }
-                    className="w-full rounded-lg border border-white/10 bg-slate-900 px-2 py-1.5 text-sm"
+                    className="w-full rounded-lg border border-slate-300 bg-white px-2 py-1.5 text-sm text-slate-900 outline-none focus:border-emerald-500 dark:border-white/10 dark:bg-slate-900 dark:text-white"
                     dir="ltr"
                   />
                 </div>
@@ -563,13 +576,13 @@ export default function SeatingStudio({
                     placeholder="قیمت ردیف"
                     value={rowPrice}
                     onChange={(e) => setRowPrice(e.target.value)}
-                    className="flex-1 rounded-lg border border-white/10 bg-slate-900 px-2 py-1.5 text-xs"
+                    className="flex-1 rounded-lg border border-slate-300 bg-white px-2 py-1.5 text-xs text-slate-900 outline-none focus:border-emerald-500 dark:border-white/10 dark:bg-slate-900 dark:text-white"
                     dir="ltr"
                   />
                   <button
                     type="button"
                     onClick={applyRowPrice}
-                    className="rounded-lg bg-white/10 px-2 py-1.5 text-[10px] font-bold"
+                    className="rounded-lg bg-slate-200 px-2 py-1.5 text-[10px] font-bold dark:bg-white/10"
                   >
                     ردیف {rowLabel(selected.row)}
                   </button>
@@ -577,9 +590,9 @@ export default function SeatingStudio({
               </div>
             </div>
           ) : (
-            <div className="text-sm text-slate-400">
-              <Maximize2 className="mb-3 h-8 w-8 text-slate-600" />
-              <p className="font-bold text-slate-300">راهنمای طراحی</p>
+            <div className="text-sm text-slate-500 dark:text-slate-400">
+              <Maximize2 className="mb-3 h-8 w-8 text-slate-400 dark:text-slate-600" />
+              <p className="font-bold text-slate-700 dark:text-slate-300">راهنمای طراحی</p>
               <ul className="mt-3 space-y-2 text-xs leading-6">
                 <li>با ابزار صندلی، هر خانه را به صندلی تبدیل کنید یا با «خالی» جای خالی بگذارید.</li>
                 <li>صحنه را یکپارچه با ابزار صحنه یا دکمه‌های گسترش تنظیم کنید.</li>
@@ -590,8 +603,8 @@ export default function SeatingStudio({
             </div>
           )}
 
-          <div className="mt-8 border-t border-white/10 pt-4">
-            <label className="mb-1 block text-[10px] text-slate-400">قیمت پیش‌فرض (ریال)</label>
+          <div className="mt-8 border-t border-slate-200 pt-4 dark:border-white/10">
+            <label className="mb-1 block text-[10px] text-slate-500 dark:text-slate-400">قیمت پیش‌فرض (ریال)</label>
             <input
               value={normalized.defaultPriceRial}
               onChange={(e) =>
@@ -600,7 +613,7 @@ export default function SeatingStudio({
                   defaultPriceRial: Number(e.target.value.replace(/\D/g, "") || 0),
                 })
               }
-              className="w-full rounded-lg border border-white/10 bg-slate-900 px-2 py-1.5 text-sm"
+              className="w-full rounded-lg border border-slate-300 bg-white px-2 py-1.5 text-sm text-slate-900 outline-none focus:border-emerald-500 dark:border-white/10 dark:bg-slate-900 dark:text-white"
               dir="ltr"
             />
           </div>

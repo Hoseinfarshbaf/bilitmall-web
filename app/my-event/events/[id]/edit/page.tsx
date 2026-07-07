@@ -103,7 +103,7 @@ export default function MyEventEditEventPage({
   if (pageLoading) {
     return (
       <MyEventShell>
-        <p className="text-slate-400">در حال بارگذاری...</p>
+        <p className="text-neutral-500 dark:text-slate-400">در حال بارگذاری...</p>
       </MyEventShell>
     );
   }
@@ -111,7 +111,7 @@ export default function MyEventEditEventPage({
   return (
     <MyEventShell title="ویرایش رویداد">
       {message ? (
-        <p className="mb-4 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-200">
+        <p className="mb-4 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-700 dark:text-amber-200">
           {message}
         </p>
       ) : null}
@@ -129,7 +129,7 @@ export default function MyEventEditEventPage({
       <button
         type="button"
         onClick={() => router.push("/my-event/dashboard")}
-        className="mt-4 text-sm font-bold text-slate-400 hover:text-white"
+        className="mt-4 text-sm font-bold text-neutral-500 hover:text-neutral-900 dark:text-slate-400 dark:hover:text-white"
       >
         بازگشت به داشبورد
       </button>

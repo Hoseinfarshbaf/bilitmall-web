@@ -35,26 +35,26 @@ export default function SeatingPlanEditor({
 
   return (
     <>
-      <div className="rounded-2xl border border-white/10 bg-gradient-to-br from-slate-800/80 to-slate-900/80 p-5">
+      <div className="rounded-2xl border border-slate-200 bg-linear-to-br from-slate-50 to-slate-100 p-5 dark:border-white/10 dark:from-slate-800/80 dark:to-slate-900/80">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
-              <LayoutGrid className="h-5 w-5 text-emerald-400" />
-              <p className="text-base font-black text-white">طراحی سالن و صندلی‌گذاری</p>
+              <LayoutGrid className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+              <p className="text-base font-black text-slate-900 dark:text-white">طراحی سالن و صندلی‌گذاری</p>
             </div>
-            <p className="mt-2 text-sm leading-6 text-slate-400">
+            <p className="mt-2 text-sm leading-6 text-slate-500 dark:text-slate-400">
               صحنه یکپارچه، بالکن‌ها، جایگاه‌ها و چیدمان آزاد صندلی‌ها را در استودیوی طراحی تنظیم
               کنید.
             </p>
             <div className="mt-3 flex flex-wrap gap-2 text-xs">
-              <span className="rounded-full bg-emerald-500/20 px-3 py-1 font-bold text-emerald-300">
+              <span className="rounded-full bg-emerald-100 px-3 py-1 font-bold text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300">
                 {bookableCount.toLocaleString("fa-IR")} صندلی
               </span>
-              <span className="rounded-full bg-violet-500/20 px-3 py-1 font-bold text-violet-300">
+              <span className="rounded-full bg-violet-100 px-3 py-1 font-bold text-violet-700 dark:bg-violet-500/20 dark:text-violet-300">
                 {layout.rows} ردیف × {layout.cols} ستون
               </span>
               {zoneCount > 0 ? (
-                <span className="rounded-full bg-sky-500/20 px-3 py-1 font-bold text-sky-300">
+                <span className="rounded-full bg-sky-100 px-3 py-1 font-bold text-sky-700 dark:bg-sky-500/20 dark:text-sky-300">
                   {zoneCount} جایگاه
                   {balconyCount > 0 ? ` (${balconyCount} بالکن)` : ""}
                 </span>
@@ -73,21 +73,21 @@ export default function SeatingPlanEditor({
         </div>
 
         {!hideVenueName ? (
-          <div className="mt-4 border-t border-white/10 pt-4">
-            <label className="mb-1 block text-xs font-bold text-slate-400">نام سالن در نقشه</label>
+          <div className="mt-4 border-t border-slate-200 pt-4 dark:border-white/10">
+            <label className="mb-1 block text-xs font-bold text-slate-500 dark:text-slate-400">نام سالن در نقشه</label>
             <input
               value={layout.name}
               onChange={(e) => setLayout({ ...layout, name: e.target.value })}
-              className="w-full max-w-md rounded-lg border border-white/10 bg-slate-900 px-3 py-2 text-sm"
+              className="w-full max-w-md rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-emerald-500 dark:border-white/10 dark:bg-slate-900 dark:text-white"
             />
           </div>
         ) : null}
 
         {templates.length > 0 ? (
-          <div className="mt-4 border-t border-white/10 pt-4">
-            <label className="mb-1 block text-xs font-bold text-slate-400">بارگذاری از قالب</label>
+          <div className="mt-4 border-t border-slate-200 pt-4 dark:border-white/10">
+            <label className="mb-1 block text-xs font-bold text-slate-500 dark:text-slate-400">بارگذاری از قالب</label>
             <select
-              className="rounded-lg border border-white/10 bg-slate-900 px-3 py-2 text-sm"
+              className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-emerald-500 dark:border-white/10 dark:bg-slate-900 dark:text-white"
               defaultValue=""
               onChange={(e) => {
                 const tpl = templates.find((t) => t.id === Number(e.target.value));
@@ -108,7 +108,7 @@ export default function SeatingPlanEditor({
           type="button"
           disabled={saving}
           onClick={() => void handleSave()}
-          className="mt-4 rounded-xl border border-white/15 px-5 py-2.5 text-sm font-bold text-slate-300 hover:bg-white/5 disabled:opacity-60"
+          className="mt-4 rounded-xl border border-slate-300 px-5 py-2.5 text-sm font-bold text-slate-600 hover:bg-slate-100 disabled:opacity-60 dark:border-white/15 dark:text-slate-300 dark:hover:bg-white/5"
         >
           {saving ? "در حال ذخیره..." : "ذخیره بدون ورود به استودیو"}
         </button>

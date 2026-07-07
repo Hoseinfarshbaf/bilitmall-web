@@ -243,13 +243,16 @@ export default function AdminVenueTemplatesPage() {
   };
 
   return (
-    <main className="min-h-screen bg-slate-50 p-4 md:p-8" dir="rtl">
+    <main
+      className="min-h-screen bg-slate-50 p-4 text-slate-900 md:p-8 dark:bg-slate-950 dark:text-slate-100"
+      dir="rtl"
+    >
       <div className="mx-auto max-w-6xl">
-        <Link href="/admin" className="mb-4 inline-block text-sm font-bold text-blue-600">
+        <Link href="/admin" className="mb-4 inline-block text-sm font-bold text-blue-600 dark:text-blue-400">
           ← پنل ادمین
         </Link>
-        <h1 className="text-3xl font-black text-slate-800">مدیریت سالن و صحنه</h1>
-        <p className="mt-2 text-sm text-slate-500">
+        <h1 className="text-3xl font-black text-slate-800 dark:text-slate-100">مدیریت سالن و صحنه</h1>
+        <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
           سالن‌های طراحی‌شده توسط برگزارکننده پس از تأیید به «کل سالن‌ها» منتقل می‌شوند. فقط
           سالن‌های تأییدشده در جستجوی مکان برگزاری هنگام ثبت رویداد پیشنهاد می‌شوند.
         </p>
@@ -394,7 +397,9 @@ function TabButton({
       type="button"
       onClick={onClick}
       className={`rounded-xl px-5 py-2.5 text-sm font-black ${
-        active ? activeClass : "bg-white text-slate-600 shadow-sm"
+        active
+          ? activeClass
+          : "bg-white text-slate-600 shadow-sm dark:bg-slate-800 dark:text-slate-300"
       }`}
     >
       {label}
@@ -419,9 +424,9 @@ function VenueTable({
   onDelete: (id: number, name: string) => void;
   onSetDefault: (id: number) => void;
 }) {
-  if (loading) return <p className="mt-8 text-slate-500">در حال بارگذاری...</p>;
+  if (loading) return <p className="mt-8 text-slate-500 dark:text-slate-400">در حال بارگذاری...</p>;
   if (rows.length === 0) {
-    return <p className="mt-8 rounded-2xl bg-white p-6 text-slate-500 shadow-sm">{empty}</p>;
+    return <p className="mt-8 rounded-2xl border border-slate-200 bg-white p-6 text-slate-500 shadow-sm dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400">{empty}</p>;
   }
 
   return (
@@ -429,27 +434,27 @@ function VenueTable({
       {rows.map((row) => (
         <div
           key={row.id}
-          className="flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-white p-5 shadow-sm"
+          className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900"
         >
           <div className="min-w-0 flex-1">
-            <p className="font-black text-slate-800">{row.name}</p>
-            <p className="mt-1 text-xs text-slate-500">
+            <p className="font-black text-slate-800 dark:text-slate-100">{row.name}</p>
+            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
               شهر: {row.city || "—"} · {row.seatCount.toLocaleString("fa-IR")} صندلی
               {row.isDefault ? " · پیش‌فرض" : ""}
               <span dir="ltr"> · {row.slug}</span>
             </p>
             {showSource ? (
-              <p className="mt-1 text-xs font-bold text-slate-600">
+              <p className="mt-1 text-xs font-bold text-slate-600 dark:text-slate-300">
                 منبع:{" "}
                 {row.source === "admin"
                   ? "مدیر سیستم"
                   : `برگزارکننده — ${row.organizerName ?? "نامشخص"}`}
               </p>
             ) : (
-              <p className="mt-1 text-xs text-blue-700">منبع: مدیر سیستم</p>
+              <p className="mt-1 text-xs text-blue-700 dark:text-blue-400">منبع: مدیر سیستم</p>
             )}
             {row.address ? (
-              <p className="mt-1 text-xs text-slate-400">{row.address}</p>
+              <p className="mt-1 text-xs text-slate-400 dark:text-slate-500">{row.address}</p>
             ) : null}
           </div>
           <div className="flex flex-wrap gap-2">
@@ -457,7 +462,7 @@ function VenueTable({
               <button
                 type="button"
                 onClick={() => onSetDefault(row.id)}
-                className="rounded-lg bg-amber-50 px-3 py-1 text-xs font-bold text-amber-800"
+                className="rounded-lg bg-amber-50 px-3 py-1 text-xs font-bold text-amber-800 dark:bg-amber-500/15 dark:text-amber-300"
               >
                 پیش‌فرض
               </button>
@@ -465,14 +470,14 @@ function VenueTable({
             <button
               type="button"
               onClick={() => onEdit(row)}
-              className="rounded-lg bg-slate-100 px-3 py-1 text-xs font-bold"
+              className="rounded-lg bg-slate-100 px-3 py-1 text-xs font-bold dark:bg-slate-800 dark:text-slate-200"
             >
               ویرایش
             </button>
             <button
               type="button"
               onClick={() => onDelete(row.id, row.name)}
-              className="rounded-lg bg-red-50 px-3 py-1 text-xs font-bold text-red-700"
+              className="rounded-lg bg-red-50 px-3 py-1 text-xs font-bold text-red-700 dark:bg-red-500/15 dark:text-red-300"
             >
               حذف
             </button>
@@ -496,10 +501,10 @@ function OrganizerTable({
   onDelete: (id: number, name: string) => void;
   onPromote: (id: number) => void;
 }) {
-  if (loading) return <p className="mt-8 text-slate-500">در حال بارگذاری...</p>;
+  if (loading) return <p className="mt-8 text-slate-500 dark:text-slate-400">در حال بارگذاری...</p>;
   if (plans.length === 0) {
     return (
-      <p className="mt-8 rounded-2xl bg-white p-6 text-slate-500 shadow-sm">
+      <p className="mt-8 rounded-2xl border border-slate-200 bg-white p-6 text-slate-500 shadow-sm dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400">
         سالن طراحی‌شده‌ای در انتظار تأیید نیست.
       </p>
     );
@@ -510,18 +515,18 @@ function OrganizerTable({
       {plans.map((plan) => (
         <div
           key={plan.id}
-          className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-violet-100 bg-white p-5 shadow-sm"
+          className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-violet-100 bg-white p-5 shadow-sm dark:border-violet-500/30 dark:bg-slate-900"
         >
           <div>
-            <p className="font-black text-slate-800">{plan.name || plan.eventPlace}</p>
-            <p className="mt-1 text-sm text-slate-600">
+            <p className="font-black text-slate-800 dark:text-slate-100">{plan.name || plan.eventPlace}</p>
+            <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
               رویداد: {plan.eventTitle} — {plan.eventPlace} — {plan.eventCity}
             </p>
-            <p className="mt-1 text-xs text-violet-700">
+            <p className="mt-1 text-xs text-violet-700 dark:text-violet-400">
               برگزارکننده: {plan.organizerName}
               <span dir="ltr"> (@{plan.organizerSlug})</span>
             </p>
-            <p className="mt-1 text-xs text-slate-500">
+            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
               {plan.seatCount.toLocaleString("fa-IR")} صندلی · وضعیت: در انتظار تأیید ·
               آخرین ویرایش: {new Date(plan.updatedAt).toLocaleString("fa-IR")}
             </p>
@@ -530,21 +535,21 @@ function OrganizerTable({
             <button
               type="button"
               onClick={() => onEdit(plan)}
-              className="rounded-lg bg-violet-100 px-3 py-1 text-xs font-bold text-violet-800"
+              className="rounded-lg bg-violet-100 px-3 py-1 text-xs font-bold text-violet-800 dark:bg-violet-500/20 dark:text-violet-300"
             >
               ویرایش نقشه
             </button>
             <button
               type="button"
               onClick={() => onPromote(plan.id)}
-              className="rounded-lg bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-800"
+              className="rounded-lg bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-800 dark:bg-emerald-500/20 dark:text-emerald-300"
             >
               تأیید و انتقال به کل سالن‌ها
             </button>
             <button
               type="button"
               onClick={() => onDelete(plan.id, plan.name || plan.eventTitle)}
-              className="rounded-lg bg-red-50 px-3 py-1 text-xs font-bold text-red-700"
+              className="rounded-lg bg-red-50 px-3 py-1 text-xs font-bold text-red-700 dark:bg-red-500/15 dark:text-red-300"
             >
               حذف
             </button>
@@ -578,11 +583,16 @@ function EditorPanel({
   saving: boolean;
   onCancel: () => void;
 }) {
-  const accentText = accent === "blue" ? "text-blue-300" : "text-violet-300";
+  const accentText =
+    accent === "blue"
+      ? "text-blue-600 dark:text-blue-300"
+      : "text-violet-600 dark:text-violet-300";
+  const metaInputClass =
+    "w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none focus:border-emerald-500 dark:border-white/10 dark:bg-slate-800 dark:text-white";
   return (
-    <div className="mt-8 rounded-3xl bg-slate-900 p-6 text-white">
+    <div className="mt-8 rounded-3xl border border-slate-200 bg-white p-6 text-slate-900 shadow-sm dark:border-transparent dark:bg-slate-900 dark:text-white dark:shadow-none">
       <p className={`mb-1 text-sm font-bold ${accentText}`}>{title}</p>
-      {subtitle ? <p className="mb-4 text-xs text-slate-400">{subtitle}</p> : null}
+      {subtitle ? <p className="mb-4 text-xs text-slate-500 dark:text-slate-400">{subtitle}</p> : null}
       {showMeta && venueMeta && setVenueMeta ? (
         <div className="mb-4 space-y-3">
           <div className="flex flex-wrap items-end gap-3">
@@ -591,7 +601,7 @@ function EditorPanel({
               <input
                 value={venueMeta.name}
                 onChange={(e) => setVenueMeta({ ...venueMeta, name: e.target.value })}
-                className="w-full rounded-xl border border-white/10 bg-slate-800 px-3 py-2.5 text-sm"
+                className={metaInputClass}
                 placeholder="مثلاً: سالن میلاد"
               />
             </div>
@@ -600,7 +610,7 @@ function EditorPanel({
               <CitySelect
                 value={venueMeta.city}
                 onChange={(city) => setVenueMeta({ ...venueMeta, city })}
-                className="w-full rounded-xl border border-white/10 bg-slate-800 px-3 py-2.5 text-sm"
+                className={metaInputClass}
               />
             </div>
           </div>
@@ -610,7 +620,7 @@ function EditorPanel({
               type="text"
               value={venueMeta.address}
               onChange={(e) => setVenueMeta({ ...venueMeta, address: e.target.value })}
-              className="w-full rounded-xl border border-white/10 bg-slate-800 px-3 py-2.5 text-sm"
+              className={metaInputClass}
               placeholder="خیابان، پلاک، ..."
             />
           </div>
@@ -625,7 +635,7 @@ function EditorPanel({
       <button
         type="button"
         onClick={onCancel}
-        className="mt-4 text-sm font-bold text-slate-400 hover:text-white"
+        className="mt-4 text-sm font-bold text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
       >
         انصراف
       </button>

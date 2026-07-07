@@ -28,22 +28,25 @@ export default function AdminOrdersPage() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-slate-50 p-4 md:p-8" dir="rtl">
+    <main
+      className="min-h-screen bg-slate-50 p-4 text-slate-900 md:p-8 dark:bg-slate-950 dark:text-slate-100"
+      dir="rtl"
+    >
       <div className="mx-auto max-w-6xl">
-        <Link href="/admin" className="mb-4 inline-block text-sm font-bold text-blue-600">
+        <Link href="/admin" className="mb-4 inline-block text-sm font-bold text-blue-600 dark:text-blue-400">
           ← بازگشت به پنل
         </Link>
-        <h1 className="text-3xl font-black text-slate-800">سفارش‌ها و پرداخت‌ها</h1>
-        <p className="mt-2 text-sm text-slate-500">تمام تراکنش‌های کاربران بلیت‌مال</p>
+        <h1 className="text-3xl font-black text-slate-800 dark:text-slate-100">سفارش‌ها و پرداخت‌ها</h1>
+        <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">تمام تراکنش‌های کاربران بلیت‌مال</p>
 
-        <div className="mt-8 overflow-hidden rounded-3xl bg-white shadow-sm">
+        <div className="mt-8 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
           {loading ? (
-            <p className="p-8 text-center text-slate-500">در حال بارگذاری...</p>
+            <p className="p-8 text-center text-slate-500 dark:text-slate-400">در حال بارگذاری...</p>
           ) : orders.length === 0 ? (
-            <p className="p-8 text-center text-slate-500">سفارشی ثبت نشده.</p>
+            <p className="p-8 text-center text-slate-500 dark:text-slate-400">سفارشی ثبت نشده.</p>
           ) : (
             <table className="min-w-full text-sm">
-              <thead className="bg-slate-50 text-slate-600">
+              <thead className="bg-slate-50 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
                 <tr>
                   <th className="px-4 py-3 text-right font-bold">کاربر</th>
                   <th className="px-4 py-3 text-right font-bold">رویداد</th>
@@ -55,10 +58,10 @@ export default function AdminOrdersPage() {
               </thead>
               <tbody>
                 {orders.map((order) => (
-                  <tr key={order.id} className="border-t border-slate-100">
+                  <tr key={order.id} className="border-t border-slate-100 dark:border-slate-800">
                     <td className="px-4 py-4">
                       <div className="font-bold">{order.user.name}</div>
-                      <div className="text-xs text-slate-500" dir="ltr">
+                      <div className="text-xs text-slate-500 dark:text-slate-400" dir="ltr">
                         {order.user.phone}
                       </div>
                     </td>
@@ -72,7 +75,7 @@ export default function AdminOrdersPage() {
                     <td className="px-4 py-4 text-xs" dir="ltr">
                       {order.paymentRef ?? "—"}
                     </td>
-                    <td className="px-4 py-4 text-xs text-slate-500" dir="ltr">
+                    <td className="px-4 py-4 text-xs text-slate-500 dark:text-slate-400" dir="ltr">
                       {new Date(order.createdAt).toLocaleDateString("fa-IR")}
                     </td>
                   </tr>

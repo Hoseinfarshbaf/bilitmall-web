@@ -74,24 +74,27 @@ export default function AdminUsersPage() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-50 p-4 md:p-8" dir="rtl">
+    <main
+      className="min-h-screen bg-slate-50 p-4 text-slate-900 md:p-8 dark:bg-slate-950 dark:text-slate-100"
+      dir="rtl"
+    >
       <div className="mx-auto max-w-6xl">
-        <Link href="/admin" className="mb-4 inline-block text-sm font-bold text-blue-600">
+        <Link href="/admin" className="mb-4 inline-block text-sm font-bold text-blue-600 dark:text-blue-400">
           ← بازگشت به پنل
         </Link>
-        <h1 className="text-3xl font-black text-slate-800">کاربران بلیت‌مال</h1>
-        <p className="mt-2 text-sm text-slate-500">
+        <h1 className="text-3xl font-black text-slate-800 dark:text-slate-100">کاربران بلیت‌مال</h1>
+        <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
           خریداران سایت — جدا از حساب‌های برگزارکننده My Event
         </p>
 
-        <div className="mt-8 overflow-hidden rounded-3xl bg-white shadow-sm">
+        <div className="mt-8 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
           {loading ? (
-            <p className="p-8 text-center text-slate-500">در حال بارگذاری...</p>
+            <p className="p-8 text-center text-slate-500 dark:text-slate-400">در حال بارگذاری...</p>
           ) : users.length === 0 ? (
-            <p className="p-8 text-center text-slate-500">هنوز کاربری ثبت‌نام نکرده.</p>
+            <p className="p-8 text-center text-slate-500 dark:text-slate-400">هنوز کاربری ثبت‌نام نکرده.</p>
           ) : (
             <table className="min-w-full text-sm">
-              <thead className="bg-slate-50 text-slate-600">
+              <thead className="bg-slate-50 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
                 <tr>
                   <th className="px-4 py-3 text-right font-bold">نام</th>
                   <th className="px-4 py-3 text-right font-bold">موبایل</th>
@@ -102,7 +105,7 @@ export default function AdminUsersPage() {
               </thead>
               <tbody>
                 {users.map((user) => (
-                  <tr key={user.id} className="border-t border-slate-100">
+                  <tr key={user.id} className="border-t border-slate-100 dark:border-slate-800">
                     <td className="px-4 py-4 font-bold">{user.name}</td>
                     <td className="px-4 py-4" dir="ltr">
                       {user.phone}
@@ -114,14 +117,14 @@ export default function AdminUsersPage() {
                         <button
                           type="button"
                           onClick={() => openEdit(user)}
-                          className="rounded-lg bg-blue-50 px-3 py-1 text-xs font-bold text-blue-700"
+                          className="rounded-lg bg-blue-50 px-3 py-1 text-xs font-bold text-blue-700 dark:bg-blue-500/15 dark:text-blue-300"
                         >
                           ویرایش
                         </button>
                         <button
                           type="button"
                           onClick={() => handleDelete(user)}
-                          className="rounded-lg bg-red-50 px-3 py-1 text-xs font-bold text-red-700"
+                          className="rounded-lg bg-red-50 px-3 py-1 text-xs font-bold text-red-700 dark:bg-red-500/15 dark:text-red-300"
                         >
                           حذف
                         </button>
@@ -139,10 +142,10 @@ export default function AdminUsersPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
           <form
             onSubmit={handleSaveEdit}
-            className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl"
+            className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl dark:bg-slate-900 dark:text-slate-100"
           >
             <h2 className="text-lg font-black">ویرایش کاربر</h2>
-            <p className="mt-1 text-xs text-slate-500" dir="ltr">
+            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400" dir="ltr">
               {editing.phone}
             </p>
             <div className="mt-4 space-y-3">
@@ -151,14 +154,14 @@ export default function AdminUsersPage() {
                 value={editName}
                 onChange={(e) => setEditName(e.target.value)}
                 placeholder="نام"
-                className="w-full rounded-xl border border-slate-200 px-4 py-2"
+                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2 text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
               />
               <input
                 value={editEmail}
                 onChange={(e) => setEditEmail(e.target.value)}
                 placeholder="ایمیل"
                 dir="ltr"
-                className="w-full rounded-xl border border-slate-200 px-4 py-2"
+                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2 text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
               />
             </div>
             <div className="mt-6 flex gap-2">
@@ -172,7 +175,7 @@ export default function AdminUsersPage() {
               <button
                 type="button"
                 onClick={() => setEditing(null)}
-                className="rounded-xl border border-slate-200 px-4 py-2 text-sm font-bold"
+                className="rounded-xl border border-slate-200 px-4 py-2 text-sm font-bold dark:border-slate-700"
               >
                 انصراف
               </button>
