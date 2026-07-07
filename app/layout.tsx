@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import FooterWrapper from "@/components/FooterWrapper";
 import NavbarWrapper from "@/components/NavbarWrapper";
+import { AuthProvider } from "@/components/AuthProvider";
+import { CitiesProvider } from "@/components/CitiesProvider";
 import { CityProvider } from "@/components/CityContext";
 
 export const metadata: Metadata = {
@@ -16,10 +19,15 @@ export default function RootLayout({
   return (
     <html lang="fa" dir="rtl">
       <body>
-        <CityProvider>
-          <NavbarWrapper />
-          {children}
-        </CityProvider>
+        <AuthProvider>
+          <CitiesProvider>
+            <CityProvider>
+              <NavbarWrapper />
+              {children}
+              <FooterWrapper />
+            </CityProvider>
+          </CitiesProvider>
+        </AuthProvider>
       </body>
     </html>
   );

@@ -1,14 +1,14 @@
-// صفحه هایی که نوبار ندارند 
 "use client";
 
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Navbar from "@/components/Navbar";
+import { shouldShowMarketplaceNavbar } from "@/lib/layout-visibility";
 
 export default function NavbarWrapper() {
   const pathname = usePathname();
 
-  // نوبار در صفحات ادمین و صفحات رویدادها (Discovery) نشان داده نشود
-  if (pathname.startsWith("/admin") || pathname.startsWith("/events")) {
+  if (!shouldShowMarketplaceNavbar(pathname)) {
     return null;
   }
 

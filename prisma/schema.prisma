@@ -1,0 +1,171 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// کاربران خریدار بلیت‌مال (جدا از MyEventUser — شماره موبایل می‌تواند تکراری باشد)
+model BilitmallUser {
+  id           Int           @id @default(autoincrement())
+  phone        String        @unique
+  passwordHash String
+  name         String
+  email        String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  orders       TicketOrder[]
+
+  @@map("BilitmallUser")
+}
+
+/// سفارش / پرداخت بلیت
+model TicketOrder {
+  id            Int           @id @default(autoincrement())
+  userId        Int
+  eventId       Int
+  eventTitle    String
+  eventSlug     String
+  amount        String
+  amountRial    Int           @default(0)
+  quantity      Int           @default(1)
+  sessionDate   String?
+  sessionTime   String?
+  status        String        @default("paid")
+  paymentRef    String?
+  paymentMethod String        @default("online")
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  user          BilitmallUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event         Event         @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([eventId])
+  @@map("TicketOrder")
+}
+
+/// برگزارکنندگان پلتفرم My Event (جدا از بلیت‌مال، متصل به Event)
+model MyEventOrganizer {
+  id          Int           @id @default(autoincrement())
+  slug        String        @unique
+  displayName String
+  bio         String?
+  coverImage  String        @default("")
+  logoImage   String        @default("")
+  avatarImage String        @default("")
+  phone       String?
+  email       String?
+  status      String        @default("pending")
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  users       MyEventUser[]
+  events      Event[]
+  venueTemplates VenueTemplate[]
+
+  @@map("MyEventOrganizer")
+}
+
+/// حساب‌های ورود برگزارکنندگان My Event
+model MyEventUser {
+  id                 Int              @id @default(autoincrement())
+  myEventOrganizerId Int              @map("organizerId")
+  phone              String           @unique
+  passwordHash       String
+  name               String
+  role               String           @default("owner")
+  createdAt          DateTime         @default(now())
+  myEventOrganizer   MyEventOrganizer @relation(fields: [myEventOrganizerId], references: [id], onDelete: Cascade)
+
+  @@index([myEventOrganizerId])
+  @@map("MyEventUser")
+}
+
+model Event {
+  id                 Int               @id @default(autoincrement())
+  slug               String            @unique
+  title              String
+  city               String
+  category           String
+  place              String
+  placeAddress       String?
+  price              String
+  image              String            @default("")
+  badge              String?
+  description        String?
+  days               String            @default("[]")
+  published          Boolean           @default(true)
+  popular            Boolean           @default(false)
+  featured           Boolean           @default(false)
+  ticketingType      String            @default("EXTERNAL_LINK")
+  status             String            @default("active")
+  source             String            @default("managed")
+  hasAssignedSeating Boolean           @default(false)
+  listOnBilitmallRequested Boolean      @default(false)
+  listOnBilitmallApproved  Boolean      @default(false)
+  publicEventSlug    String?
+  publicCitySlug     String?
+  myEventOrganizerId Int?              @map("organizerId")
+  myEventOrganizer   MyEventOrganizer? @relation(fields: [myEventOrganizerId], references: [id], onDelete: SetNull)
+  venueTemplateId    Int?
+  venueTemplate      VenueTemplate?    @relation(fields: [venueTemplateId], references: [id], onDelete: SetNull)
+  seatingPlan        EventSeatingPlan?
+  orders             TicketOrder[]
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+
+  @@index([myEventOrganizerId])
+}
+
+/// قالب سالن تأییدشده (فهرست کل سالن‌ها — پیشنهاد هنگام ثبت رویداد)
+model VenueTemplate {
+  id                  Int               @id @default(autoincrement())
+  name                String
+  slug                String            @unique
+  city                String            @default("")
+  address             String            @default("")
+  isDefault           Boolean           @default(false)
+  layout              String
+  source              String            @default("admin")
+  myEventOrganizerId  Int?              @map("organizerId")
+  myEventOrganizer    MyEventOrganizer? @relation(fields: [myEventOrganizerId], references: [id], onDelete: SetNull)
+  sourceSeatingPlanId Int?              @unique
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+  events              Event[]
+
+  @@index([city])
+  @@index([source])
+  @@map("VenueTemplate")
+}
+
+/// نقشه صندلی اختصاصی هر رویداد
+model EventSeatingPlan {
+  id                      Int      @id @default(autoincrement())
+  eventId                 Int      @unique
+  name                    String   @default("")
+  layout                  String
+  approvalStatus          String   @default("pending")
+  promotedVenueTemplateId Int?
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+  event                   Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@index([approvalStatus])
+  @@map("EventSeatingPlan")
+}
+
+/// شهرهای فعال در کل سیستم (بلیت‌مال، My Event، سالن‌ها)
+model City {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  slug      String   @unique
+  sortOrder Int      @default(0)
+  isPopular Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([sortOrder])
+  @@map("City")
+}
