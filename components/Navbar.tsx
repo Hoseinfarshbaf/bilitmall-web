@@ -124,7 +124,7 @@ export default function Navbar() {
                       شهرهای پربازدید
                     </div>
                   )}
-                  {(searchQuery ? filteredCities : popularCities.length > 0 ? popularCities : cities.slice(0, 5)).map((city) => (
+                  {(searchQuery ? filteredCities : popularCities.length > 0 ? popularCities : cities.slice(0, 6)).map((city) => (
                     <button
                       key={city}
                       onClick={() => {

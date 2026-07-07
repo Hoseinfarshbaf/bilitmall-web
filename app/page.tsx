@@ -4,6 +4,7 @@ import PopularEvents from "@/components/PopularEvents";
 import SearchBar from "@/components/SearchBar";
 import SpecialOffers from "@/components/SpecialOffers";
 import CategorySlider from "@/components/CategorySlider";
+import OrganizerCta from "@/components/OrganizerCta";
 import { useEvents } from "@/hooks/useEvents";
 import { useCity } from "@/components/CityContext";
 import { getCityEventsFromList } from "@/lib/events/helpers";
@@ -42,7 +43,7 @@ export default function Home() {
     <main className="min-h-screen bg-neutral-50 pb-20">
       <SpecialOffers />
 
-      <section className="py-8">
+      <section className="py-6">
         <div className="mx-auto max-w-6xl px-4">
           <SearchBar />
         </div>
@@ -50,7 +51,7 @@ export default function Home() {
 
       <PopularEvents />
 
-      <section className="mt-12">
+      <section className="mt-10">
         <div className="mx-auto max-w-6xl px-4">
           {loading ? (
             <p className="py-20 text-center text-neutral-500">در حال بارگذاری رویدادها...</p>
@@ -95,6 +96,8 @@ export default function Home() {
           )}
         </div>
       </section>
+
+      <OrganizerCta />
     </main>
   );
 }

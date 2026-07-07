@@ -51,6 +51,25 @@ export async function getCityNames(): Promise<string[]> {
   return cities.map((c) => c.name);
 }
 
+export async function listCitiesWithEventCount(): Promise<CityRecord[]> {
+  await ensureCitiesSeeded();
+  const rows = await prisma.city.findMany({
+    orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
+  });
+
+  const grouped = await prisma.event.groupBy({
+    by: ["city"],
+    where: { published: true },
+    _count: { _all: true },
+  });
+  const countByCity = new Map(grouped.map((g) => [g.city, g._count._all]));
+
+  return rows.map((row) => ({
+    ...toCityRecord(row),
+    eventCount: countByCity.get(row.name) ?? 0,
+  }));
+}
+
 export async function listCitiesWithUsage(): Promise<CityWithUsage[]> {
   await ensureCitiesSeeded();
   const rows = await prisma.city.findMany({
@@ -112,6 +131,25 @@ export async function createCity(
       slug,
       isPopular: options?.isPopular ?? false,
       sortOrder: (maxOrder._max.sortOrder ?? 0) + 1,
+    },
+  });
+
+  return toCityRecord(row);
+}
+
+export async function updateCity(
+  id: number,
+  data: { isPopular?: boolean }
+): Promise<CityRecord> {
+  const city = await prisma.city.findUnique({ where: { id } });
+  if (!city) {
+    throw new Error("شهر یافت نشد.");
+  }
+
+  const row = await prisma.city.update({
+    where: { id },
+    data: {
+      ...(data.isPopular !== undefined ? { isPopular: data.isPopular } : {}),
     },
   });
 

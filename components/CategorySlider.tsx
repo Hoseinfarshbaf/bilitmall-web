@@ -124,8 +124,8 @@ const CategorySlider = ({
     : "flex flex-nowrap gap-4 pb-4 pt-2 px-2 overflow-x-auto snap-x snap-mandatory touch-pan-x md:overflow-visible md:flex-wrap md:snap-none";
 
   return (
-    <div className="mb-16">
-      <div className="mb-6 flex items-end justify-between gap-4 px-1">
+    <div className="mb-12">
+      <div className="mb-5 flex items-end justify-between gap-4 px-1">
         <Link
           href={listHref}
           className="group/title min-w-0 transition-opacity hover:opacity-90"

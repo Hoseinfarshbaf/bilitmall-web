@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { CalendarDays, ChevronLeft, ChevronRight, MapPin } from "lucide-react";
+import { ArrowLeft, CalendarDays, MapPin } from "lucide-react";
 import { useEvents } from "@/hooks/useEvents";
 import { useCity } from "@/components/CityContext";
 import { formatEventDateDisplay } from "@/lib/events/date-utils";
@@ -34,14 +34,6 @@ export default function SpecialOffers() {
     },
     [slides.length]
   );
-
-  const goNext = useCallback(() => {
-    setActiveIndex((current) => (current + 1) % slides.length);
-  }, [slides.length]);
-
-  const goPrev = useCallback(() => {
-    setActiveIndex((current) => (current - 1 + slides.length) % slides.length);
-  }, [slides.length]);
 
   useEffect(() => {
     setActiveIndex(0);
@@ -92,18 +84,22 @@ export default function SpecialOffers() {
                   </span>
                 </div>
 
-                <div className="relative flex h-full flex-col items-end justify-end p-6 pb-14 text-right text-white sm:p-8 sm:pb-16">
-                  <h3 className="line-clamp-2 text-2xl font-black leading-tight drop-shadow-md sm:text-4xl">
+                <div className="relative flex h-full flex-col items-start justify-end p-6 pb-12 text-right text-white sm:p-8 sm:pb-14">
+                  <h3 className="line-clamp-2 max-w-2xl text-xl font-extrabold leading-snug tracking-tight drop-shadow-md sm:text-3xl">
                     {event.title}
                   </h3>
-                  <div className="mt-4 flex flex-wrap items-center justify-end gap-2.5 text-sm font-semibold text-white/90">
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1.5 backdrop-blur-sm">
+                  <div className="mt-3 flex flex-wrap items-center gap-2.5 text-[13px] font-semibold text-white/90 sm:text-sm">
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1.5 ring-1 ring-white/10 backdrop-blur-sm">
                       <CalendarDays className="h-4 w-4 text-red-300" />
                       {formatEventDateDisplay(event)}
                     </span>
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1.5 backdrop-blur-sm">
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1.5 ring-1 ring-white/10 backdrop-blur-sm">
                       <MapPin className="h-4 w-4 text-red-300" />
                       {event.place}
+                    </span>
+                    <span className="inline-flex items-center gap-1 text-red-300 opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100">
+                      <span className="font-black">مشاهده و خرید</span>
+                      <ArrowLeft className="h-4 w-4" />
                     </span>
                   </div>
                 </div>
@@ -111,34 +107,6 @@ export default function SpecialOffers() {
             </div>
           ))}
 
-          {multi ? (
-            <>
-              <button
-                type="button"
-                aria-label="اسلاید بعدی"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  goNext();
-                }}
-                className="absolute left-3 top-1/2 z-30 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-black/50 text-white shadow-lg backdrop-blur-sm transition hover:bg-black/70"
-              >
-                <ChevronLeft className="h-5 w-5" />
-              </button>
-              <button
-                type="button"
-                aria-label="اسلاید قبلی"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  goPrev();
-                }}
-                className="absolute right-3 top-1/2 z-30 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-black/50 text-white shadow-lg backdrop-blur-sm transition hover:bg-black/70"
-              >
-                <ChevronRight className="h-5 w-5" />
-              </button>
-            </>
-          ) : null}
         </div>
 
         {multi ? (

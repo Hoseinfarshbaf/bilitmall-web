@@ -6,6 +6,7 @@ export type CityRecord = {
   isPopular: boolean;
   createdAt: string;
   updatedAt: string;
+  eventCount?: number;
 };
 
 export type CityWithUsage = CityRecord & {

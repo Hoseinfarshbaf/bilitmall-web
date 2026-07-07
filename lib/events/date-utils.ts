@@ -198,6 +198,31 @@ export function getUpcomingEventSchedule(
   return upcoming;
 }
 
+/** تعداد روز مانده تا یک تاریخ شمسی (۰ = امروز، منفی = گذشته) */
+export function getDaysUntilDate(date: string): number {
+  const normalized = normalizeDateString(date);
+  const target = new DateObject({
+    date: normalized,
+    format: "YYYY/MM/DD",
+    calendar: persian,
+  }).toDate();
+  target.setHours(0, 0, 0, 0);
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  return Math.round((target.getTime() - today.getTime()) / 86_400_000);
+}
+
+/** برچسب فارسی «روز مانده به اجرا» */
+export function formatDaysUntilLabel(date: string): string {
+  const days = getDaysUntilDate(date);
+  if (days < 0) return "برگزار شده";
+  if (days === 0) return "امروز";
+  if (days === 1) return "فردا";
+  return `${days.toLocaleString("fa-IR")} روز مانده`;
+}
+
 export function eventMatchesDateFilter(
   event: Pick<EventItem, "date" | "time" | "days">,
   dateFilter: string | null | undefined

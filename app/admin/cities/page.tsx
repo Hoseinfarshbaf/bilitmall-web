@@ -62,6 +62,36 @@ export default function AdminCitiesPage() {
     }
   }
 
+  async function handleTogglePopular(city: CityWithUsage) {
+    const nextPopular = !city.isPopular;
+
+    setCities((prev) =>
+      prev.map((c) => (c.id === city.id ? { ...c, isPopular: nextPopular } : c))
+    );
+
+    const res = await fetch("/api/admin/cities", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: city.id, isPopular: nextPopular }),
+    });
+    const data = await res.json();
+
+    if (!res.ok) {
+      setCities((prev) =>
+        prev.map((c) => (c.id === city.id ? { ...c, isPopular: city.isPopular } : c))
+      );
+      alert(data.error ?? "خطا در به‌روزرسانی");
+      return;
+    }
+
+    setMessage(
+      nextPopular
+        ? `شهر «${city.name}» به شهرهای پربازدید نوبار اضافه شد.`
+        : `شهر «${city.name}» از شهرهای پربازدید نوبار حذف شد.`
+    );
+    await refreshGlobalCities();
+  }
+
   async function handleDelete(city: CityWithUsage) {
     if (
       !confirm(
@@ -165,13 +195,29 @@ export default function AdminCitiesPage() {
                       {city.venueCount.toLocaleString("fa-IR")}
                     </td>
                     <td className="px-4 py-3">
-                      {city.isPopular ? (
-                        <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-bold text-amber-800">
-                          پربازدید
-                        </span>
-                      ) : (
-                        <span className="text-slate-400">—</span>
-                      )}
+                      <button
+                        type="button"
+                        onClick={() => void handleTogglePopular(city)}
+                        role="switch"
+                        aria-checked={city.isPopular}
+                        title={
+                          city.isPopular
+                            ? "کلیک کنید تا از نوبار حذف شود"
+                            : "کلیک کنید تا به نوبار اضافه شود"
+                        }
+                        className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-bold transition-colors ${
+                          city.isPopular
+                            ? "bg-amber-100 text-amber-800 hover:bg-amber-200"
+                            : "bg-slate-100 text-slate-500 hover:bg-slate-200"
+                        }`}
+                      >
+                        <span
+                          className={`inline-block h-2 w-2 rounded-full ${
+                            city.isPopular ? "bg-amber-500" : "bg-slate-400"
+                          }`}
+                        />
+                        {city.isPopular ? "پربازدید" : "عادی"}
+                      </button>
                     </td>
                     <td className="px-4 py-3">
                       <button

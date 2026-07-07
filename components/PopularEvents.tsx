@@ -21,7 +21,7 @@ export default function PopularEvents() {
   }
 
   return (
-    <section className="py-12">
+    <section className="pt-10">
       <div className="mx-auto max-w-6xl px-4">
         <CategorySlider
           categoryLabel="محبوب"

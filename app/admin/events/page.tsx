@@ -18,7 +18,12 @@ import {
   EVENT_STATUS_LABELS,
   resolveEventStatus,
 } from "@/lib/events/status";
-import { eventMatchesDateFilter, getUpcomingEventSchedule } from "@/lib/events/date-utils";
+import {
+  eventMatchesDateFilter,
+  formatDaysUntilLabel,
+  getDaysUntilDate,
+  getUpcomingEventSchedule,
+} from "@/lib/events/date-utils";
 import { getEventImageStyle, getEventUrl } from "@/lib/events/helpers";
 
 type ViewMode = "list" | "create" | "edit";
@@ -31,39 +36,60 @@ function EventScheduleCell({ event }: { event: EventItem }) {
     return <span className="text-xs text-slate-400">—</span>;
   }
 
-  const firstDay = schedule[0];
   const totalSessions = schedule.reduce(
     (count, day) => count + day.sessions.length,
     0
   );
-  const moreDays = schedule.length - 1;
 
   return (
-    <div className="min-w-[140px]">
-      <div className="text-xs font-bold text-slate-800">{firstDay.date}</div>
-      <div className="mt-1 flex flex-wrap gap-1">
-        {firstDay.sessions.map((session, index) => (
-          <span
-            key={`${firstDay.date}-${session.time}-${index}`}
-            className={`rounded-md px-2 py-0.5 text-[11px] font-medium ring-1 ${
-              session.purchaseUrl
-                ? "bg-green-50 text-green-700 ring-green-200"
-                : "bg-white text-slate-600 ring-slate-200"
-            }`}
-            title={session.purchaseUrl ? "لینک خرید ثبت شده" : "بدون لینک خرید"}
+    <div className="min-w-[190px] space-y-2">
+      {schedule.map((day) => {
+        const daysUntil = getDaysUntilDate(day.date);
+        return (
+          <div
+            key={day.date}
+            className="rounded-lg border border-slate-100 bg-slate-50/60 px-2.5 py-2"
           >
-            {session.time}
-            {session.purchaseUrl ? " 🔗" : ""}
-          </span>
-        ))}
-      </div>
-      {moreDays > 0 || totalSessions > firstDay.sessions.length ? (
-        <p className="mt-1.5 text-[11px] font-medium text-slate-500">
-          {moreDays > 0 ? `${moreDays.toLocaleString("fa-IR")} روز دیگر` : null}
-          {moreDays > 0 && totalSessions > 1 ? " · " : null}
-          {totalSessions > 1
-            ? `${totalSessions.toLocaleString("fa-IR")} سانس`
-            : null}
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-xs font-bold text-slate-800">{day.date}</span>
+              <span
+                className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
+                  daysUntil === 0
+                    ? "bg-red-100 text-red-700"
+                    : daysUntil <= 3
+                      ? "bg-amber-100 text-amber-700"
+                      : "bg-blue-50 text-blue-700"
+                }`}
+              >
+                {formatDaysUntilLabel(day.date)}
+              </span>
+            </div>
+            <div className="mt-1.5 flex flex-wrap items-center gap-1">
+              <span className="text-[10px] font-bold text-slate-400">
+                {day.sessions.length.toLocaleString("fa-IR")} سانس:
+              </span>
+              {day.sessions.map((session, index) => (
+                <span
+                  key={`${day.date}-${session.time}-${index}`}
+                  className={`rounded-md px-2 py-0.5 text-[11px] font-medium ring-1 ${
+                    session.purchaseUrl
+                      ? "bg-green-50 text-green-700 ring-green-200"
+                      : "bg-white text-slate-600 ring-slate-200"
+                  }`}
+                  title={session.purchaseUrl ? "لینک خرید ثبت شده" : "بدون لینک خرید"}
+                >
+                  {session.time}
+                  {session.purchaseUrl ? " 🔗" : ""}
+                </span>
+              ))}
+            </div>
+          </div>
+        );
+      })}
+      {schedule.length > 1 ? (
+        <p className="text-[11px] font-medium text-slate-500">
+          مجموعاً {schedule.length.toLocaleString("fa-IR")} روز ·{" "}
+          {totalSessions.toLocaleString("fa-IR")} سانس
         </p>
       ) : null}
     </div>

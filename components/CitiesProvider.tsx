@@ -46,15 +46,24 @@ export function CitiesProvider({ children }: { children: React.ReactNode }) {
   const value = useMemo<CitiesContextType>(() => {
     const names =
       cityRows.length > 0 ? cityRows.map((c) => c.name) : [...DEFAULT_CITY_NAMES];
-    const popular =
-      cityRows.length > 0
-        ? cityRows.filter((c) => c.isPopular).map((c) => c.name)
-        : DEFAULT_CITY_NAMES.slice(0, 5);
+
+    let popular: string[];
+    if (cityRows.length > 0) {
+      const byEvents = (a: CityRecord, b: CityRecord) =>
+        (b.eventCount ?? 0) - (a.eventCount ?? 0);
+
+      const popularFirst = cityRows.filter((c) => c.isPopular).sort(byEvents);
+      const rest = cityRows.filter((c) => !c.isPopular).sort(byEvents);
+
+      popular = [...popularFirst, ...rest].slice(0, 6).map((c) => c.name);
+    } else {
+      popular = DEFAULT_CITY_NAMES.slice(0, 6);
+    }
 
     return {
       cities: names,
       cityRows,
-      popularCities: popular.length > 0 ? popular : names.slice(0, 5),
+      popularCities: popular.length > 0 ? popular : names.slice(0, 6),
       loading,
       refresh,
     };
