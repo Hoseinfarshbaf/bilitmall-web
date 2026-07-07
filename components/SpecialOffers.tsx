@@ -77,23 +77,32 @@ export default function SpecialOffers() {
             >
               <Link href={getEventUrl(event)} className="relative block h-full w-full">
                 <div
-                  className="absolute inset-0 bg-neutral-900 bg-cover bg-center"
+                  className="absolute inset-0 bg-neutral-900 bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-105"
                   style={getEventBannerImageStyle(event.image)}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/45 to-black/15" />
+                <div className="absolute inset-0 bg-linear-to-tl from-black/90 via-black/45 to-transparent" />
 
-                <div className="relative flex h-full flex-col justify-end p-6 pb-14 text-white sm:p-8 sm:pb-16">
-                  <span className="mb-3 inline-flex w-fit rounded-full bg-white/15 px-3 py-1 text-xs font-bold backdrop-blur-sm">
-                    پیشنهاد ویژه • {event.category} • {event.city}
+                <div className="absolute right-5 top-5 z-20 sm:right-7 sm:top-7">
+                  <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-black text-white shadow-lg backdrop-blur-md">
+                    <span className="relative flex h-2 w-2">
+                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75" />
+                      <span className="relative inline-flex h-2 w-2 rounded-full bg-red-500" />
+                    </span>
+                    پیشنهاد ویژه
                   </span>
-                  <h3 className="line-clamp-2 text-2xl font-black sm:text-4xl">{event.title}</h3>
-                  <div className="mt-4 flex flex-wrap items-center gap-4 text-sm font-medium text-white/90">
-                    <span className="inline-flex items-center gap-1.5">
-                      <CalendarDays className="h-4 w-4" />
+                </div>
+
+                <div className="relative flex h-full flex-col items-end justify-end p-6 pb-14 text-right text-white sm:p-8 sm:pb-16">
+                  <h3 className="line-clamp-2 text-2xl font-black leading-tight drop-shadow-md sm:text-4xl">
+                    {event.title}
+                  </h3>
+                  <div className="mt-4 flex flex-wrap items-center justify-end gap-2.5 text-sm font-semibold text-white/90">
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1.5 backdrop-blur-sm">
+                      <CalendarDays className="h-4 w-4 text-red-300" />
                       {formatEventDateDisplay(event)}
                     </span>
-                    <span className="inline-flex items-center gap-1.5">
-                      <MapPin className="h-4 w-4" />
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1.5 backdrop-blur-sm">
+                      <MapPin className="h-4 w-4 text-red-300" />
                       {event.place}
                     </span>
                   </div>

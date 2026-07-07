@@ -138,13 +138,15 @@ const CategorySlider = ({
           </p>
         </Link>
 
-        <Link
-          href={listHref}
-          className="flex shrink-0 items-center gap-2 rounded-full bg-neutral-100 px-4 py-2 text-xs font-bold transition-all duration-300 hover:bg-neutral-900 hover:text-white"
-        >
-          <span>مشاهده همه</span>
-          <ArrowLeft className="h-3 w-3" />
-        </Link>
+        {visibleData.length >= 4 ? (
+          <Link
+            href={listHref}
+            className="flex shrink-0 items-center gap-2 rounded-full bg-neutral-100 px-4 py-2 text-xs font-bold transition-all duration-300 hover:bg-neutral-900 hover:text-white"
+          >
+            <span>مشاهده همه</span>
+            <ArrowLeft className="h-3 w-3" />
+          </Link>
+        ) : null}
       </div>
 
       <div className="relative">
