@@ -200,8 +200,8 @@ export async function updateMyEventOrganizerProfile(
 
   let passwordHash = user.passwordHash;
   if (input.newPassword) {
-    if (input.newPassword.length < 6) {
-      return { ok: false, error: "رمز عبور جدید باید حداقل ۶ کاراکتر باشد.", status: 400 };
+    if (input.newPassword.length < 8) {
+      return { ok: false, error: "رمز عبور جدید باید حداقل ۸ کاراکتر باشد.", status: 400 };
     }
     if (!input.currentPassword || !verifyPassword(input.currentPassword, user.passwordHash)) {
       return { ok: false, error: "رمز عبور فعلی اشتباه است.", status: 400 };

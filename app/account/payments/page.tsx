@@ -14,17 +14,20 @@ export default function AccountPaymentsPage() {
 
   useEffect(() => {
     async function load() {
-      const meRes = await fetch("/api/auth/me");
-      if (!meRes.ok) {
-        router.replace("/auth/login");
-        return;
-      }
+      try {
+        const meRes = await fetch("/api/auth/me");
+        if (!meRes.ok) {
+          router.replace("/auth/login");
+          return;
+        }
 
-      const ordersRes = await fetch("/api/account/orders");
-      if (ordersRes.ok) {
-        setOrders(await ordersRes.json());
+        const ordersRes = await fetch("/api/account/orders");
+        if (ordersRes.ok) {
+          setOrders(await ordersRes.json());
+        }
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     }
 
     void load();

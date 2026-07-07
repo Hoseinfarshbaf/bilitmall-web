@@ -131,6 +131,8 @@ export default function MyEventRegisterPage() {
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            minLength={8}
+            placeholder="حداقل ۸ کاراکتر"
             className="w-full rounded-xl border border-white/10 bg-slate-900 px-4 py-3 outline-none focus:border-emerald-500"
           />
         </div>

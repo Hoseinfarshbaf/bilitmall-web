@@ -77,7 +77,7 @@ export async function POST(request: Request) {
 export async function DELETE(request: Request) {
   const { searchParams } = new URL(request.url);
   const id = Number(searchParams.get("id"));
-  if (!id) {
+  if (!Number.isFinite(id)) {
     return NextResponse.json({ error: "شناسه الزامی است." }, { status: 400 });
   }
   try {

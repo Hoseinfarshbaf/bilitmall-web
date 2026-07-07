@@ -429,7 +429,7 @@ export default function MyEventProfilePage() {
                 onChange={(e) => setNewPassword(e.target.value)}
                 className={inputClass}
                 dir="ltr"
-                minLength={6}
+                minLength={8}
               />
             </div>
             <div>
@@ -440,7 +440,7 @@ export default function MyEventProfilePage() {
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 className={inputClass}
                 dir="ltr"
-                minLength={6}
+                minLength={8}
               />
             </div>
           </div>
