@@ -14,11 +14,12 @@ import {
   type EventFormData,
   type EventItem,
 } from "@/lib/events/types";
-import { getEventSchedule, isEventEnded, normalizeDateString, normalizeEventDays, normalizeTimeString } from "@/lib/events/date-utils";
+import { getEventSchedule, hasScheduleGaps, isEventEnded, normalizeDateString, normalizeEventDays, normalizeTimeString } from "@/lib/events/date-utils";
 import { hasUploadedImage } from "@/lib/events/helpers";
 import { EVENT_IMAGE_RECOMMENDED_TEXT } from "@/lib/events/image-specs";
 import { processEventImageFile } from "@/lib/events/process-event-image";
 import EventImagePreviews from "@/components/admin/EventImagePreviews";
+import EventImportPanel from "@/components/admin/EventImportPanel";
 import VenuePlaceAutocomplete from "@/components/venues/VenuePlaceAutocomplete";
 
 const emptyForm = (): EventFormData => ({
@@ -43,6 +44,7 @@ type EventFormProps = {
   onSubmit: (data: EventFormData, imageFile: File | null) => Promise<void>;
   onCancel: () => void;
   submitting?: boolean;
+  showImport?: boolean;
 };
 
 export default function EventForm({
@@ -50,6 +52,7 @@ export default function EventForm({
   onSubmit,
   onCancel,
   submitting = false,
+  showImport = !initialEvent,
 }: EventFormProps) {
   const [formData, setFormData] = useState<EventFormData>(emptyForm);
   const [startPickerValue, setStartPickerValue] = useState<DateObject | null>(null);
@@ -58,6 +61,7 @@ export default function EventForm({
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageProcessing, setImageProcessing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const skipScheduleRangeFillRef = useRef(false);
 
   useEffect(() => {
     return () => {
@@ -111,11 +115,18 @@ export default function EventForm({
       });
       setStartPickerValue(firstDate);
       setEndPickerValue(lastDate);
+      if (hasScheduleGaps(schedule)) {
+        skipScheduleRangeFillRef.current = true;
+      }
     }
   }, [initialEvent]);
 
   useEffect(() => {
     if (!startPickerValue || !endPickerValue) return;
+    if (skipScheduleRangeFillRef.current) {
+      skipScheduleRangeFillRef.current = false;
+      return;
+    }
 
     const start = new DateObject(startPickerValue).toDate();
     const end = new DateObject(endPickerValue).toDate();
@@ -216,6 +227,33 @@ export default function EventForm({
     setFormData({ ...formData, days: newDays });
   };
 
+  function applyImportedDraft(draft: EventFormData) {
+    const normalizedDays = normalizeEventDays(draft.days);
+    skipScheduleRangeFillRef.current = true;
+    setFormData({ ...draft, days: normalizedDays });
+    setImageFile(null);
+    setImagePreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+
+    if (normalizedDays.length > 0) {
+      const firstDate = new DateObject({
+        date: normalizeDateString(normalizedDays[0].date),
+        format: "YYYY/MM/DD",
+        calendar: persian,
+      });
+      const lastDate = new DateObject({
+        date: normalizeDateString(normalizedDays[normalizedDays.length - 1].date),
+        format: "YYYY/MM/DD",
+        calendar: persian,
+      });
+      setStartPickerValue(firstDate);
+      setEndPickerValue(lastDate);
+    } else {
+      setStartPickerValue(null);
+      setEndPickerValue(null);
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -242,6 +280,7 @@ export default function EventForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
+      {showImport ? <EventImportPanel onApply={applyImportedDraft} /> : null}
       {isPastDate ? (
         <div className="rounded-2xl border border-slate-300 bg-slate-100 px-4 py-3 text-sm text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200">
           <span className="font-bold">تاریخ گذشته</span>
@@ -310,7 +349,7 @@ export default function EventForm({
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div>
           <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
-            مکان برگزاری
+            محل برگزاری
           </label>
           <VenuePlaceAutocomplete
             variant="admin"
@@ -318,6 +357,7 @@ export default function EventForm({
             value={formData.place}
             venueTemplateId={formData.venueTemplateId ?? null}
             placeAddress={formData.placeAddress ?? ""}
+            showLinkedAddress={false}
             onChange={(place, venueTemplateId, placeAddress) =>
               setFormData({ ...formData, place, venueTemplateId, placeAddress })
             }
@@ -327,6 +367,21 @@ export default function EventForm({
           />
         </div>
 
+        <div>
+          <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
+            نشانی
+          </label>
+          <textarea
+            rows={3}
+            value={formData.placeAddress ?? ""}
+            className="w-full resize-y rounded-xl border border-slate-200 bg-white p-3 text-slate-900 outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+            placeholder="نشانی محل برگزاری را وارد کنید"
+            onChange={(e) => setFormData({ ...formData, placeAddress: e.target.value })}
+          />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div>
           <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
             قیمت
@@ -340,9 +395,7 @@ export default function EventForm({
             onChange={(e) => setFormData({ ...formData, price: e.target.value })}
           />
         </div>
-      </div>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div>
           <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
             برچسب (اختیاری)
@@ -355,7 +408,9 @@ export default function EventForm({
             onChange={(e) => setFormData({ ...formData, badge: e.target.value })}
           />
         </div>
+      </div>
 
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div>
           <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
             وضعیت

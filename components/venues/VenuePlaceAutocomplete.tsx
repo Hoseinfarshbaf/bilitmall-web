@@ -20,6 +20,7 @@ type VenuePlaceAutocompleteProps = {
   className?: string;
   required?: boolean;
   variant?: "my-event" | "admin";
+  showLinkedAddress?: boolean;
   searchPath?: string;
 };
 
@@ -52,10 +53,11 @@ export default function VenuePlaceAutocomplete({
   venueTemplateId,
   placeAddress,
   onChange,
-  placeholder = "مکان برگزاری",
+  placeholder = "محل برگزاری",
   className = "",
   required,
   variant = "my-event",
+  showLinkedAddress = true,
   searchPath,
 }: VenuePlaceAutocompleteProps) {
   const theme = themes[variant];
@@ -138,7 +140,7 @@ export default function VenuePlaceAutocomplete({
           <p className={`text-xs ${theme.selected}`}>
             سالن ثبت‌شده انتخاب شد — نقشه صندلی همان سالن برای رویداد لحاظ می‌شود.
           </p>
-          {placeAddress ? (
+          {showLinkedAddress && placeAddress ? (
             <p className={`text-xs ${theme.address}`}>آدرس اجرا: {placeAddress}</p>
           ) : null}
         </div>

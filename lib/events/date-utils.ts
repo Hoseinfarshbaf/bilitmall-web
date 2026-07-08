@@ -47,6 +47,32 @@ export function normalizeEventDays(days: EventDay[]): EventDay[] {
   }));
 }
 
+export function hasScheduleGaps(days: EventDay[]): boolean {
+  const normalized = normalizeEventDays(days);
+  if (normalized.length <= 1) return false;
+
+  const sorted = [...normalized].sort((a, b) => a.date.localeCompare(b.date, "en"));
+  const start = new DateObject({
+    date: sorted[0].date,
+    format: "YYYY/MM/DD",
+    calendar: persian,
+  }).toDate();
+  const end = new DateObject({
+    date: sorted[sorted.length - 1].date,
+    format: "YYYY/MM/DD",
+    calendar: persian,
+  }).toDate();
+
+  let expected = 0;
+  const cursor = new Date(start);
+  while (cursor <= end) {
+    expected += 1;
+    cursor.setDate(cursor.getDate() + 1);
+  }
+
+  return sorted.length < expected;
+}
+
 export function parseDaysFromRecord(raw: string): EventDay[] {
   try {
     const parsed = JSON.parse(raw);
