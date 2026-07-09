@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import { Link2, Loader2, Sparkles } from "lucide-react";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { Link2, Loader2, SearchCheck, Sparkles } from "lucide-react";
 import type { EventFormData } from "@/lib/events/types";
 import type { ImportProvider, ImportQuestion, ImportResult } from "@/lib/events/import/types";
 import EventImagePreviews from "@/components/admin/EventImagePreviews";
@@ -12,6 +13,8 @@ const PROVIDER_LABELS: Record<string, string> = {
   generic: "عمومی",
 };
 
+const ASSETS_DOWNLOAD_STORAGE_KEY = "event-assets-download";
+
 const PROVIDER_OPTIONS: { value: ImportProvider | "auto"; label: string }[] = [
   { value: "auto", label: "تشخیص خودکار از لینک" },
   { value: "honarticket", label: "هنر تیکت" },
@@ -21,15 +24,43 @@ const PROVIDER_OPTIONS: { value: ImportProvider | "auto"; label: string }[] = [
 
 type EventImportPanelProps = {
   onApply: (draft: EventFormData) => void;
+  initialImportUrl?: string;
 };
 
-export default function EventImportPanel({ onApply }: EventImportPanelProps) {
+export default function EventImportPanel({ onApply, initialImportUrl }: EventImportPanelProps) {
   const [url, setUrl] = useState("");
   const [provider, setProvider] = useState<ImportProvider | "auto">("auto");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [result, setResult] = useState<ImportResult | null>(null);
   const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [assetsDownloadNotice, setAssetsDownloadNotice] = useState<{
+    folderPath: string;
+    warnings: string[];
+  } | null>(null);
+
+  useEffect(() => {
+    if (initialImportUrl?.trim()) {
+      setUrl(initialImportUrl.trim());
+    }
+  }, [initialImportUrl]);
+
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem(ASSETS_DOWNLOAD_STORAGE_KEY);
+      if (!raw) return;
+      sessionStorage.removeItem(ASSETS_DOWNLOAD_STORAGE_KEY);
+      const parsed = JSON.parse(raw) as { folderPath?: string; warnings?: string[] };
+      if (parsed.folderPath) {
+        setAssetsDownloadNotice({
+          folderPath: parsed.folderPath,
+          warnings: parsed.warnings ?? [],
+        });
+      }
+    } catch {
+      sessionStorage.removeItem(ASSETS_DOWNLOAD_STORAGE_KEY);
+    }
+  }, []);
 
   async function runImport(answerOverrides?: Record<string, string>) {
     const trimmed = url.trim();
@@ -83,10 +114,35 @@ export default function EventImportPanel({ onApply }: EventImportPanelProps) {
           import از لینک فروش بلیت
         </h2>
       </div>
-      <p className="mb-4 text-sm text-slate-600 dark:text-slate-400">
-        لینک رویداد از هنر تیکت یا ملوتیک را وارد کنید. فیلدهای فرم پر می‌شوند و لینک
-        خرید هر سانس به صفحه مبدأ اشاره می‌کند.
-      </p>
+      {assetsDownloadNotice ? (
+        <div className="mb-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-200">
+          <p className="font-bold">تصاویر در پوشه دسکتاپ ذخیره شد:</p>
+          <p className="mt-1 font-mono text-xs" dir="ltr">
+            {assetsDownloadNotice.folderPath}
+          </p>
+          {assetsDownloadNotice.warnings.length > 0 ? (
+            <ul className="mt-2 space-y-1 text-xs">
+              {assetsDownloadNotice.warnings.map((warning, index) => (
+                <li key={`${index}-${warning}`}>• {warning}</li>
+              ))}
+            </ul>
+          ) : null}
+        </div>
+      ) : null}
+
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <p className="text-sm text-slate-600 dark:text-slate-400">
+          لینک رویداد از هنر تیکت یا ملوتیک را وارد کنید. فیلدهای فرم پر می‌شوند و لینک
+          خرید هر سانس به صفحه مبدأ اشاره می‌کند.
+        </p>
+        <Link
+          href="/admin/events/discover"
+          className="inline-flex shrink-0 items-center gap-2 rounded-xl border border-blue-300 bg-white px-4 py-2 text-sm font-bold text-blue-700 transition hover:bg-blue-50 dark:border-blue-500/40 dark:bg-slate-900 dark:text-blue-300 dark:hover:bg-blue-500/10"
+        >
+          <SearchCheck className="h-4 w-4" />
+          رویدادهای ثبت‌نشده
+        </Link>
+      </div>
 
       <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
         <div>

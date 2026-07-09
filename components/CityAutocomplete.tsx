@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { MapPin, Search, X } from "lucide-react";
 import { useCityOptions } from "@/hooks/useCityOptions";
+import { cn } from "@/lib/utils";
 
 type CityAutocompleteProps = {
   value: string;
@@ -13,6 +14,10 @@ type CityAutocompleteProps = {
   className?: string;
   /** در پنل ادمین همه شهرهای ثبت‌شده نمایش داده می‌شود، نه فقط شهرهای دارای رویداد */
   includeAllCities?: boolean;
+  /** گزینه «همه» برای فیلتر لیست‌ها */
+  includeAll?: boolean;
+  allLabel?: string;
+  allValue?: string;
 };
 
 /** نرمال‌سازی حروف فارسی/عربی برای جستجوی روان */
@@ -27,8 +32,8 @@ function normalize(text: string): string {
     .toLowerCase();
 }
 
-const baseInputClass =
-  "w-full rounded-xl border border-slate-200 bg-white py-3 pr-10 pl-9 text-slate-900 outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100";
+const defaultInputClass =
+  "w-full rounded-xl border border-slate-200 bg-white py-3 text-sm text-slate-900 outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100";
 
 export default function CityAutocomplete({
   value,
@@ -36,8 +41,11 @@ export default function CityAutocomplete({
   id,
   required,
   placeholder = "جستجوی شهر...",
-  className = baseInputClass,
+  className,
   includeAllCities = false,
+  includeAll = false,
+  allLabel = "همه شهرها",
+  allValue = "همه",
 }: CityAutocompleteProps) {
   const { cities, loading } = useCityOptions(includeAllCities);
   const [query, setQuery] = useState(value);
@@ -46,8 +54,39 @@ export default function CityAutocomplete({
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    setQuery(value);
-  }, [value]);
+    setQuery(includeAll && value === allValue ? "" : value);
+  }, [value, includeAll, allValue]);
+
+  const inputPlaceholder = includeAll ? allLabel : placeholder;
+
+  const suggestions = useMemo(() => {
+    const q = normalize(query);
+
+    let cityMatches: string[];
+    if (!q) {
+      cityMatches = cities;
+    } else {
+      const starts: string[] = [];
+      const contains: string[] = [];
+      for (const city of cities) {
+        const nc = normalize(city);
+        if (nc.startsWith(q)) starts.push(city);
+        else if (nc.includes(q)) contains.push(city);
+      }
+      cityMatches = [...starts, ...contains];
+    }
+
+    if (!includeAll) return cityMatches;
+
+    const showAll =
+      !q || normalize(allLabel).includes(q) || normalize(allValue).includes(q);
+
+    return showAll ? [allValue, ...cityMatches] : cityMatches;
+  }, [cities, query, includeAll, allLabel, allValue]);
+
+  useEffect(() => {
+    setActiveIndex(0);
+  }, [query]);
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -59,27 +98,13 @@ export default function CityAutocomplete({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const suggestions = useMemo(() => {
-    const q = normalize(query);
-    if (!q) return cities;
-
-    const starts: string[] = [];
-    const contains: string[] = [];
-    for (const city of cities) {
-      const nc = normalize(city);
-      if (nc.startsWith(q)) starts.push(city);
-      else if (nc.includes(q)) contains.push(city);
-    }
-    return [...starts, ...contains];
-  }, [cities, query]);
-
-  useEffect(() => {
-    setActiveIndex(0);
-  }, [query]);
+  function suggestionLabel(city: string) {
+    return includeAll && city === allValue ? allLabel : city;
+  }
 
   function selectCity(city: string) {
     onChange(city);
-    setQuery(city);
+    setQuery(includeAll && city === allValue ? "" : city);
     setOpen(false);
   }
 
@@ -101,37 +126,52 @@ export default function CityAutocomplete({
     }
   }
 
-  const isExactMatch = suggestions.length === 1 && normalize(suggestions[0]) === normalize(query);
+  const isExactMatch =
+    suggestions.length === 1 && normalize(suggestionLabel(suggestions[0])) === normalize(query);
   const showList = open && suggestions.length > 0 && !isExactMatch;
+  const showClear = query || (includeAll && value !== allValue);
 
   return (
-    <div ref={containerRef} className="relative">
-      <Search className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+    <div ref={containerRef} className={cn("relative min-w-0 w-full", open && "z-30")}>
+      <Search className="pointer-events-none absolute right-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-slate-400" />
       <input
         id={id}
         type="text"
         required={required}
         value={query}
-        placeholder={placeholder}
+        placeholder={inputPlaceholder}
         disabled={loading}
         onChange={(e) => {
           setQuery(e.target.value);
           setOpen(true);
+          if (!e.target.value && includeAll) {
+            onChange(allValue);
+          }
         }}
         onFocus={() => setOpen(true)}
         onKeyDown={handleKeyDown}
-        className={`${className} disabled:opacity-60`}
+        className={cn(
+          defaultInputClass,
+          className,
+          "pr-10",
+          showClear ? "pl-9" : "pl-4",
+          "disabled:opacity-60"
+        )}
         autoComplete="off"
       />
-      {query ? (
+      {showClear ? (
         <button
           type="button"
           onClick={() => {
+            if (includeAll) {
+              onChange(allValue);
+            } else {
+              onChange("");
+            }
             setQuery("");
-            onChange("");
             setOpen(true);
           }}
-          className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+          className="absolute left-3 top-1/2 z-10 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
           aria-label="پاک کردن"
         >
           <X className="h-4 w-4" />
@@ -139,7 +179,7 @@ export default function CityAutocomplete({
       ) : null}
 
       {showList ? (
-        <ul className="absolute z-30 mt-1 max-h-60 w-full overflow-auto rounded-xl border border-slate-200 bg-white py-1 shadow-lg dark:border-slate-700 dark:bg-slate-800">
+        <ul className="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-xl border border-slate-200 bg-white py-1 shadow-lg dark:border-slate-700 dark:bg-slate-800">
           {suggestions.map((city, index) => (
             <li key={city}>
               <button
@@ -153,7 +193,7 @@ export default function CityAutocomplete({
                 } ${city === value ? "font-black" : "font-medium"}`}
               >
                 <MapPin className="h-4 w-4 shrink-0 text-slate-400" />
-                <span>{city}</span>
+                <span>{suggestionLabel(city)}</span>
               </button>
             </li>
           ))}
@@ -161,7 +201,7 @@ export default function CityAutocomplete({
       ) : null}
 
       {open && !loading && suggestions.length === 0 ? (
-        <div className="absolute z-30 mt-1 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-500 shadow-lg dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400">
+        <div className="absolute z-50 mt-1 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-500 shadow-lg dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400">
           شهری با این نام یافت نشد.
         </div>
       ) : null}

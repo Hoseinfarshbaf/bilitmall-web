@@ -1,4 +1,5 @@
 import type { EventFormData } from "@/lib/events/types";
+import { EVENT_PRICE_EXTERNAL_LABEL } from "@/lib/events/pricing";
 import { EVENT_CATEGORIES } from "@/lib/events/types";
 import { normalizeEventDays } from "@/lib/events/date-utils";
 import { getCityNames } from "@/lib/cities";
@@ -127,7 +128,6 @@ function toDraft(
     place: partial.place ?? "",
     placeAddress: partial.placeAddress ?? "",
     venueTemplateId: null,
-    price: partial.price ?? "",
     image: localImage ?? "",
     bannerImage: "",
     badge: "",
@@ -136,6 +136,11 @@ function toDraft(
     popular: false,
     featured: false,
     status: "active",
+    ticketingType: "EXTERNAL_LINK",
+    hasAssignedSeating: false,
+    pricingMode: null,
+    fixedPriceAmount: "",
+    price: partial.price?.trim() || EVENT_PRICE_EXTERNAL_LABEL,
   };
 }
 

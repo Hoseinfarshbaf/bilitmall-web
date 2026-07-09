@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { adminTableClasses } from "@/components/admin/admin-table-classes";
 import { getMyEventPublicUrl } from "@/lib/my-event/auth";
 import { MY_EVENT_STATUS_LABELS } from "@/lib/my-event/constants";
 import { formatAdminDateTime } from "@/lib/admin/format-datetime";
@@ -205,30 +206,31 @@ export default function AdminMyEventPage() {
             : `${filteredOrganizers.length} از ${organizers.length} برگزارکننده`}
         </p>
 
-        <div className="mt-4 overflow-x-auto rounded-3xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+        <div className={`mt-4 ${adminTableClasses.panel}`}>
           {loading ? (
-            <p className="p-8 text-center text-slate-500 dark:text-slate-400">در حال بارگذاری...</p>
+            <p className={adminTableClasses.emptyInPanel}>در حال بارگذاری...</p>
           ) : organizers.length === 0 ? (
-            <p className="p-8 text-center text-slate-500 dark:text-slate-400">هنوز برگزارکننده‌ای ثبت نشده.</p>
+            <p className={adminTableClasses.emptyInPanel}>هنوز برگزارکننده‌ای ثبت نشده.</p>
           ) : filteredOrganizers.length === 0 ? (
-            <p className="p-8 text-center text-slate-500 dark:text-slate-400">نتیجه‌ای با این فیلتر یافت نشد.</p>
+            <p className={adminTableClasses.emptyInPanel}>نتیجه‌ای با این فیلتر یافت نشد.</p>
           ) : (
-            <table className="min-w-full text-sm">
-              <thead className="bg-slate-50 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
-                <tr>
-                  <th className="px-4 py-3 text-right font-bold">نام برند</th>
-                  <th className="px-4 py-3 text-right font-bold">شماره موبایل</th>
-                  <th className="px-4 py-3 text-right font-bold">تاریخ ثبت‌نام</th>
-                  <th className="px-4 py-3 text-right font-bold">صفحه</th>
-                  <th className="px-4 py-3 text-right font-bold">رویدادها</th>
-                  <th className="px-4 py-3 text-right font-bold">وضعیت</th>
-                  <th className="px-4 py-3 text-right font-bold">عملیات</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredOrganizers.map((org) => (
-                  <tr key={org.id} className="border-t border-slate-100 dark:border-slate-800">
-                    <td className="px-4 py-4">
+            <div className={adminTableClasses.panelInner}>
+              <table className={adminTableClasses.table}>
+                <thead className={adminTableClasses.thead}>
+                  <tr>
+                    <th className={adminTableClasses.th}>نام برند</th>
+                    <th className={adminTableClasses.th}>شماره موبایل</th>
+                    <th className={adminTableClasses.th}>تاریخ ثبت‌نام</th>
+                    <th className={adminTableClasses.th}>صفحه</th>
+                    <th className={adminTableClasses.th}>رویدادها</th>
+                    <th className={adminTableClasses.th}>وضعیت</th>
+                    <th className={adminTableClasses.th}>عملیات</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredOrganizers.map((org) => (
+                    <tr key={org.id} className={adminTableClasses.tr}>
+                      <td className={adminTableClasses.td}>
                       <div className="font-bold text-slate-800 dark:text-slate-100">{org.displayName}</div>
                       {org.email ? (
                         <div className="text-xs text-slate-500 dark:text-slate-400" dir="ltr">
@@ -236,13 +238,18 @@ export default function AdminMyEventPage() {
                         </div>
                       ) : null}
                     </td>
-                    <td className="px-4 py-4 font-mono text-slate-700 dark:text-slate-300" dir="ltr">
-                      {org.phone ?? "—"}
-                    </td>
-                    <td className="px-4 py-4 text-xs text-slate-600 whitespace-nowrap dark:text-slate-400">
-                      {formatAdminDateTime(org.createdAt)}
-                    </td>
-                    <td className="px-4 py-4">
+                      <td
+                        className={`${adminTableClasses.td} font-mono text-slate-700 dark:text-slate-300`}
+                        dir="ltr"
+                      >
+                        {org.phone ?? "—"}
+                      </td>
+                      <td
+                        className={`${adminTableClasses.td} text-xs text-slate-600 whitespace-nowrap dark:text-slate-400`}
+                      >
+                        {formatAdminDateTime(org.createdAt)}
+                      </td>
+                      <td className={adminTableClasses.td}>
                       {org.status === "active" ? (
                         <a
                           href={getMyEventPublicUrl(org.slug)}
@@ -259,8 +266,8 @@ export default function AdminMyEventPage() {
                         </span>
                       )}
                     </td>
-                    <td className="px-4 py-4">{org.eventCount}</td>
-                    <td className="px-4 py-4">
+                      <td className={adminTableClasses.td}>{org.eventCount}</td>
+                      <td className={adminTableClasses.td}>
                       <span
                         className={`rounded-full px-3 py-1 text-xs font-bold ${
                           org.status === "active"
@@ -273,7 +280,7 @@ export default function AdminMyEventPage() {
                         {MY_EVENT_STATUS_LABELS[org.status] ?? org.status}
                       </span>
                     </td>
-                    <td className="px-4 py-4">
+                      <td className={adminTableClasses.td}>
                       <div className="flex flex-wrap gap-2">
                         <button
                           type="button"
@@ -312,7 +319,8 @@ export default function AdminMyEventPage() {
                   </tr>
                 ))}
               </tbody>
-            </table>
+              </table>
+            </div>
           )}
         </div>
       </div>

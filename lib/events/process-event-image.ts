@@ -3,6 +3,8 @@ import {
   EVENT_BANNER_MIN_HEIGHT,
   EVENT_BANNER_MIN_WIDTH,
   EVENT_CARD_IMAGE,
+  EVENT_IMAGE_IDEAL_MIN_HEIGHT,
+  EVENT_IMAGE_IDEAL_MIN_WIDTH,
   EVENT_IMAGE_MIN_HEIGHT,
   EVENT_IMAGE_MIN_WIDTH,
 } from "./image-specs";
@@ -55,12 +57,20 @@ async function processImageToFile(
   file: File,
   target: { width: number; height: number },
   min: { width: number; height: number },
-  suffix: string
+  suffix: string,
+  tooSmallMessage: (min: { width: number; height: number }) => string
 ): Promise<File> {
   const image = await loadImageFromFile(file);
 
-  if (image.width < min.width || image.height < min.height) {
-    throw new Error(`حداقل ابعاد تصویر ${min.width}×${min.height} پیکسل است.`);
+  const { cropWidth, cropHeight, offsetX, offsetY } = coverCrop(
+    image.width,
+    image.height,
+    target.width,
+    target.height
+  );
+
+  if (cropWidth < min.width || cropHeight < min.height) {
+    throw new Error(tooSmallMessage(min));
   }
 
   const canvas = document.createElement("canvas");
@@ -72,12 +82,8 @@ async function processImageToFile(
     throw new Error("پردازش تصویر در مرورگر ممکن نشد.");
   }
 
-  const { cropWidth, cropHeight, offsetX, offsetY } = coverCrop(
-    image.width,
-    image.height,
-    target.width,
-    target.height
-  );
+  context.imageSmoothingEnabled = true;
+  context.imageSmoothingQuality = "high";
 
   context.drawImage(
     image,
@@ -114,7 +120,9 @@ export async function processEventImageFile(file: File): Promise<File> {
     file,
     EVENT_CARD_IMAGE,
     { width: EVENT_IMAGE_MIN_WIDTH, height: EVENT_IMAGE_MIN_HEIGHT },
-    "card"
+    "card",
+    (min) =>
+      `ابعاد تصویر برای کارت بلیت‌مال کافی نیست. حداقل مؤثر پس از برش: ${min.width}×${min.height} پیکسل (ترجیحاً ${EVENT_IMAGE_IDEAL_MIN_WIDTH}×${EVENT_IMAGE_IDEAL_MIN_HEIGHT}).`
   );
 }
 
@@ -123,6 +131,7 @@ export async function processEventBannerImageFile(file: File): Promise<File> {
     file,
     EVENT_BANNER_IMAGE,
     { width: EVENT_BANNER_MIN_WIDTH, height: EVENT_BANNER_MIN_HEIGHT },
-    "banner"
+    "banner",
+    (min) => `حداقل ابعاد تصویر بنر ${min.width}×${min.height} پیکسل است.`
   );
 }

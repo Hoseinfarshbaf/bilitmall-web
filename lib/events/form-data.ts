@@ -2,7 +2,7 @@ import fs from "fs/promises";
 import path from "path";
 import { randomUUID } from "crypto";
 import sharp from "sharp";
-import type { EventDay, EventFormData } from "@/lib/events/types";
+import type { EventDay, EventFormData, EventPricingMode, TicketingType } from "@/lib/events/types";
 import { hasUploadedImage } from "@/lib/events/helpers";
 import { normalizeEventDays } from "@/lib/events/date-utils";
 import { EVENT_BANNER_IMAGE, EVENT_CARD_IMAGE } from "@/lib/events/image-specs";
@@ -91,7 +91,27 @@ export function parseEventFormData(body: Record<string, unknown>): EventFormData
     popular: body.popular === true || body.popular === "true",
     featured: body.featured === true || body.featured === "true",
     status: (body.status as EventFormData["status"]) ?? "active",
+    ticketingType: parseTicketingType(body.ticketingType),
+    hasAssignedSeating: parseNullableBoolean(body.hasAssignedSeating),
+    pricingMode: parsePricingMode(body.pricingMode),
+    fixedPriceAmount: String(body.fixedPriceAmount ?? ""),
   };
+}
+
+function parseTicketingType(value: unknown): TicketingType | null {
+  if (value === "INTERNAL" || value === "EXTERNAL_LINK") return value;
+  return null;
+}
+
+function parseNullableBoolean(value: unknown): boolean | null {
+  if (value === true || value === "true") return true;
+  if (value === false || value === "false") return false;
+  return null;
+}
+
+function parsePricingMode(value: unknown): EventPricingMode | null {
+  if (value === "free" || value === "fixed" || value === "per_seat") return value;
+  return null;
 }
 
 export async function parseEventRequest(request: Request): Promise<{
@@ -144,6 +164,10 @@ export async function parseEventRequest(request: Request): Promise<{
       featured:
         formData.get("featured") === "true" || formData.get("featured") === "on",
       status: (String(formData.get("status") ?? "active") as EventFormData["status"]),
+      ticketingType: parseTicketingType(formData.get("ticketingType")),
+      hasAssignedSeating: parseNullableBoolean(formData.get("hasAssignedSeating")),
+      pricingMode: parsePricingMode(formData.get("pricingMode")),
+      fixedPriceAmount: String(formData.get("fixedPriceAmount") ?? ""),
     };
 
     return { form, imageFile, bannerImageFile };

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useCities } from "@/components/CitiesProvider";
+import { adminTableClasses } from "@/components/admin/admin-table-classes";
 import type { CityWithUsage } from "@/lib/cities/types";
 
 export default function AdminCitiesPage() {
@@ -127,36 +128,42 @@ export default function AdminCitiesPage() {
           </p>
         ) : null}
 
-        <div className="mt-8 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+        <div className={`mt-8 ${adminTableClasses.panel}`}>
           {loading ? (
-            <p className="p-8 text-center text-slate-500 dark:text-slate-400">در حال بارگذاری...</p>
+            <p className={adminTableClasses.emptyInPanel}>در حال بارگذاری...</p>
           ) : cities.length === 0 ? (
-            <p className="p-8 text-center text-slate-500 dark:text-slate-400">شهری ثبت نشده.</p>
+            <p className={adminTableClasses.emptyInPanel}>شهری ثبت نشده.</p>
           ) : (
-            <table className="min-w-full text-sm">
-              <thead className="bg-slate-50 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
-                <tr>
-                  <th className="px-4 py-3 text-right font-bold">شهر</th>
-                  <th className="px-4 py-3 text-right font-bold">اسلاگ</th>
-                  <th className="px-4 py-3 text-right font-bold">رویداد</th>
-                  <th className="px-4 py-3 text-right font-bold">سالن</th>
-                  <th className="px-4 py-3 text-right font-bold">عملیات</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                {cities.map((city) => (
-                  <tr key={city.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50">
-                    <td className="px-4 py-3 font-bold text-slate-800 dark:text-slate-100">{city.name}</td>
-                    <td className="px-4 py-3 font-mono text-xs text-slate-500 dark:text-slate-400" dir="ltr">
-                      {city.slug}
-                    </td>
-                    <td className="px-4 py-3 text-slate-600 dark:text-slate-300">
-                      {city.eventCount.toLocaleString("fa-IR")}
-                    </td>
-                    <td className="px-4 py-3 text-slate-600 dark:text-slate-300">
-                      {city.venueCount.toLocaleString("fa-IR")}
-                    </td>
-                    <td className="px-4 py-3">
+            <div className={adminTableClasses.panelInner}>
+              <table className={adminTableClasses.table}>
+                <thead className={adminTableClasses.thead}>
+                  <tr>
+                    <th className={adminTableClasses.th}>شهر</th>
+                    <th className={adminTableClasses.th}>اسلاگ</th>
+                    <th className={adminTableClasses.th}>رویداد</th>
+                    <th className={adminTableClasses.th}>سالن</th>
+                    <th className={adminTableClasses.th}>عملیات</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {cities.map((city) => (
+                    <tr key={city.id} className={adminTableClasses.tr}>
+                      <td className={`${adminTableClasses.td} font-bold text-slate-800 dark:text-slate-100`}>
+                        {city.name}
+                      </td>
+                      <td
+                        className={`${adminTableClasses.td} font-mono text-xs text-slate-500 dark:text-slate-400`}
+                        dir="ltr"
+                      >
+                        {city.slug}
+                      </td>
+                      <td className={adminTableClasses.td}>
+                        {city.eventCount.toLocaleString("fa-IR")}
+                      </td>
+                      <td className={adminTableClasses.td}>
+                        {city.venueCount.toLocaleString("fa-IR")}
+                      </td>
+                      <td className={adminTableClasses.td}>
                       <button
                         type="button"
                         onClick={() => void handleDelete(city)}
@@ -164,11 +171,12 @@ export default function AdminCitiesPage() {
                       >
                         حذف
                       </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
       </div>

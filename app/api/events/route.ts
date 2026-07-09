@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createManagedEvent, getAllEvents } from "@/lib/events";
 import { applyUploadedImages, parseEventRequest, validateEventBannerImage, validateEventImage } from "@/lib/events/form-data";
+import { validateEventFormBusinessRules } from "@/lib/events/pricing";
 
 export async function GET() {
   const events = await getAllEvents();
@@ -22,18 +23,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: bannerError }, { status: 400 });
     }
 
-    if (!body.title?.trim() || !body.place?.trim() || !body.price?.trim()) {
-      return NextResponse.json(
-        { error: "عنوان، مکان و قیمت الزامی است." },
-        { status: 400 }
-      );
-    }
-
-    if (!body.days?.length) {
-      return NextResponse.json(
-        { error: "حداقل یک روز و سانس برای رویداد لازم است." },
-        { status: 400 }
-      );
+    const businessError = validateEventFormBusinessRules(body);
+    if (businessError) {
+      return NextResponse.json({ error: businessError }, { status: 400 });
     }
 
     const event = await createManagedEvent(body);

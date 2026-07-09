@@ -34,6 +34,7 @@ function toManagedEvent(record: {
   popular: boolean;
   featured: boolean;
   ticketingType: string;
+  hasAssignedSeating: boolean;
   status: string;
   createdAt: Date;
   updatedAt: Date;
@@ -56,6 +57,7 @@ function toManagedEvent(record: {
     popular: record.popular,
     featured: record.featured,
     ticketingType: record.ticketingType as ManagedEvent["ticketingType"],
+    hasAssignedSeating: record.hasAssignedSeating === true,
     status: record.status as ManagedEvent["status"],
     createdAt: record.createdAt.toISOString(),
     updatedAt: record.updatedAt.toISOString(),
@@ -80,6 +82,7 @@ function toEventData(event: ManagedEvent, source: "seed" | "managed") {
     popular: event.popular,
     featured: event.featured,
     ticketingType: event.ticketingType,
+    hasAssignedSeating: event.hasAssignedSeating === true,
     status: event.status,
     source,
   };

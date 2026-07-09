@@ -1,13 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import DatePicker, { DateObject } from "react-multi-date-picker";
 import persian from "react-date-object/calendars/persian";
 import persian_fa from "react-date-object/locales/persian_fa";
 import EventForm from "@/components/admin/EventForm";
+import EventAdminStatsPanel from "@/components/admin/EventAdminStatsPanel";
+import EventScheduleCell from "@/components/admin/EventScheduleCell";
 import EventStatusBadge from "@/components/admin/EventStatusBadge";
-import CitySelect from "@/components/CitySelect";
+import { adminTableClasses } from "@/components/admin/admin-table-classes";
+import CityAutocomplete from "@/components/CityAutocomplete";
 import { useAdminEvents } from "@/hooks/useEvents";
 import {
   EVENT_CATEGORIES,
@@ -20,83 +24,17 @@ import {
 } from "@/lib/events/status";
 import {
   eventMatchesDateFilter,
-  formatDaysUntilLabel,
-  getDaysUntilDate,
   getUpcomingEventSchedule,
 } from "@/lib/events/date-utils";
+import { resolveFormPrice } from "@/lib/events/pricing";
 import { getEventImageStyle, getEventUrl } from "@/lib/events/helpers";
+import { cn } from "@/lib/utils";
 
 type ViewMode = "list" | "create" | "edit";
 type HighlightFilter = "همه" | "popular" | "featured" | "both";
 
-function EventScheduleCell({ event }: { event: EventItem }) {
-  const schedule = getUpcomingEventSchedule(event);
-
-  if (schedule.length === 0) {
-    return <span className="text-xs text-slate-400 dark:text-slate-500">—</span>;
-  }
-
-  const totalSessions = schedule.reduce(
-    (count, day) => count + day.sessions.length,
-    0
-  );
-
-  return (
-    <div className="min-w-[190px] space-y-2">
-      {schedule.map((day) => {
-        const daysUntil = getDaysUntilDate(day.date);
-        return (
-          <div
-            key={day.date}
-            className="rounded-lg border border-slate-100 bg-slate-50/60 px-2.5 py-2 dark:border-slate-700 dark:bg-slate-800/60"
-          >
-            <div className="flex items-center justify-between gap-2">
-              <span className="text-xs font-bold text-slate-800 dark:text-slate-100">{day.date}</span>
-              <span
-                className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
-                  daysUntil === 0
-                    ? "bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-300"
-                    : daysUntil <= 3
-                      ? "bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300"
-                      : "bg-blue-50 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300"
-                }`}
-              >
-                {formatDaysUntilLabel(day.date)}
-              </span>
-            </div>
-            <div className="mt-1.5 flex flex-wrap items-center gap-1">
-              <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500">
-                {day.sessions.length.toLocaleString("fa-IR")} سانس:
-              </span>
-              {day.sessions.map((session, index) => (
-                <span
-                  key={`${day.date}-${session.time}-${index}`}
-                  className={`rounded-md px-2 py-0.5 text-[11px] font-medium ring-1 ${
-                    session.purchaseUrl
-                      ? "bg-green-50 text-green-700 ring-green-200 dark:bg-green-500/15 dark:text-green-300 dark:ring-green-500/30"
-                      : "bg-white text-slate-600 ring-slate-200 dark:bg-slate-900 dark:text-slate-300 dark:ring-slate-700"
-                  }`}
-                  title={session.purchaseUrl ? "لینک خرید ثبت شده" : "بدون لینک خرید"}
-                >
-                  {session.time}
-                  {session.purchaseUrl ? " 🔗" : ""}
-                </span>
-              ))}
-            </div>
-          </div>
-        );
-      })}
-      {schedule.length > 1 ? (
-        <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
-          مجموعاً {schedule.length.toLocaleString("fa-IR")} روز ·{" "}
-          {totalSessions.toLocaleString("fa-IR")} سانس
-        </p>
-      ) : null}
-    </div>
-  );
-}
-
-export default function AdminEventsPage() {
+function AdminEventsPageContent() {
+  const searchParams = useSearchParams();
   const { events, loading, error, refetch } = useAdminEvents();
   const [view, setView] = useState<ViewMode>("list");
   const [selectedEvent, setSelectedEvent] = useState<EventItem | null>(null);
@@ -107,6 +45,15 @@ export default function AdminEventsPage() {
   const [statusFilter, setStatusFilter] = useState("همه");
   const [dateFilter, setDateFilter] = useState<DateObject | null>(null);
   const [highlightFilter, setHighlightFilter] = useState<HighlightFilter>("همه");
+
+  const initialImportUrl = searchParams.get("importUrl") ?? "";
+
+  useEffect(() => {
+    if (searchParams.get("create") === "1") {
+      setSelectedEvent(null);
+      setView("create");
+    }
+  }, [searchParams]);
 
   const dateFilterValue = dateFilter?.format("YYYY/MM/DD") ?? "";
 
@@ -180,7 +127,7 @@ export default function AdminEventsPage() {
       } else {
         payload.append("venueTemplateId", "");
       }
-      payload.append("price", formData.price);
+      payload.append("price", resolveFormPrice(formData));
       payload.append("imageUrl", formData.image);
       payload.append("bannerImageUrl", formData.bannerImage);
       payload.append("badge", formData.badge);
@@ -189,6 +136,16 @@ export default function AdminEventsPage() {
       payload.append("popular", String(formData.popular));
       payload.append("featured", String(formData.featured));
       payload.append("status", formData.status);
+      if (formData.ticketingType) {
+        payload.append("ticketingType", formData.ticketingType);
+      }
+      if (formData.hasAssignedSeating !== null) {
+        payload.append("hasAssignedSeating", String(formData.hasAssignedSeating));
+      }
+      if (formData.pricingMode) {
+        payload.append("pricingMode", formData.pricingMode);
+      }
+      payload.append("fixedPriceAmount", formData.fixedPriceAmount);
 
       if (imageFile) {
         payload.append("image", imageFile);
@@ -270,15 +227,17 @@ export default function AdminEventsPage() {
         {view === "list" ? (
           <div className="space-y-5">
             <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-              <div className="grid grid-cols-1 gap-3 md:grid-cols-3 lg:grid-cols-6">
-                <input
-                  type="text"
-                  placeholder="جستجو..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
-                />
-                <div className="rounded-xl border border-slate-200 p-2 focus-within:border-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:[&_input]:text-slate-100">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+                <div className="min-w-0">
+                  <input
+                    type="text"
+                    placeholder="جستجو..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                  />
+                </div>
+                <div className="min-w-0 rounded-xl border border-slate-200 p-2 focus-within:border-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:[&_input]:text-slate-100">
                   <DatePicker
                     value={dateFilter}
                     onChange={(date) => setDateFilter((date as DateObject) ?? null)}
@@ -290,48 +249,55 @@ export default function AdminEventsPage() {
                     placeholder="فیلتر تاریخ"
                   />
                 </div>
-                <CitySelect
-                  includeAllCities
-                  value={cityFilter}
-                  includeAll
-                  onChange={setCityFilter}
-                  className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
-                />
-                <select
-                  value={categoryFilter}
-                  onChange={(e) => setCategoryFilter(e.target.value)}
-                  className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
-                >
-                  <option value="همه">همه دسته‌ها</option>
-                  {EVENT_CATEGORIES.map((category) => (
-                    <option key={category} value={category}>
-                      {category}
-                    </option>
-                  ))}
-                </select>
-                <select
-                  value={highlightFilter}
-                  onChange={(e) =>
-                    setHighlightFilter(e.target.value as HighlightFilter)
-                  }
-                  className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
-                >
-                  <option value="همه">همه نمایش‌ها</option>
-                  <option value="popular">فقط محبوب</option>
-                  <option value="featured">فقط ویژه</option>
-                  <option value="both">محبوب و ویژه</option>
-                </select>
-                <select
-                  value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value)}
-                  className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
-                >
-                  <option value="همه">همه وضعیت‌ها</option>
-                  <option value="active">{EVENT_STATUS_LABELS.active}</option>
-                  <option value="sold_out">{EVENT_STATUS_LABELS.sold_out}</option>
-                  <option value="cancelled">{EVENT_STATUS_LABELS.cancelled}</option>
-                  <option value="draft">{EVENT_STATUS_LABELS.draft}</option>
-                </select>
+                <div className="min-w-0">
+                  <CityAutocomplete
+                    includeAllCities
+                    includeAll
+                    value={cityFilter}
+                    onChange={setCityFilter}
+                  />
+                </div>
+                <div className="min-w-0">
+                  <select
+                    value={categoryFilter}
+                    onChange={(e) => setCategoryFilter(e.target.value)}
+                    className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                  >
+                    <option value="همه">همه دسته‌ها</option>
+                    {EVENT_CATEGORIES.map((category) => (
+                      <option key={category} value={category}>
+                        {category}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="min-w-0">
+                  <select
+                    value={highlightFilter}
+                    onChange={(e) =>
+                      setHighlightFilter(e.target.value as HighlightFilter)
+                    }
+                    className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                  >
+                    <option value="همه">همه نمایش‌ها</option>
+                    <option value="popular">فقط محبوب</option>
+                    <option value="featured">فقط ویژه</option>
+                    <option value="both">محبوب و ویژه</option>
+                  </select>
+                </div>
+                <div className="min-w-0">
+                  <select
+                    value={statusFilter}
+                    onChange={(e) => setStatusFilter(e.target.value)}
+                    className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                  >
+                    <option value="همه">همه وضعیت‌ها</option>
+                    <option value="active">{EVENT_STATUS_LABELS.active}</option>
+                    <option value="sold_out">{EVENT_STATUS_LABELS.sold_out}</option>
+                    <option value="cancelled">{EVENT_STATUS_LABELS.cancelled}</option>
+                    <option value="draft">{EVENT_STATUS_LABELS.draft}</option>
+                  </select>
+                </div>
               </div>
               {dateFilter ? (
                 <button
@@ -344,26 +310,33 @@ export default function AdminEventsPage() {
               ) : null}
             </div>
 
-            <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+            {!loading && !error ? (
+              <EventAdminStatsPanel
+                events={events}
+                filteredCount={filteredEvents.length}
+              />
+            ) : null}
+
+            <div className={adminTableClasses.panel}>
               {loading ? (
-                <p className="p-8 text-center text-slate-500 dark:text-slate-400">در حال بارگذاری...</p>
+                <p className={adminTableClasses.emptyInPanel}>در حال بارگذاری...</p>
               ) : error ? (
-                <p className="p-8 text-center text-red-500 dark:text-red-400">{error}</p>
+                <p className={`${adminTableClasses.emptyInPanel} text-red-500 dark:text-red-400`}>{error}</p>
               ) : filteredEvents.length === 0 ? (
-                <p className="p-8 text-center text-slate-500 dark:text-slate-400">رویدادی یافت نشد.</p>
+                <p className={adminTableClasses.emptyInPanel}>رویدادی یافت نشد.</p>
               ) : (
-                <div className="overflow-x-auto">
-                  <table className="min-w-full text-sm">
-                    <thead className="bg-slate-50 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                <div className={adminTableClasses.panelInner}>
+                  <table className={adminTableClasses.table}>
+                    <thead className={adminTableClasses.thead}>
                       <tr>
-                        <th className="px-4 py-3 text-right font-bold">رویداد</th>
-                        <th className="px-4 py-3 text-right font-bold">شهر</th>
-                        <th className="px-4 py-3 text-right font-bold">دسته</th>
-                        <th className="px-4 py-3 text-right font-bold">تاریخ</th>
-                        <th className="px-4 py-3 text-right font-bold">محبوب</th>
-                        <th className="px-4 py-3 text-right font-bold">ویژه</th>
-                        <th className="px-4 py-3 text-right font-bold">وضعیت</th>
-                        <th className="px-4 py-3 text-right font-bold">عملیات</th>
+                        <th className={adminTableClasses.th}>رویداد</th>
+                        <th className={adminTableClasses.th}>شهر</th>
+                        <th className={adminTableClasses.th}>دسته</th>
+                        <th className={adminTableClasses.th}>تاریخ</th>
+                        <th className={adminTableClasses.th}>محبوب</th>
+                        <th className={adminTableClasses.th}>ویژه</th>
+                        <th className={adminTableClasses.th}>وضعیت</th>
+                        <th className={adminTableClasses.th}>عملیات</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -375,8 +348,8 @@ export default function AdminEventsPage() {
                         );
 
                         return (
-                          <tr key={event.id} className="border-t border-slate-100 dark:border-slate-800">
-                            <td className="px-4 py-4">
+                          <tr key={event.id} className={adminTableClasses.tr}>
+                            <td className={cn(adminTableClasses.td, adminTableClasses.tdAccent)}>
                               <div className="flex items-center gap-3">
                                 <div
                                   className="h-12 w-12 shrink-0 rounded-xl"
@@ -390,12 +363,12 @@ export default function AdminEventsPage() {
                                 </div>
                               </div>
                             </td>
-                            <td className="px-4 py-4">{event.city}</td>
-                            <td className="px-4 py-4">{event.category}</td>
-                            <td className="px-4 py-4 align-top">
+                            <td className={adminTableClasses.td}>{event.city}</td>
+                            <td className={adminTableClasses.td}>{event.category}</td>
+                            <td className={adminTableClasses.tdTop}>
                               <EventScheduleCell event={event} />
                             </td>
-                            <td className="px-4 py-4">
+                            <td className={adminTableClasses.td}>
                               {event.popular ? (
                                 <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-700 dark:bg-amber-500/20 dark:text-amber-300">
                                   محبوب
@@ -404,7 +377,7 @@ export default function AdminEventsPage() {
                                 <span className="text-xs text-slate-400 dark:text-slate-500">—</span>
                               )}
                             </td>
-                            <td className="px-4 py-4">
+                            <td className={adminTableClasses.td}>
                               {event.featured ? (
                                 <span className="rounded-full bg-red-100 px-3 py-1 text-xs font-bold text-red-700 dark:bg-red-500/20 dark:text-red-300">
                                   ویژه
@@ -413,10 +386,10 @@ export default function AdminEventsPage() {
                                 <span className="text-xs text-slate-400 dark:text-slate-500">—</span>
                               )}
                             </td>
-                            <td className="px-4 py-4">
+                            <td className={adminTableClasses.td}>
                               <EventStatusBadge event={event} />
                             </td>
-                            <td className="px-4 py-4">
+                            <td className={adminTableClasses.td}>
                               <div className="flex flex-wrap gap-2">
                                 <button
                                   type="button"
@@ -456,6 +429,7 @@ export default function AdminEventsPage() {
             </h2>
             <EventForm
               initialEvent={selectedEvent}
+              initialImportUrl={initialImportUrl}
               onSubmit={handleSubmit}
               onCancel={backToList}
               submitting={submitting}
@@ -464,5 +438,19 @@ export default function AdminEventsPage() {
         )}
       </div>
     </main>
+  );
+}
+
+export default function AdminEventsPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="min-h-screen bg-slate-50 p-4 text-slate-900 md:p-8 dark:bg-slate-950 dark:text-slate-100">
+          <p className="text-center text-slate-500 dark:text-slate-400">در حال بارگذاری...</p>
+        </main>
+      }
+    >
+      <AdminEventsPageContent />
+    </Suspense>
   );
 }

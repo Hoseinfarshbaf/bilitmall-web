@@ -12,6 +12,8 @@ export type EventStatusValue = "active" | "held" | "sold_out" | "cancelled" | "d
 
 export type TicketingType = "EXTERNAL_LINK" | "INTERNAL";
 
+export type EventPricingMode = "free" | "fixed" | "per_seat";
+
 export const EVENT_CATEGORY_EVENT = "ایونت";
 
 export function resolveTicketingType(category: string): TicketingType {
@@ -89,6 +91,10 @@ export type EventFormData = {
   popular: boolean;
   featured: boolean;
   status: EventStatusValue;
+  ticketingType: TicketingType | null;
+  hasAssignedSeating: boolean | null;
+  pricingMode: EventPricingMode | null;
+  fixedPriceAmount: string;
 };
 
 import { DEFAULT_CITY_NAMES } from "@/lib/cities/constants";

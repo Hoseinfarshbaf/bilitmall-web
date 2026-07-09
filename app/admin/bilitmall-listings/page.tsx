@@ -2,10 +2,12 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { adminTableClasses } from "@/components/admin/admin-table-classes";
 import {
   BILITMALL_LISTING_LABELS,
   MY_EVENT_EVENT_STATUS_LABELS,
 } from "@/lib/my-event/constants";
+import { cn } from "@/lib/utils";
 
 type ListingRow = {
   id: number;
@@ -77,41 +79,42 @@ export default function AdminBilitmallListingsPage() {
           رویدادهایی که برگزارکننده خواسته در مارکت‌پلیس بلیت‌مال نمایش داده شوند
         </p>
 
-        <div className="mt-8 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+        <div className={`mt-8 ${adminTableClasses.panel}`}>
           {loading ? (
-            <p className="p-8 text-center text-slate-500 dark:text-slate-400">در حال بارگذاری...</p>
+            <p className={adminTableClasses.emptyInPanel}>در حال بارگذاری...</p>
           ) : events.length === 0 ? (
-            <p className="p-8 text-center text-slate-500 dark:text-slate-400">درخواستی ثبت نشده.</p>
+            <p className={adminTableClasses.emptyInPanel}>درخواستی ثبت نشده.</p>
           ) : (
-            <table className="min-w-full text-sm">
-              <thead className="bg-slate-50 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
-                <tr>
-                  <th className="px-4 py-3 text-right font-bold">رویداد</th>
-                  <th className="px-4 py-3 text-right font-bold">برگزارکننده</th>
-                  <th className="px-4 py-3 text-right font-bold">وضعیت My Event</th>
-                  <th className="px-4 py-3 text-right font-bold">بلیت‌مال</th>
-                  <th className="px-4 py-3 text-right font-bold">عملیات</th>
-                </tr>
-              </thead>
-              <tbody>
-                {events.map((event) => (
-                  <tr key={event.id} className="border-t border-slate-100 dark:border-slate-800">
-                    <td className="px-4 py-4">
+            <div className={adminTableClasses.panelInner}>
+              <table className={adminTableClasses.table}>
+                <thead className={adminTableClasses.thead}>
+                  <tr>
+                    <th className={adminTableClasses.th}>رویداد</th>
+                    <th className={adminTableClasses.th}>برگزارکننده</th>
+                    <th className={adminTableClasses.th}>وضعیت My Event</th>
+                    <th className={adminTableClasses.th}>بلیت‌مال</th>
+                    <th className={adminTableClasses.th}>عملیات</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {events.map((event) => (
+                    <tr key={event.id} className={adminTableClasses.tr}>
+                      <td className={cn(adminTableClasses.td, adminTableClasses.tdAccent)}>
                       <div className="font-bold">{event.title}</div>
                       <div className="text-xs text-slate-500 dark:text-slate-400">
                         {event.category} — {event.city}
                       </div>
-                    </td>
-                    <td className="px-4 py-4">
+                      </td>
+                      <td className={adminTableClasses.td}>
                       <div className="font-bold">{event.organizer?.displayName ?? "—"}</div>
                       <div className="text-xs text-slate-500 dark:text-slate-400" dir="ltr">
                         {event.organizer?.phone ?? ""}
                       </div>
-                    </td>
-                    <td className="px-4 py-4">
+                      </td>
+                      <td className={adminTableClasses.td}>
                       {MY_EVENT_EVENT_STATUS_LABELS[event.status] ?? event.status}
-                    </td>
-                    <td className="px-4 py-4">
+                      </td>
+                      <td className={adminTableClasses.td}>
                       <span
                         className={`rounded-full px-2 py-1 text-xs font-bold ${
                           event.listOnBilitmallApproved
@@ -123,8 +126,8 @@ export default function AdminBilitmallListingsPage() {
                           ? BILITMALL_LISTING_LABELS.approved
                           : BILITMALL_LISTING_LABELS.pending}
                       </span>
-                    </td>
-                    <td className="px-4 py-4">
+                      </td>
+                      <td className={adminTableClasses.td}>
                       {!event.listOnBilitmallApproved ? (
                         <div className="flex flex-wrap gap-2">
                           <button
@@ -155,7 +158,8 @@ export default function AdminBilitmallListingsPage() {
                   </tr>
                 ))}
               </tbody>
-            </table>
+              </table>
+            </div>
           )}
         </div>
       </div>

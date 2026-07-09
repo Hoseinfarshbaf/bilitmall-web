@@ -22,6 +22,8 @@ import { hasUploadedImage, isAdminListableEvent, MAX_FEATURED_EVENTS, POPULAR_CA
 import { runAdminEventMaintenance } from "./maintenance";
 import { MY_EVENT_EVENT_SOURCE } from "@/lib/my-event/constants";
 import { resolveEventPlaceAddress } from "./venue";
+import { resolveFormPrice } from "./pricing";
+import { syncEventSeatingFromVenueTemplate } from "@/lib/seating/store";
 
 export {
   POPULAR_CATEGORY_SLUG,
@@ -297,7 +299,7 @@ async function formToManagedEvent(
     place: form.place.trim(),
     placeAddress: placeAddress ?? undefined,
     venueTemplateId,
-    price: form.price.trim(),
+    price: resolveFormPrice(form),
     image: form.image,
     bannerImage: form.bannerImage,
     badge: form.badge.trim() || undefined,
@@ -305,7 +307,8 @@ async function formToManagedEvent(
     published: form.published,
     popular: form.popular,
     featured: form.featured,
-    ticketingType: resolveTicketingType(form.category),
+    ticketingType: form.ticketingType ?? resolveTicketingType(form.category),
+    hasAssignedSeating: form.hasAssignedSeating === true,
     status: form.status,
     createdAt: existing?.createdAt ?? now,
     updatedAt: now,
@@ -316,6 +319,11 @@ export async function createManagedEvent(form: EventFormData): Promise<EventItem
   await assertFeaturedLimit(form.featured, form.city);
   const managed = await formToManagedEvent(form);
   const saved = await saveManagedEvent(managed);
+
+  if (saved.hasAssignedSeating && saved.venueTemplateId) {
+    await syncEventSeatingFromVenueTemplate(saved.id, saved.venueTemplateId);
+  }
+
   return managedToEventItem({ ...saved, source: "managed" });
 }
 
@@ -338,6 +346,10 @@ export async function updateEvent(
   const saved = await saveManagedEvent(managed, {
     preserveSource: dbRecord.source as "seed" | "managed",
   });
+
+  if (saved.hasAssignedSeating && saved.venueTemplateId) {
+    await syncEventSeatingFromVenueTemplate(saved.id, saved.venueTemplateId);
+  }
 
   return managedToEventItem({
     ...saved,

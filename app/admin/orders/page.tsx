@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { adminTableClasses } from "@/components/admin/admin-table-classes";
 import { ORDER_STATUS_LABELS } from "@/lib/bilitmall/store";
 
 type OrderRow = {
@@ -39,49 +40,54 @@ export default function AdminOrdersPage() {
         <h1 className="text-3xl font-black text-slate-800 dark:text-slate-100">سفارش‌ها و پرداخت‌ها</h1>
         <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">تمام تراکنش‌های کاربران بلیت‌مال</p>
 
-        <div className="mt-8 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+        <div className={`mt-8 ${adminTableClasses.panel}`}>
           {loading ? (
-            <p className="p-8 text-center text-slate-500 dark:text-slate-400">در حال بارگذاری...</p>
+            <p className={adminTableClasses.emptyInPanel}>در حال بارگذاری...</p>
           ) : orders.length === 0 ? (
-            <p className="p-8 text-center text-slate-500 dark:text-slate-400">سفارشی ثبت نشده.</p>
+            <p className={adminTableClasses.emptyInPanel}>سفارشی ثبت نشده.</p>
           ) : (
-            <table className="min-w-full text-sm">
-              <thead className="bg-slate-50 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
-                <tr>
-                  <th className="px-4 py-3 text-right font-bold">کاربر</th>
-                  <th className="px-4 py-3 text-right font-bold">رویداد</th>
-                  <th className="px-4 py-3 text-right font-bold">مبلغ</th>
-                  <th className="px-4 py-3 text-right font-bold">وضعیت</th>
-                  <th className="px-4 py-3 text-right font-bold">پیگیری</th>
-                  <th className="px-4 py-3 text-right font-bold">تاریخ</th>
-                </tr>
-              </thead>
-              <tbody>
-                {orders.map((order) => (
-                  <tr key={order.id} className="border-t border-slate-100 dark:border-slate-800">
-                    <td className="px-4 py-4">
-                      <div className="font-bold">{order.user.name}</div>
-                      <div className="text-xs text-slate-500 dark:text-slate-400" dir="ltr">
-                        {order.user.phone}
-                      </div>
-                    </td>
-                    <td className="px-4 py-4">{order.eventTitle}</td>
-                    <td className="px-4 py-4">
-                      {order.amount} × {order.quantity}
-                    </td>
-                    <td className="px-4 py-4">
-                      {ORDER_STATUS_LABELS[order.status] ?? order.status}
-                    </td>
-                    <td className="px-4 py-4 text-xs" dir="ltr">
-                      {order.paymentRef ?? "—"}
-                    </td>
-                    <td className="px-4 py-4 text-xs text-slate-500 dark:text-slate-400" dir="ltr">
-                      {new Date(order.createdAt).toLocaleDateString("fa-IR")}
-                    </td>
+            <div className={adminTableClasses.panelInner}>
+              <table className={adminTableClasses.table}>
+                <thead className={adminTableClasses.thead}>
+                  <tr>
+                    <th className={adminTableClasses.th}>کاربر</th>
+                    <th className={adminTableClasses.th}>رویداد</th>
+                    <th className={adminTableClasses.th}>مبلغ</th>
+                    <th className={adminTableClasses.th}>وضعیت</th>
+                    <th className={adminTableClasses.th}>پیگیری</th>
+                    <th className={adminTableClasses.th}>تاریخ</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {orders.map((order) => (
+                    <tr key={order.id} className={adminTableClasses.tr}>
+                      <td className={adminTableClasses.td}>
+                        <div className="font-bold">{order.user.name}</div>
+                        <div className="text-xs text-slate-500 dark:text-slate-400" dir="ltr">
+                          {order.user.phone}
+                        </div>
+                      </td>
+                      <td className={adminTableClasses.td}>{order.eventTitle}</td>
+                      <td className={adminTableClasses.td}>
+                        {order.amount} × {order.quantity}
+                      </td>
+                      <td className={adminTableClasses.td}>
+                        {ORDER_STATUS_LABELS[order.status] ?? order.status}
+                      </td>
+                      <td className={`${adminTableClasses.td} text-xs`} dir="ltr">
+                        {order.paymentRef ?? "—"}
+                      </td>
+                      <td
+                        className={`${adminTableClasses.td} text-xs text-slate-500 dark:text-slate-400`}
+                        dir="ltr"
+                      >
+                        {new Date(order.createdAt).toLocaleDateString("fa-IR")}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
       </div>

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { adminTableClasses } from "@/components/admin/admin-table-classes";
 import { getMyEventPublicUrl } from "@/lib/my-event/auth";
 import { buildPublicEventSlug } from "@/lib/my-event/public-slugs";
 import {
@@ -10,6 +11,7 @@ import {
   MY_EVENT_STATUS_LABELS,
 } from "@/lib/my-event/constants";
 import { formatAdminDateTime } from "@/lib/admin/format-datetime";
+import { cn } from "@/lib/utils";
 
 type EventRow = {
   id: number;
@@ -298,33 +300,34 @@ export default function AdminMyEventEventsPage() {
             : `${filteredEvents.length} از ${events.length} رویداد`}
         </p>
 
-        <div className="mt-4 overflow-x-auto rounded-3xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+        <div className={`mt-4 ${adminTableClasses.panel}`}>
           {loading ? (
-            <p className="p-8 text-center text-slate-500 dark:text-slate-400">در حال بارگذاری...</p>
+            <p className={adminTableClasses.emptyInPanel}>در حال بارگذاری...</p>
           ) : events.length === 0 ? (
-            <p className="p-8 text-center text-slate-500 dark:text-slate-400">رویدادی ثبت نشده.</p>
+            <p className={adminTableClasses.emptyInPanel}>رویدادی ثبت نشده.</p>
           ) : filteredEvents.length === 0 ? (
-            <p className="p-8 text-center text-slate-500 dark:text-slate-400">نتیجه‌ای با این فیلتر یافت نشد.</p>
+            <p className={adminTableClasses.emptyInPanel}>نتیجه‌ای با این فیلتر یافت نشد.</p>
           ) : (
-            <table className="min-w-full text-sm">
-              <thead className="bg-slate-50 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
-                <tr>
-                  <th className="px-4 py-3 text-right font-bold">رویداد</th>
-                  <th className="px-4 py-3 text-right font-bold">برگزارکننده</th>
-                  <th className="px-4 py-3 text-right font-bold">تاریخ درخواست رویداد</th>
-                  <th className="px-4 py-3 text-right font-bold">درخواست‌ها</th>
-                  <th className="px-4 py-3 text-right font-bold">وضعیت</th>
-                  <th className="px-4 py-3 text-right font-bold">عملیات</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredEvents.map((event) => (
-                  <tr key={event.id} className="border-t border-slate-100 dark:border-slate-800">
-                    <td className="px-4 py-4">
+            <div className={adminTableClasses.panelInner}>
+              <table className={adminTableClasses.table}>
+                <thead className={adminTableClasses.thead}>
+                  <tr>
+                    <th className={adminTableClasses.th}>رویداد</th>
+                    <th className={adminTableClasses.th}>برگزارکننده</th>
+                    <th className={adminTableClasses.th}>تاریخ درخواست رویداد</th>
+                    <th className={adminTableClasses.th}>درخواست‌ها</th>
+                    <th className={adminTableClasses.th}>وضعیت</th>
+                    <th className={adminTableClasses.th}>عملیات</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredEvents.map((event) => (
+                    <tr key={event.id} className={adminTableClasses.tr}>
+                      <td className={cn(adminTableClasses.td, adminTableClasses.tdAccent)}>
                       <div className="font-bold">{event.title}</div>
                       <div className="text-xs text-slate-500 dark:text-slate-400">{event.city}</div>
                     </td>
-                    <td className="px-4 py-4">
+                      <td className={adminTableClasses.td}>
                       {event.organizer ? (
                         <>
                           <div className="font-bold">{event.organizer.displayName}</div>
@@ -339,10 +342,12 @@ export default function AdminMyEventEventsPage() {
                         "—"
                       )}
                     </td>
-                    <td className="px-4 py-4 text-xs text-slate-600 whitespace-nowrap dark:text-slate-400">
+                      <td
+                        className={`${adminTableClasses.td} text-xs text-slate-600 whitespace-nowrap dark:text-slate-400`}
+                      >
                       {formatAdminDateTime(event.createdAt)}
                     </td>
-                    <td className="px-4 py-4 text-xs">
+                      <td className={`${adminTableClasses.td} text-xs`}>
                       <div>صفحه اختصاصی ✓</div>
                       <div className={event.listOnBilitmallRequested ? "text-amber-700 dark:text-amber-400" : "text-slate-400 dark:text-slate-500"}>
                         بلیت‌مال:{" "}
@@ -353,7 +358,7 @@ export default function AdminMyEventEventsPage() {
                           : "—"}
                       </div>
                     </td>
-                    <td className="px-4 py-4">
+                      <td className={adminTableClasses.td}>
                       <span
                         className={`rounded-full px-2 py-1 text-xs font-bold ${
                           event.status === "active"
@@ -366,7 +371,7 @@ export default function AdminMyEventEventsPage() {
                         {MY_EVENT_EVENT_STATUS_LABELS[event.status] ?? event.status}
                       </span>
                     </td>
-                    <td className="px-4 py-4">
+                      <td className={adminTableClasses.td}>
                       <div className="flex flex-wrap gap-2">
                         {event.status === "pending" ? (
                           <>
@@ -433,7 +438,8 @@ export default function AdminMyEventEventsPage() {
                   </tr>
                 ))}
               </tbody>
-            </table>
+              </table>
+            </div>
           )}
         </div>
       </div>

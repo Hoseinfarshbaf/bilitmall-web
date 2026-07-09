@@ -9,7 +9,6 @@ import CityAutocomplete from "@/components/CityAutocomplete";
 import {
   ADMIN_EVENT_STATUSES,
   EVENT_CATEGORIES,
-  EVENT_CATEGORY_EVENT,
   type EventDay,
   type EventFormData,
   type EventItem,
@@ -23,7 +22,17 @@ import {
 import { processEventBannerImageFile, processEventImageFile } from "@/lib/events/process-event-image";
 import EventImagePreviews from "@/components/admin/EventImagePreviews";
 import EventImportPanel from "@/components/admin/EventImportPanel";
+import EventTicketingSetup from "@/components/admin/EventTicketingSetup";
 import VenuePlaceAutocomplete from "@/components/venues/VenuePlaceAutocomplete";
+import {
+  EVENT_PRICE_EXTERNAL_LABEL,
+  eventToFormTicketingFields,
+  isExternalTicketing,
+  isInternalTicketing,
+  isTicketingSetupComplete,
+  resolveFormPrice,
+  validateEventFormBusinessRules,
+} from "@/lib/events/pricing";
 
 const emptyForm = (): EventFormData => ({
   title: "",
@@ -41,10 +50,15 @@ const emptyForm = (): EventFormData => ({
   popular: false,
   featured: false,
   status: "active",
+  ticketingType: null,
+  hasAssignedSeating: null,
+  pricingMode: null,
+  fixedPriceAmount: "",
 });
 
 type EventFormProps = {
   initialEvent?: EventItem | null;
+  initialImportUrl?: string;
   onSubmit: (
     data: EventFormData,
     imageFile: File | null,
@@ -57,6 +71,7 @@ type EventFormProps = {
 
 export default function EventForm({
   initialEvent,
+  initialImportUrl,
   onSubmit,
   onCancel,
   submitting = false,
@@ -71,6 +86,7 @@ export default function EventForm({
   const [bannerImagePreview, setBannerImagePreview] = useState<string | null>(null);
   const [imageProcessing, setImageProcessing] = useState(false);
   const [bannerImageProcessing, setBannerImageProcessing] = useState(false);
+  const [ticketingSetupComplete, setTicketingSetupComplete] = useState(Boolean(initialEvent));
   const fileInputRef = useRef<HTMLInputElement>(null);
   const bannerFileInputRef = useRef<HTMLInputElement>(null);
   const skipScheduleRangeFillRef = useRef(false);
@@ -85,6 +101,7 @@ export default function EventForm({
   useEffect(() => {
     if (!initialEvent) {
       setFormData(emptyForm());
+      setTicketingSetupComplete(false);
       setStartPickerValue(null);
       setEndPickerValue(null);
       setImageFile(null);
@@ -95,6 +112,7 @@ export default function EventForm({
     }
 
     const schedule = getEventSchedule(initialEvent);
+    const ticketingFields = eventToFormTicketingFields(initialEvent);
     setFormData({
       title: initialEvent.title,
       city: initialEvent.city,
@@ -102,7 +120,6 @@ export default function EventForm({
       place: initialEvent.place,
       placeAddress: initialEvent.placeAddress ?? "",
       venueTemplateId: initialEvent.venueTemplateId ?? null,
-      price: initialEvent.price,
       image: initialEvent.image,
       bannerImage: initialEvent.bannerImage ?? "",
       badge: initialEvent.badge ?? "",
@@ -114,7 +131,9 @@ export default function EventForm({
         initialEvent.status === "held" || initialEvent.status === "draft"
           ? "active"
           : (initialEvent.status ?? "active"),
+      ...ticketingFields,
     });
+    setTicketingSetupComplete(true);
     setImageFile(null);
     setImagePreview(null);
     setBannerImageFile(null);
@@ -138,6 +157,20 @@ export default function EventForm({
       }
     }
   }, [initialEvent]);
+
+  useEffect(() => {
+    if (initialEvent || !initialImportUrl?.trim()) return;
+    setFormData((prev) => ({
+      ...prev,
+      ticketingType: "EXTERNAL_LINK",
+      hasAssignedSeating: false,
+      pricingMode: null,
+      fixedPriceAmount: "",
+      price: EVENT_PRICE_EXTERNAL_LABEL,
+      category: prev.category || "کنسرت",
+    }));
+    setTicketingSetupComplete(true);
+  }, [initialEvent, initialImportUrl]);
 
   useEffect(() => {
     if (!startPickerValue || !endPickerValue) return;
@@ -271,7 +304,17 @@ export default function EventForm({
   function applyImportedDraft(draft: EventFormData) {
     const normalizedDays = normalizeEventDays(draft.days);
     skipScheduleRangeFillRef.current = true;
-    setFormData({ ...draft, days: normalizedDays, bannerImage: draft.bannerImage ?? "" });
+    setFormData({
+      ...emptyForm(),
+      ...draft,
+      days: normalizedDays,
+      bannerImage: draft.bannerImage ?? "",
+      ticketingType: draft.ticketingType ?? "EXTERNAL_LINK",
+      hasAssignedSeating: draft.hasAssignedSeating ?? false,
+      pricingMode: draft.pricingMode ?? null,
+      fixedPriceAmount: draft.fixedPriceAmount ?? "",
+    });
+    setTicketingSetupComplete(true);
     setImageFile(null);
     setImagePreview(null);
     setBannerImageFile(null);
@@ -321,8 +364,27 @@ export default function EventForm({
       return;
     }
 
-    await onSubmit(formData, imageFile, bannerImageFile);
+    const businessError = validateEventFormBusinessRules(formData);
+    if (businessError) {
+      alert(businessError);
+      return;
+    }
+
+    if (!ticketingSetupComplete || !isTicketingSetupComplete(formData)) {
+      alert("تنظیمات فروش بلیت را کامل کنید.");
+      return;
+    }
+
+    await onSubmit(
+      { ...formData, price: resolveFormPrice(formData) },
+      imageFile,
+      bannerImageFile
+    );
   };
+
+  const showMainForm = ticketingSetupComplete && isTicketingSetupComplete(formData);
+  const isExternal = isExternalTicketing(formData.ticketingType);
+  const isInternal = isInternalTicketing(formData.ticketingType);
 
   const previewImageUrl =
     imagePreview ?? (hasUploadedImage(formData.image) ? formData.image : "");
@@ -338,7 +400,21 @@ export default function EventForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
-      {showImport ? <EventImportPanel onApply={applyImportedDraft} /> : null}
+      <EventTicketingSetup
+        formData={formData}
+        onChange={(patch) => setFormData((prev) => ({ ...prev, ...patch }))}
+        setupComplete={ticketingSetupComplete}
+        onSetupComplete={() => setTicketingSetupComplete(true)}
+        onEditSetup={() => setTicketingSetupComplete(false)}
+        isEdit={Boolean(initialEvent)}
+        eventId={initialEvent?.id}
+      />
+
+      {showMainForm ? (
+        <>
+      {showImport && isExternal ? (
+        <EventImportPanel onApply={applyImportedDraft} initialImportUrl={initialImportUrl} />
+      ) : null}
       {isPastDate ? (
         <div className="rounded-2xl border border-slate-300 bg-slate-100 px-4 py-3 text-sm text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200">
           <span className="font-bold">تاریخ گذشته</span>
@@ -384,22 +460,28 @@ export default function EventForm({
           <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
             دسته‌بندی
           </label>
-          <select
-            className="w-full rounded-xl border border-slate-200 bg-white p-3 text-slate-900 outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
-            value={formData.category}
-            onChange={(e) =>
-              setFormData({ ...formData, category: e.target.value })
-            }
-          >
-            {EVENT_CATEGORIES.map((category) => (
-              <option key={category} value={category}>
-                {category}
-              </option>
-            ))}
-          </select>
-          {formData.category === EVENT_CATEGORY_EVENT ? (
+          {isInternal && formData.category ? (
+            <p className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-800 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100">
+              {formData.category}
+            </p>
+          ) : (
+            <select
+              className="w-full rounded-xl border border-slate-200 bg-white p-3 text-slate-900 outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+              value={formData.category}
+              onChange={(e) =>
+                setFormData({ ...formData, category: e.target.value })
+              }
+            >
+              {EVENT_CATEGORIES.map((category) => (
+                <option key={category} value={category}>
+                  {category}
+                </option>
+              ))}
+            </select>
+          )}
+          {isExternal ? (
             <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
-              ایونت‌ها با تیکتینگ داخلی (QR) مدیریت می‌شوند؛ کنسرت و تئاتر به لینک خارجی متصل می‌مانند.
+              برای هر سانس لینک خرید از سایت فروشنده را در بخش زمان‌بندی وارد کنید.
             </p>
           ) : null}
         </div>
@@ -443,20 +525,6 @@ export default function EventForm({
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div>
           <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
-            قیمت
-          </label>
-          <input
-            type="text"
-            required
-            value={formData.price}
-            className="w-full rounded-xl border border-slate-200 bg-white p-3 text-slate-900 outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
-            placeholder="مثلاً: از ۳۵۰ هزار تومان"
-            onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-          />
-        </div>
-
-        <div>
-          <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
             برچسب (اختیاری)
           </label>
           <input
@@ -467,9 +535,7 @@ export default function EventForm({
             onChange={(e) => setFormData({ ...formData, badge: e.target.value })}
           />
         </div>
-      </div>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div>
           <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
             وضعیت
@@ -675,20 +741,22 @@ export default function EventForm({
                             <X className="h-3.5 w-3.5" />
                           </button>
                         </div>
-                        <input
-                          type="url"
-                          dir="ltr"
-                          placeholder="لینک خرید سانس"
-                          className="mt-1.5 w-full rounded border border-slate-200 bg-white px-2 py-1 text-left text-xs text-slate-900 outline-none focus:border-blue-500 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
-                          value={session.purchaseUrl ?? ""}
-                          onChange={(e) =>
-                            updateSessionPurchaseUrl(
-                              dayIndex,
-                              sessionIndex,
-                              e.target.value
-                            )
-                          }
-                        />
+                        {isExternal ? (
+                          <input
+                            type="url"
+                            dir="ltr"
+                            placeholder="لینک خرید سانس"
+                            className="mt-1.5 w-full rounded border border-slate-200 bg-white px-2 py-1 text-left text-xs text-slate-900 outline-none focus:border-blue-500 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
+                            value={session.purchaseUrl ?? ""}
+                            onChange={(e) =>
+                              updateSessionPurchaseUrl(
+                                dayIndex,
+                                sessionIndex,
+                                e.target.value
+                              )
+                            }
+                          />
+                        ) : null}
                       </div>
                     ))}
                   </div>
@@ -792,7 +860,10 @@ export default function EventForm({
           </div>
         ) : null}
       </div>
+        </>
+      ) : null}
 
+      {showMainForm ? (
       <div className="flex gap-3">
         <button
           type="button"
@@ -813,6 +884,7 @@ export default function EventForm({
               : "انتشار رویداد"}
         </button>
       </div>
+      ) : null}
     </form>
   );
 }
