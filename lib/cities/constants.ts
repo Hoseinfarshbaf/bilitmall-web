@@ -1,3 +1,5 @@
+export const TOP_CITIES_IN_SELECTOR = 5;
+
 export type DefaultCitySeed = {
   name: string;
   slug: string;

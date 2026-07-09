@@ -40,6 +40,7 @@ export default function VenueListFiltersBar({
       <div className="w-36">
         <label className="mb-1 block text-xs font-bold text-slate-500 dark:text-slate-400">شهر</label>
         <CitySelect
+          includeAllCities
           value={city}
           includeAll
           onChange={onCityChange}

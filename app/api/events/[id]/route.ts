@@ -4,7 +4,7 @@ import {
   removeEvent,
   updateEvent,
 } from "@/lib/events";
-import { applyUploadedImage, parseEventRequest, validateEventImage } from "@/lib/events/form-data";
+import { applyUploadedImages, parseEventRequest, validateEventBannerImage, validateEventImage } from "@/lib/events/form-data";
 
 type RouteContext = {
   params: Promise<{ id: string }>;
@@ -25,8 +25,8 @@ export async function PUT(request: Request, context: RouteContext) {
   try {
     const { id: idParam } = await context.params;
     const id = Number(idParam);
-    const { form, imageFile } = await parseEventRequest(request);
-    const body = await applyUploadedImage(form, imageFile);
+    const { form, imageFile, bannerImageFile } = await parseEventRequest(request);
+    const body = await applyUploadedImages(form, imageFile, bannerImageFile);
     const existing = await getEventById(id);
 
     if (!existing) {
@@ -36,6 +36,11 @@ export async function PUT(request: Request, context: RouteContext) {
     const imageError = validateEventImage(body, imageFile, { isCreate: false });
     if (imageError) {
       return NextResponse.json({ error: imageError }, { status: 400 });
+    }
+
+    const bannerError = validateEventBannerImage(body, bannerImageFile, { isCreate: false });
+    if (bannerError) {
+      return NextResponse.json({ error: bannerError }, { status: 400 });
     }
 
     if (!body.title?.trim() || !body.place?.trim() || !body.price?.trim()) {

@@ -100,6 +100,13 @@ export function getEventImageUrl(image?: string | null): string {
   return image;
 }
 
+export function getEventBannerImageUrl(
+  event: Pick<EventItem, "image" | "bannerImage">
+): string {
+  if (event.bannerImage?.trim()) return event.bannerImage.trim();
+  return getEventImageUrl(event.image);
+}
+
 export function getEventImageStyle(image?: string | null): CSSProperties {
   const url = getEventImageUrl(image);
 

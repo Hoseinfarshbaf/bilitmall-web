@@ -1,4 +1,7 @@
 import {
+  EVENT_BANNER_IMAGE,
+  EVENT_BANNER_MIN_HEIGHT,
+  EVENT_BANNER_MIN_WIDTH,
   EVENT_CARD_IMAGE,
   EVENT_IMAGE_MIN_HEIGHT,
   EVENT_IMAGE_MIN_WIDTH,
@@ -48,18 +51,21 @@ function coverCrop(
   return { cropWidth, cropHeight, offsetX, offsetY };
 }
 
-export async function processEventImageFile(file: File): Promise<File> {
+async function processImageToFile(
+  file: File,
+  target: { width: number; height: number },
+  min: { width: number; height: number },
+  suffix: string
+): Promise<File> {
   const image = await loadImageFromFile(file);
 
-  if (image.width < EVENT_IMAGE_MIN_WIDTH || image.height < EVENT_IMAGE_MIN_HEIGHT) {
-    throw new Error(
-      `حداقل ابعاد تصویر ${EVENT_IMAGE_MIN_WIDTH}×${EVENT_IMAGE_MIN_HEIGHT} پیکسل است.`
-    );
+  if (image.width < min.width || image.height < min.height) {
+    throw new Error(`حداقل ابعاد تصویر ${min.width}×${min.height} پیکسل است.`);
   }
 
   const canvas = document.createElement("canvas");
-  canvas.width = EVENT_CARD_IMAGE.width;
-  canvas.height = EVENT_CARD_IMAGE.height;
+  canvas.width = target.width;
+  canvas.height = target.height;
 
   const context = canvas.getContext("2d");
   if (!context) {
@@ -69,8 +75,8 @@ export async function processEventImageFile(file: File): Promise<File> {
   const { cropWidth, cropHeight, offsetX, offsetY } = coverCrop(
     image.width,
     image.height,
-    EVENT_CARD_IMAGE.width,
-    EVENT_CARD_IMAGE.height
+    target.width,
+    target.height
   );
 
   context.drawImage(
@@ -81,8 +87,8 @@ export async function processEventImageFile(file: File): Promise<File> {
     cropHeight,
     0,
     0,
-    EVENT_CARD_IMAGE.width,
-    EVENT_CARD_IMAGE.height
+    target.width,
+    target.height
   );
 
   const blob = await new Promise<Blob>((resolve, reject) => {
@@ -100,5 +106,23 @@ export async function processEventImageFile(file: File): Promise<File> {
   });
 
   const baseName = file.name.replace(/\.[^.]+$/, "") || "event";
-  return new File([blob], `${baseName}-cover.jpg`, { type: "image/jpeg" });
+  return new File([blob], `${baseName}-${suffix}.jpg`, { type: "image/jpeg" });
+}
+
+export async function processEventImageFile(file: File): Promise<File> {
+  return processImageToFile(
+    file,
+    EVENT_CARD_IMAGE,
+    { width: EVENT_IMAGE_MIN_WIDTH, height: EVENT_IMAGE_MIN_HEIGHT },
+    "card"
+  );
+}
+
+export async function processEventBannerImageFile(file: File): Promise<File> {
+  return processImageToFile(
+    file,
+    EVENT_BANNER_IMAGE,
+    { width: EVENT_BANNER_MIN_WIDTH, height: EVENT_BANNER_MIN_HEIGHT },
+    "banner"
+  );
 }

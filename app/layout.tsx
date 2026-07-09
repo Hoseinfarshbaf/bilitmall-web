@@ -5,6 +5,7 @@ import NavbarWrapper from "@/components/NavbarWrapper";
 import { AuthProvider } from "@/components/AuthProvider";
 import { CitiesProvider } from "@/components/CitiesProvider";
 import { CityProvider } from "@/components/CityContext";
+import CitySelectionSync from "@/components/CitySelectionSync";
 
 export const metadata: Metadata = {
   title: "بلیت‌مال",
@@ -22,6 +23,7 @@ export default function RootLayout({
         <AuthProvider>
           <CitiesProvider>
             <CityProvider>
+              <CitySelectionSync />
               <NavbarWrapper />
               {children}
               <FooterWrapper />

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCities } from "@/components/CitiesProvider";
+import { useCityOptions } from "@/hooks/useCityOptions";
 
 type CitySelectProps = {
   value: string;
@@ -10,6 +10,8 @@ type CitySelectProps = {
   allLabel?: string;
   disabled?: boolean;
   id?: string;
+  /** در پنل ادمین همه شهرهای ثبت‌شده نمایش داده می‌شود، نه فقط شهرهای دارای رویداد */
+  includeAllCities?: boolean;
 };
 
 export default function CitySelect({
@@ -20,8 +22,9 @@ export default function CitySelect({
   allLabel = "همه شهرها",
   disabled,
   id,
+  includeAllCities = false,
 }: CitySelectProps) {
-  const { cities, loading } = useCities();
+  const { cities, loading } = useCityOptions(includeAllCities);
 
   return (
     <select

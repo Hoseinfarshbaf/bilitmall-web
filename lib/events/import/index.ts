@@ -129,6 +129,7 @@ function toDraft(
     venueTemplateId: null,
     price: partial.price ?? "",
     image: localImage ?? "",
+    bannerImage: "",
     badge: "",
     days,
     published: true,

@@ -27,6 +27,7 @@ function toManagedEvent(record: {
   venueTemplateId?: number | null;
   price: string;
   image: string;
+  bannerImage: string;
   badge: string | null;
   days: string;
   published: boolean;
@@ -48,6 +49,7 @@ function toManagedEvent(record: {
     venueTemplateId: record.venueTemplateId ?? null,
     price: record.price,
     image: record.image,
+    bannerImage: record.bannerImage ?? "",
     badge: record.badge ?? undefined,
     days: parseDays(record.days),
     published: record.published,
@@ -71,6 +73,7 @@ function toEventData(event: ManagedEvent, source: "seed" | "managed") {
     venueTemplateId: event.venueTemplateId ?? null,
     price: event.price,
     image: event.image,
+    bannerImage: event.bannerImage ?? "",
     badge: event.badge ?? null,
     days: serializeDays(event.days),
     published: event.published,

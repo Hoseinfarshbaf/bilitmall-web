@@ -12,7 +12,8 @@ import { useEvents } from "@/hooks/useEvents";
 import { useCities } from "@/components/CitiesProvider";
 import { useCity } from "@/components/CityContext";
 import EventCard from "@/components/EventCard";
-import { Search, MapPin, ChevronDown, Home } from "lucide-react";
+import CityPickerPanel from "@/components/CityPickerPanel";
+import { MapPin, ChevronDown, Home, Search } from "lucide-react";
 import Link from "next/link";
 
 const CATEGORIES = [
@@ -28,7 +29,7 @@ export default function DiscoveryPage() {
   const searchParams = useSearchParams();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { events, loading } = useEvents();
-  const { cities } = useCities();
+  const { cities, topCities } = useCities();
   const { setSelectedCity } = useCity();
   
   const cityParam = decodeURIComponent(params.city as string);
@@ -109,7 +110,7 @@ export default function DiscoveryPage() {
 
             <div className="relative mr-auto shrink-0" ref={dropdownRef}>
               <button
-                onClick={() => setIsCityOpen(!isCityOpen)}
+                onClick={() => setIsCityOpen((open) => !open)}
                 className="flex items-center gap-1.5 rounded-xl border border-gray-200 px-3 py-2 text-sm font-bold text-gray-700 transition-all hover:border-red-600 hover:text-red-600"
               >
                 <MapPin className="w-4 h-4 text-red-600" />
@@ -117,28 +118,20 @@ export default function DiscoveryPage() {
                 <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${isCityOpen ? 'rotate-180' : ''}`} />
               </button>
 
-              {isCityOpen && (
-                <div className="absolute left-0 mt-2 max-h-72 w-52 overflow-y-auto bg-white border border-gray-100 rounded-2xl shadow-2xl p-2 z-60">
-                  <div className="grid grid-cols-1 gap-1">
-                    {cities.map(city => (
-                      <button
-                        key={city}
-                        onClick={() => {
-                          router.push(buildDiscoveryPageUrl(city, categoryParam));
-                          setIsCityOpen(false);
-                        }}
-                        className={`text-right px-4 py-2.5 rounded-xl text-sm font-bold transition-all ${
-                          city === cityParam
-                          ? "bg-red-600 text-white"
-                          : "text-gray-600 hover:bg-red-50 hover:text-red-600"
-                        }`}
-                      >
-                        {city}
-                      </button>
-                    ))}
-                  </div>
+              {isCityOpen ? (
+                <div className="absolute left-0 z-60 mt-2">
+                  <CityPickerPanel
+                    variant="discovery"
+                    cities={cities}
+                    topCities={topCities}
+                    selectedCity={cityParam}
+                    onSelect={(city) => {
+                      router.push(buildDiscoveryPageUrl(city, categoryParam));
+                      setIsCityOpen(false);
+                    }}
+                  />
                 </div>
-              )}
+              ) : null}
             </div>
           </div>
 

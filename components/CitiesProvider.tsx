@@ -9,12 +9,13 @@ import {
   useState,
 } from "react";
 import type { CityRecord } from "@/lib/cities/types";
-import { DEFAULT_CITY_NAMES } from "@/lib/cities/constants";
+import { TOP_CITIES_IN_SELECTOR } from "@/lib/cities/constants";
 
 type CitiesContextType = {
   cities: string[];
   cityRows: CityRecord[];
-  popularCities: string[];
+  /** حداکثر ۵ شهر با بیشترین رویداد فعال — برای نمایش پیش‌فرض در انتخاب شهر */
+  topCities: string[];
   loading: boolean;
   refresh: () => Promise<void>;
 };
@@ -44,26 +45,23 @@ export function CitiesProvider({ children }: { children: React.ReactNode }) {
   }, [refresh]);
 
   const value = useMemo<CitiesContextType>(() => {
-    const names =
-      cityRows.length > 0 ? cityRows.map((c) => c.name) : [...DEFAULT_CITY_NAMES];
+    const activeCityRows = cityRows.filter((c) => (c.eventCount ?? 0) > 0);
+    const names = activeCityRows.map((c) => c.name);
 
-    let popular: string[];
-    if (cityRows.length > 0) {
-      const byEvents = (a: CityRecord, b: CityRecord) =>
-        (b.eventCount ?? 0) - (a.eventCount ?? 0);
+    const byEvents = (a: CityRecord, b: CityRecord) =>
+      (b.eventCount ?? 0) - (a.eventCount ?? 0) ||
+      a.sortOrder - b.sortOrder ||
+      a.name.localeCompare(b.name, "fa");
 
-      const popularFirst = cityRows.filter((c) => c.isPopular).sort(byEvents);
-      const rest = cityRows.filter((c) => !c.isPopular).sort(byEvents);
-
-      popular = [...popularFirst, ...rest].slice(0, 6).map((c) => c.name);
-    } else {
-      popular = DEFAULT_CITY_NAMES.slice(0, 6);
-    }
+    const topCities = [...activeCityRows]
+      .sort(byEvents)
+      .slice(0, TOP_CITIES_IN_SELECTOR)
+      .map((c) => c.name);
 
     return {
       cities: names,
       cityRows,
-      popularCities: popular.length > 0 ? popular : names.slice(0, 6),
+      topCities,
       loading,
       refresh,
     };

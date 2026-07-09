@@ -62,6 +62,7 @@ function dbRecordToManagedEvent(record: {
   venueTemplateId?: number | null;
   price: string;
   image: string;
+  bannerImage?: string | null;
   badge: string | null;
   days: string;
   published: boolean;
@@ -94,6 +95,7 @@ function dbRecordToManagedEvent(record: {
     venueTemplateId: record.venueTemplateId ?? null,
     price: record.price,
     image: record.image,
+    bannerImage: record.bannerImage?.trim() || "",
     badge: record.badge ?? undefined,
     days: parseDays(record.days),
     published: record.published,
@@ -165,6 +167,7 @@ async function ensureSeedData(): Promise<void> {
       place: seed.place,
       price: seed.price,
       image: seed.image,
+      bannerImage: "",
       badge: seed.badge,
       days,
       published: true,
@@ -296,6 +299,7 @@ async function formToManagedEvent(
     venueTemplateId,
     price: form.price.trim(),
     image: form.image,
+    bannerImage: form.bannerImage,
     badge: form.badge.trim() || undefined,
     days: normalizeEventDays(form.days),
     published: form.published,

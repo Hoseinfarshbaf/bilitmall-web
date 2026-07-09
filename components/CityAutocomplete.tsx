@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { MapPin, Search, X } from "lucide-react";
-import { useCities } from "@/components/CitiesProvider";
+import { useCityOptions } from "@/hooks/useCityOptions";
 
 type CityAutocompleteProps = {
   value: string;
@@ -11,6 +11,8 @@ type CityAutocompleteProps = {
   required?: boolean;
   placeholder?: string;
   className?: string;
+  /** در پنل ادمین همه شهرهای ثبت‌شده نمایش داده می‌شود، نه فقط شهرهای دارای رویداد */
+  includeAllCities?: boolean;
 };
 
 /** نرمال‌سازی حروف فارسی/عربی برای جستجوی روان */
@@ -35,8 +37,9 @@ export default function CityAutocomplete({
   required,
   placeholder = "جستجوی شهر...",
   className = baseInputClass,
+  includeAllCities = false,
 }: CityAutocompleteProps) {
-  const { cities, loading } = useCities();
+  const { cities, loading } = useCityOptions(includeAllCities);
   const [query, setQuery] = useState(value);
   const [open, setOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);

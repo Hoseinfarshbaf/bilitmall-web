@@ -295,6 +295,7 @@ export function managedToEventItem(
     venueTemplateId: event.venueTemplateId,
     price: event.price,
     image: event.image,
+    bannerImage: event.bannerImage,
     badge: event.badge,
     days: event.days,
     published: event.published,

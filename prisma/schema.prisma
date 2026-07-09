@@ -92,6 +92,7 @@ model Event {
   placeAddress       String?
   price              String
   image              String            @default("")
+  bannerImage        String            @default("")
   badge              String?
   description        String?
   days               String            @default("[]")

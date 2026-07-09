@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { buildPublicCitySlug } from "@/lib/my-event/public-slugs";
 import { DEFAULT_CITIES } from "@/lib/cities/constants";
 import type { CityRecord, CityWithUsage } from "@/lib/cities/types";
+import { getAllEvents } from "@/lib/events";
 
 function toCityRecord(row: {
   id: number;
@@ -51,23 +52,30 @@ export async function getCityNames(): Promise<string[]> {
   return cities.map((c) => c.name);
 }
 
-export async function listCitiesWithEventCount(): Promise<CityRecord[]> {
+export async function listCitiesWithEventCount(options?: {
+  onlyWithEvents?: boolean;
+}): Promise<CityRecord[]> {
   await ensureCitiesSeeded();
   const rows = await prisma.city.findMany({
     orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
   });
 
-  const grouped = await prisma.event.groupBy({
-    by: ["city"],
-    where: { published: true },
-    _count: { _all: true },
-  });
-  const countByCity = new Map(grouped.map((g) => [g.city, g._count._all]));
+  const publicEvents = await getAllEvents();
+  const countByCity = new Map<string, number>();
+  for (const event of publicEvents) {
+    countByCity.set(event.city, (countByCity.get(event.city) ?? 0) + 1);
+  }
 
-  return rows.map((row) => ({
+  const cities = rows.map((row) => ({
     ...toCityRecord(row),
     eventCount: countByCity.get(row.name) ?? 0,
   }));
+
+  if (options?.onlyWithEvents) {
+    return cities.filter((city) => (city.eventCount ?? 0) > 0);
+  }
+
+  return cities;
 }
 
 export async function listCitiesWithUsage(): Promise<CityWithUsage[]> {

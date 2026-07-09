@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createManagedEvent, getAllEvents } from "@/lib/events";
-import { applyUploadedImage, parseEventRequest, validateEventImage } from "@/lib/events/form-data";
+import { applyUploadedImages, parseEventRequest, validateEventBannerImage, validateEventImage } from "@/lib/events/form-data";
 
 export async function GET() {
   const events = await getAllEvents();
@@ -9,12 +9,17 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const { form, imageFile } = await parseEventRequest(request);
-    const body = await applyUploadedImage(form, imageFile);
+    const { form, imageFile, bannerImageFile } = await parseEventRequest(request);
+    const body = await applyUploadedImages(form, imageFile, bannerImageFile);
 
     const imageError = validateEventImage(body, imageFile, { isCreate: true });
     if (imageError) {
       return NextResponse.json({ error: imageError }, { status: 400 });
+    }
+
+    const bannerError = validateEventBannerImage(body, bannerImageFile, { isCreate: true });
+    if (bannerError) {
+      return NextResponse.json({ error: bannerError }, { status: 400 });
     }
 
     if (!body.title?.trim() || !body.place?.trim() || !body.price?.trim()) {

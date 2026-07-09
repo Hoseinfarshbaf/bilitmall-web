@@ -402,6 +402,7 @@ export default function MyEventEventForm({
         <div>
           <label className={labelClass}>شهر</label>
           <CityAutocomplete
+            includeAllCities
             required
             value={formData.city}
             className="w-full rounded-xl border border-neutral-300 bg-white py-3 pr-10 pl-9 text-neutral-900 outline-none focus:border-emerald-500 dark:border-white/10 dark:bg-slate-900 dark:text-white"

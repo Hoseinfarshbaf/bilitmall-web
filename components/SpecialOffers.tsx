@@ -8,6 +8,7 @@ import { useCity } from "@/components/CityContext";
 import { formatEventDateDisplay } from "@/lib/events/date-utils";
 import {
   getEventBannerImageStyle,
+  getEventBannerImageUrl,
   getEventUrl,
   getFeaturedEventsFromList,
 } from "@/lib/events/helpers";
@@ -70,7 +71,7 @@ export default function SpecialOffers() {
               <Link href={getEventUrl(event)} className="relative block h-full w-full">
                 <div
                   className="absolute inset-0 bg-neutral-900 bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-105"
-                  style={getEventBannerImageStyle(event.image)}
+                  style={getEventBannerImageStyle(getEventBannerImageUrl(event))}
                 />
                 <div className="absolute inset-0 bg-linear-to-tl from-black/90 via-black/45 to-transparent" />
 

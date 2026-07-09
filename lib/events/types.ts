@@ -31,6 +31,7 @@ export type EventItem = {
   venueTemplateId?: number | null;
   price: string;
   image: string;
+  bannerImage?: string;
   badge?: string;
   days?: EventDay[];
   published?: boolean;
@@ -59,6 +60,7 @@ export type ManagedEvent = {
   venueTemplateId?: number | null;
   price: string;
   image: string;
+  bannerImage: string;
   badge?: string;
   days: EventDay[];
   published: boolean;
@@ -80,6 +82,7 @@ export type EventFormData = {
   venueTemplateId?: number | null;
   price: string;
   image: string;
+  bannerImage: string;
   badge: string;
   days: EventDay[];
   published: boolean;

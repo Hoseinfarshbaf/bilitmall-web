@@ -5,7 +5,7 @@ import sharp from "sharp";
 import type { EventDay, EventFormData } from "@/lib/events/types";
 import { hasUploadedImage } from "@/lib/events/helpers";
 import { normalizeEventDays } from "@/lib/events/date-utils";
-import { EVENT_CARD_IMAGE } from "@/lib/events/image-specs";
+import { EVENT_BANNER_IMAGE, EVENT_CARD_IMAGE } from "@/lib/events/image-specs";
 
 const UPLOAD_DIR = path.join(process.cwd(), "public", "uploads", "events");
 const MAX_FILE_SIZE = 8 * 1024 * 1024;
@@ -15,7 +15,10 @@ export async function ensureUploadDir(): Promise<void> {
   await fs.mkdir(UPLOAD_DIR, { recursive: true });
 }
 
-export async function saveEventImage(file: File): Promise<string> {
+async function saveProcessedImage(
+  file: File,
+  target: { width: number; height: number }
+): Promise<string> {
   if (!ALLOWED_TYPES.has(file.type)) {
     throw new Error("فرمت تصویر مجاز نیست. JPG، PNG یا WebP انتخاب کن.");
   }
@@ -32,7 +35,7 @@ export async function saveEventImage(file: File): Promise<string> {
 
   const processed = await sharp(buffer)
     .rotate()
-    .resize(EVENT_CARD_IMAGE.width, EVENT_CARD_IMAGE.height, {
+    .resize(target.width, target.height, {
       fit: "cover",
       position: "centre",
     })
@@ -42,6 +45,14 @@ export async function saveEventImage(file: File): Promise<string> {
   await fs.writeFile(filepath, processed);
 
   return `/uploads/events/${filename}`;
+}
+
+export async function saveEventImage(file: File): Promise<string> {
+  return saveProcessedImage(file, EVENT_CARD_IMAGE);
+}
+
+export async function saveEventBannerImage(file: File): Promise<string> {
+  return saveProcessedImage(file, EVENT_BANNER_IMAGE);
 }
 
 function parseDays(value: unknown): EventDay[] {
@@ -73,6 +84,7 @@ export function parseEventFormData(body: Record<string, unknown>): EventFormData
     })(),
     price: String(body.price ?? ""),
     image: String(body.image ?? ""),
+    bannerImage: String(body.bannerImage ?? ""),
     badge: String(body.badge ?? ""),
     days: parseDays(body.days),
     published: body.published === true || body.published === "true",
@@ -85,6 +97,7 @@ export function parseEventFormData(body: Record<string, unknown>): EventFormData
 export async function parseEventRequest(request: Request): Promise<{
   form: EventFormData;
   imageFile: File | null;
+  bannerImageFile: File | null;
 }> {
   const contentType = request.headers.get("content-type") ?? "";
 
@@ -101,6 +114,12 @@ export async function parseEventRequest(request: Request): Promise<{
     const imageFile =
       uploadedImage instanceof File && uploadedImage.size > 0 ? uploadedImage : null;
 
+    const uploadedBannerImage = formData.get("bannerImage");
+    const bannerImageFile =
+      uploadedBannerImage instanceof File && uploadedBannerImage.size > 0
+        ? uploadedBannerImage
+        : null;
+
     const form: EventFormData = {
       title: String(formData.get("title") ?? ""),
       city: String(formData.get("city") ?? "تهران"),
@@ -115,6 +134,7 @@ export async function parseEventRequest(request: Request): Promise<{
       })(),
       price: String(formData.get("price") ?? ""),
       image: String(formData.get("imageUrl") ?? ""),
+      bannerImage: String(formData.get("bannerImageUrl") ?? ""),
       badge: String(formData.get("badge") ?? ""),
       days,
       published:
@@ -126,21 +146,31 @@ export async function parseEventRequest(request: Request): Promise<{
       status: (String(formData.get("status") ?? "active") as EventFormData["status"]),
     };
 
-    return { form, imageFile };
+    return { form, imageFile, bannerImageFile };
   }
 
   const body = (await request.json()) as Record<string, unknown>;
-  return { form: parseEventFormData(body), imageFile: null };
+  return { form: parseEventFormData(body), imageFile: null, bannerImageFile: null };
 }
 
-export async function applyUploadedImage(
+export async function applyUploadedImages(
   form: EventFormData,
-  imageFile: File | null
+  imageFile: File | null,
+  bannerImageFile: File | null
 ): Promise<EventFormData> {
-  if (!imageFile) return form;
+  let next = form;
 
-  const uploadedUrl = await saveEventImage(imageFile);
-  return { ...form, image: uploadedUrl };
+  if (imageFile) {
+    const uploadedUrl = await saveEventImage(imageFile);
+    next = { ...next, image: uploadedUrl };
+  }
+
+  if (bannerImageFile) {
+    const uploadedUrl = await saveEventBannerImage(bannerImageFile);
+    next = { ...next, bannerImage: uploadedUrl };
+  }
+
+  return next;
 }
 
 export function validateEventImage(
@@ -151,5 +181,17 @@ export function validateEventImage(
   if (imageFile) return null;
   if (hasUploadedImage(form.image)) return null;
   if (!options?.isCreate && form.image.trim()) return null;
-  return "آپلود تصویر رویداد الزامی است.";
+  return "آپلود تصویر کارت رویداد الزامی است.";
+}
+
+export function validateEventBannerImage(
+  form: EventFormData,
+  bannerImageFile: File | null,
+  options?: { isCreate?: boolean }
+): string | null {
+  if (!form.featured) return null;
+  if (bannerImageFile) return null;
+  if (hasUploadedImage(form.bannerImage)) return null;
+  if (!options?.isCreate && form.bannerImage.trim()) return null;
+  return "برای نمایش در پیشنهاد ویژه، آپلود تصویر بنر الزامی است.";
 }

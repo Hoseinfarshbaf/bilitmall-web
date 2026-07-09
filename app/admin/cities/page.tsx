@@ -10,7 +10,6 @@ export default function AdminCitiesPage() {
   const [cities, setCities] = useState<CityWithUsage[]>([]);
   const [loading, setLoading] = useState(true);
   const [newCityName, setNewCityName] = useState("");
-  const [newCityPopular, setNewCityPopular] = useState(false);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
 
@@ -45,7 +44,7 @@ export default function AdminCitiesPage() {
       const res = await fetch("/api/admin/cities", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, isPopular: newCityPopular }),
+        body: JSON.stringify({ name }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -53,43 +52,12 @@ export default function AdminCitiesPage() {
         return;
       }
       setNewCityName("");
-      setNewCityPopular(false);
       setMessage(`شهر «${name}» اضافه شد و در تمام بخش‌های سیستم فعال است.`);
       await load();
       await refreshGlobalCities();
     } finally {
       setSaving(false);
     }
-  }
-
-  async function handleTogglePopular(city: CityWithUsage) {
-    const nextPopular = !city.isPopular;
-
-    setCities((prev) =>
-      prev.map((c) => (c.id === city.id ? { ...c, isPopular: nextPopular } : c))
-    );
-
-    const res = await fetch("/api/admin/cities", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id: city.id, isPopular: nextPopular }),
-    });
-    const data = await res.json();
-
-    if (!res.ok) {
-      setCities((prev) =>
-        prev.map((c) => (c.id === city.id ? { ...c, isPopular: city.isPopular } : c))
-      );
-      alert(data.error ?? "خطا در به‌روزرسانی");
-      return;
-    }
-
-    setMessage(
-      nextPopular
-        ? `شهر «${city.name}» به شهرهای پربازدید نوبار اضافه شد.`
-        : `شهر «${city.name}» از شهرهای پربازدید نوبار حذف شد.`
-    );
-    await refreshGlobalCities();
   }
 
   async function handleDelete(city: CityWithUsage) {
@@ -123,8 +91,9 @@ export default function AdminCitiesPage() {
         </Link>
         <h1 className="text-3xl font-black text-slate-800 dark:text-slate-100">مدیریت شهرها</h1>
         <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
-          شهرهای فعال در ثبت رویداد، سالن، جستجو، نوبار سایت و استودیو برگزارکننده نمایش داده
-          می‌شوند.
+          شهرهای فعال در ثبت رویداد، سالن و فرم‌های سیستم نمایش داده می‌شوند. در سایت عمومی،
+          فقط شهرهایی که رویداد فعال دارند دیده می‌شوند و ۵ شهر اول بر اساس تعداد رویداد
+          به‌صورت خودکار در انتخاب شهر نمایش داده می‌شوند.
         </p>
 
         <form
@@ -142,15 +111,6 @@ export default function AdminCitiesPage() {
                 className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
               />
             </div>
-            <label className="flex items-center gap-2 pb-2.5 text-sm font-bold text-slate-600 dark:text-slate-300">
-              <input
-                type="checkbox"
-                checked={newCityPopular}
-                onChange={(e) => setNewCityPopular(e.target.checked)}
-                className="rounded"
-              />
-              شهر پربازدید (نوبار)
-            </label>
             <button
               type="submit"
               disabled={saving || !newCityName.trim()}
@@ -180,7 +140,6 @@ export default function AdminCitiesPage() {
                   <th className="px-4 py-3 text-right font-bold">اسلاگ</th>
                   <th className="px-4 py-3 text-right font-bold">رویداد</th>
                   <th className="px-4 py-3 text-right font-bold">سالن</th>
-                  <th className="px-4 py-3 text-right font-bold">نوبار</th>
                   <th className="px-4 py-3 text-right font-bold">عملیات</th>
                 </tr>
               </thead>
@@ -196,31 +155,6 @@ export default function AdminCitiesPage() {
                     </td>
                     <td className="px-4 py-3 text-slate-600 dark:text-slate-300">
                       {city.venueCount.toLocaleString("fa-IR")}
-                    </td>
-                    <td className="px-4 py-3">
-                      <button
-                        type="button"
-                        onClick={() => void handleTogglePopular(city)}
-                        role="switch"
-                        aria-checked={city.isPopular}
-                        title={
-                          city.isPopular
-                            ? "کلیک کنید تا از نوبار حذف شود"
-                            : "کلیک کنید تا به نوبار اضافه شود"
-                        }
-                        className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-bold transition-colors ${
-                          city.isPopular
-                            ? "bg-amber-100 text-amber-800 hover:bg-amber-200 dark:bg-amber-500/20 dark:text-amber-300 dark:hover:bg-amber-500/30"
-                            : "bg-slate-100 text-slate-500 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700"
-                        }`}
-                      >
-                        <span
-                          className={`inline-block h-2 w-2 rounded-full ${
-                            city.isPopular ? "bg-amber-500" : "bg-slate-400"
-                          }`}
-                        />
-                        {city.isPopular ? "پربازدید" : "عادی"}
-                      </button>
                     </td>
                     <td className="px-4 py-3">
                       <button

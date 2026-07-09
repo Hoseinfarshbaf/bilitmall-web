@@ -32,6 +32,7 @@ export default async function OrganizerSiteHomePage({ params }: PageProps) {
         place: page.event.place,
         price: page.event.price,
         image: page.event.image,
+        bannerImage: "",
         badge: page.event.badge ?? undefined,
         days: parseDaysFromRecord(page.event.days),
         published: page.event.published,

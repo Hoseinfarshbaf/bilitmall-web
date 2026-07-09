@@ -608,6 +608,7 @@ function EditorPanel({
             <div className="w-36 shrink-0">
               <label className="mb-1.5 block text-sm font-bold">شهر</label>
               <CitySelect
+                includeAllCities
                 value={venueMeta.city}
                 onChange={(city) => setVenueMeta({ ...venueMeta, city })}
                 className={metaInputClass}

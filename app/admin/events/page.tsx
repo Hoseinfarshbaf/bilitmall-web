@@ -165,7 +165,7 @@ export default function AdminEventsPage() {
     setSelectedEvent(null);
   };
 
-  const handleSubmit = async (formData: EventFormData, imageFile: File | null) => {
+  const handleSubmit = async (formData: EventFormData, imageFile: File | null, bannerImageFile: File | null) => {
     setSubmitting(true);
 
     try {
@@ -182,6 +182,7 @@ export default function AdminEventsPage() {
       }
       payload.append("price", formData.price);
       payload.append("imageUrl", formData.image);
+      payload.append("bannerImageUrl", formData.bannerImage);
       payload.append("badge", formData.badge);
       payload.append("days", JSON.stringify(formData.days));
       payload.append("published", String(formData.published));
@@ -191,6 +192,10 @@ export default function AdminEventsPage() {
 
       if (imageFile) {
         payload.append("image", imageFile);
+      }
+
+      if (bannerImageFile) {
+        payload.append("bannerImage", bannerImageFile);
       }
 
       const response = await fetch(
@@ -286,6 +291,7 @@ export default function AdminEventsPage() {
                   />
                 </div>
                 <CitySelect
+                  includeAllCities
                   value={cityFilter}
                   includeAll
                   onChange={setCityFilter}
