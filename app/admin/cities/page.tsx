@@ -31,7 +31,29 @@ export default function AdminCitiesPage() {
   }
 
   useEffect(() => {
-    void load();
+    let cancelled = false;
+
+    void fetch("/api/admin/cities")
+      .then(async (res) => {
+        if (cancelled) return;
+        const data = await res.json();
+        if (!cancelled && res.ok && Array.isArray(data)) {
+          setCities(data);
+        } else if (!cancelled) {
+          setCities([]);
+          setMessage(data.error ?? "خطا در بارگذاری شهرها");
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setCities([]);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   async function handleAdd(e: React.FormEvent) {

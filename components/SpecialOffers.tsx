@@ -7,18 +7,18 @@ import { useEvents } from "@/hooks/useEvents";
 import { useCity } from "@/components/CityContext";
 import { formatEventDateDisplay } from "@/lib/events/date-utils";
 import {
-  getEventBannerImageStyle,
   getEventBannerImageUrl,
   getEventUrl,
   getFeaturedEventsFromList,
 } from "@/lib/events/helpers";
+import EventFramedImage from "@/components/EventFramedImage";
+import { EVENT_BANNER_IMAGE } from "@/lib/events/image-specs";
 
 const AUTO_INTERVAL_MS = 5000;
 
 export default function SpecialOffers() {
   const { selectedCity } = useCity();
   const { events, loading } = useEvents();
-  const [activeIndex, setActiveIndex] = useState(0);
 
   const slides = useMemo(
     () => getFeaturedEventsFromList(events, selectedCity),
@@ -28,6 +28,13 @@ export default function SpecialOffers() {
   const slideKey = useMemo(() => slides.map((s) => s.id).join(","), [slides]);
   const multi = slides.length > 1;
 
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [trackedSlideKey, setTrackedSlideKey] = useState(slideKey);
+  if (slideKey !== trackedSlideKey) {
+    setTrackedSlideKey(slideKey);
+    setActiveIndex(0);
+  }
+
   const goTo = useCallback(
     (index: number) => {
       if (slides.length === 0) return;
@@ -35,10 +42,6 @@ export default function SpecialOffers() {
     },
     [slides.length]
   );
-
-  useEffect(() => {
-    setActiveIndex(0);
-  }, [selectedCity, slideKey]);
 
   useEffect(() => {
     if (slides.length <= 1) return;
@@ -57,7 +60,10 @@ export default function SpecialOffers() {
   return (
     <section className="mx-auto max-w-6xl px-4 pt-8">
       <div className="group relative w-full overflow-hidden rounded-[28px] shadow-lg">
-        <div className="relative h-72 sm:h-80">
+        <div
+          className="relative w-full"
+          style={{ aspectRatio: `${EVENT_BANNER_IMAGE.width} / ${EVENT_BANNER_IMAGE.height}` }}
+        >
           {slides.map((event, index) => (
             <div
               key={event.id}
@@ -69,10 +75,7 @@ export default function SpecialOffers() {
               aria-hidden={index !== activeIndex}
             >
               <Link href={getEventUrl(event)} className="relative block h-full w-full">
-                <div
-                  className="absolute inset-0 bg-neutral-900 bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-105"
-                  style={getEventBannerImageStyle(getEventBannerImageUrl(event))}
-                />
+                <EventFramedImage variant="banner" image={getEventBannerImageUrl(event)} />
                 <div className="absolute inset-0 bg-linear-to-tl from-black/90 via-black/45 to-transparent" />
 
                 <div className="absolute right-5 top-5 z-20 sm:right-7 sm:top-7">
@@ -85,8 +88,8 @@ export default function SpecialOffers() {
                   </span>
                 </div>
 
-                <div className="relative flex h-full flex-col items-start justify-end p-6 pb-12 text-right text-white sm:p-8 sm:pb-14">
-                  <h3 className="line-clamp-2 max-w-2xl text-xl font-extrabold leading-snug tracking-tight drop-shadow-md sm:text-3xl">
+                <div className="relative flex h-full flex-col items-start justify-end p-5 pb-10 text-right text-white sm:p-6 sm:pb-11">
+                  <h3 className="line-clamp-2 max-w-2xl text-lg font-extrabold leading-snug tracking-tight drop-shadow-md sm:text-2xl">
                     {event.title}
                   </h3>
                   <div className="mt-3 flex flex-wrap items-center gap-2.5 text-[13px] font-semibold text-white/90 sm:text-sm">
@@ -111,7 +114,7 @@ export default function SpecialOffers() {
         </div>
 
         {multi ? (
-          <div className="absolute bottom-4 left-1/2 z-30 flex -translate-x-1/2 items-center gap-2">
+          <div className="absolute bottom-3 left-1/2 z-30 flex -translate-x-1/2 items-center gap-2">
             {slides.map((event, index) => (
               <button
                 key={event.id}

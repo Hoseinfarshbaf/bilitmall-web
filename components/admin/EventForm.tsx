@@ -99,77 +99,85 @@ export default function EventForm({
   }, [imagePreview, bannerImagePreview]);
 
   useEffect(() => {
-    if (!initialEvent) {
-      setFormData(emptyForm());
-      setTicketingSetupComplete(false);
-      setStartPickerValue(null);
-      setEndPickerValue(null);
+    const timer = setTimeout(() => {
+      if (!initialEvent) {
+        setFormData(emptyForm());
+        setTicketingSetupComplete(false);
+        setStartPickerValue(null);
+        setEndPickerValue(null);
+        setImageFile(null);
+        setImagePreview(null);
+        setBannerImageFile(null);
+        setBannerImagePreview(null);
+        return;
+      }
+
+      const schedule = getEventSchedule(initialEvent);
+      const ticketingFields = eventToFormTicketingFields(initialEvent);
+      setFormData({
+        title: initialEvent.title,
+        city: initialEvent.city,
+        category: initialEvent.category,
+        place: initialEvent.place,
+        placeAddress: initialEvent.placeAddress ?? "",
+        venueTemplateId: initialEvent.venueTemplateId ?? null,
+        image: initialEvent.image,
+        bannerImage: initialEvent.bannerImage ?? "",
+        badge: initialEvent.badge ?? "",
+        days: schedule,
+        published: initialEvent.published !== false,
+        popular: initialEvent.popular === true,
+        featured: initialEvent.featured === true,
+        status:
+          initialEvent.status === "held" || initialEvent.status === "draft"
+            ? "active"
+            : (initialEvent.status ?? "active"),
+        ...ticketingFields,
+      });
+      setTicketingSetupComplete(true);
       setImageFile(null);
       setImagePreview(null);
       setBannerImageFile(null);
       setBannerImagePreview(null);
-      return;
-    }
 
-    const schedule = getEventSchedule(initialEvent);
-    const ticketingFields = eventToFormTicketingFields(initialEvent);
-    setFormData({
-      title: initialEvent.title,
-      city: initialEvent.city,
-      category: initialEvent.category,
-      place: initialEvent.place,
-      placeAddress: initialEvent.placeAddress ?? "",
-      venueTemplateId: initialEvent.venueTemplateId ?? null,
-      image: initialEvent.image,
-      bannerImage: initialEvent.bannerImage ?? "",
-      badge: initialEvent.badge ?? "",
-      days: schedule,
-      published: initialEvent.published !== false,
-      popular: initialEvent.popular === true,
-      featured: initialEvent.featured === true,
-      status:
-        initialEvent.status === "held" || initialEvent.status === "draft"
-          ? "active"
-          : (initialEvent.status ?? "active"),
-      ...ticketingFields,
-    });
-    setTicketingSetupComplete(true);
-    setImageFile(null);
-    setImagePreview(null);
-    setBannerImageFile(null);
-    setBannerImagePreview(null);
-
-    if (schedule.length > 0) {
-      const firstDate = new DateObject({
-        date: normalizeDateString(schedule[0].date),
-        format: "YYYY/MM/DD",
-        calendar: persian,
-      });
-      const lastDate = new DateObject({
-        date: normalizeDateString(schedule[schedule.length - 1].date),
-        format: "YYYY/MM/DD",
-        calendar: persian,
-      });
-      setStartPickerValue(firstDate);
-      setEndPickerValue(lastDate);
-      if (hasScheduleGaps(schedule)) {
-        skipScheduleRangeFillRef.current = true;
+      if (schedule.length > 0) {
+        const firstDate = new DateObject({
+          date: normalizeDateString(schedule[0].date),
+          format: "YYYY/MM/DD",
+          calendar: persian,
+        });
+        const lastDate = new DateObject({
+          date: normalizeDateString(schedule[schedule.length - 1].date),
+          format: "YYYY/MM/DD",
+          calendar: persian,
+        });
+        setStartPickerValue(firstDate);
+        setEndPickerValue(lastDate);
+        if (hasScheduleGaps(schedule)) {
+          skipScheduleRangeFillRef.current = true;
+        }
       }
-    }
+    }, 0);
+
+    return () => clearTimeout(timer);
   }, [initialEvent]);
 
   useEffect(() => {
-    if (initialEvent || !initialImportUrl?.trim()) return;
-    setFormData((prev) => ({
-      ...prev,
-      ticketingType: "EXTERNAL_LINK",
-      hasAssignedSeating: false,
-      pricingMode: null,
-      fixedPriceAmount: "",
-      price: EVENT_PRICE_EXTERNAL_LABEL,
-      category: prev.category || "کنسرت",
-    }));
-    setTicketingSetupComplete(true);
+    const timer = setTimeout(() => {
+      if (initialEvent || !initialImportUrl?.trim()) return;
+      setFormData((prev) => ({
+        ...prev,
+        ticketingType: "EXTERNAL_LINK",
+        hasAssignedSeating: false,
+        pricingMode: null,
+        fixedPriceAmount: "",
+        price: EVENT_PRICE_EXTERNAL_LABEL,
+        category: prev.category || "کنسرت",
+      }));
+      setTicketingSetupComplete(true);
+    }, 0);
+
+    return () => clearTimeout(timer);
   }, [initialEvent, initialImportUrl]);
 
   useEffect(() => {
@@ -183,7 +191,8 @@ export default function EventForm({
     const end = new DateObject(endPickerValue).toDate();
     if (start > end) return;
 
-    setFormData((prev) => {
+    const timer = setTimeout(() => {
+      setFormData((prev) => {
       const generatedDays: EventDay[] = [];
       const current = new Date(start);
 
@@ -211,7 +220,10 @@ export default function EventForm({
       }
 
       return { ...prev, days: generatedDays };
-    });
+      });
+    }, 0);
+
+    return () => clearTimeout(timer);
   }, [startPickerValue, endPickerValue]);
 
   const handleImageSelect = async (file: File | null) => {

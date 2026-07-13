@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ComponentType } from "react";
 import {
   CalendarDays,
   CheckCircle2,
@@ -12,8 +12,14 @@ import {
 } from "lucide-react";
 import type { EventDay, TicketingType } from "@/lib/events/types";
 import { formatPersianDateLong } from "@/lib/events/date-utils";
+import {
+  useEventPageTheme,
+  type BookingFlowTheme,
+  type EventPageVariant,
+} from "@/lib/events/event-page-theme";
 import type { SeatingLayout } from "@/lib/seating/types";
 import SeatingPlanPicker from "@/components/events/SeatingPlanPicker";
+import { cn } from "@/lib/utils";
 
 type FlowStep = "schedule" | "seats" | "payment" | "external" | "success";
 
@@ -28,28 +34,7 @@ type EventBookingFlowProps = {
   unavailableMessage: string;
   ticketingType?: TicketingType;
   hasAssignedSeating?: boolean;
-  variant?: "bilitmall" | "organizer";
-};
-
-const themes = {
-  bilitmall: {
-    chipActive: "border-red-400 bg-red-500/25 text-white shadow-lg shadow-red-500/20",
-    chipIdle: "border-white/15 bg-white/10 text-white/85 hover:border-red-400/40",
-    btn: "bg-red-600 hover:bg-red-500",
-    stepActive: "bg-red-500 text-white",
-    stepDone: "bg-red-500/30 text-red-200",
-    stepIdle: "bg-white/10 text-white/50",
-    line: "bg-red-500/40",
-  },
-  organizer: {
-    chipActive: "border-emerald-400 bg-emerald-500/25 text-white shadow-lg shadow-emerald-500/20",
-    chipIdle: "border-white/15 bg-white/10 text-white/85 hover:border-emerald-400/40",
-    btn: "bg-emerald-600 hover:bg-emerald-500",
-    stepActive: "bg-emerald-500 text-white",
-    stepDone: "bg-emerald-500/30 text-emerald-200",
-    stepIdle: "bg-white/10 text-white/50",
-    line: "bg-emerald-500/40",
-  },
+  variant?: EventPageVariant;
 };
 
 function formatRial(rial: number): string {
@@ -69,7 +54,7 @@ export default function EventBookingFlow({
   hasAssignedSeating = false,
   variant = "bilitmall",
 }: EventBookingFlowProps) {
-  const theme = themes[variant];
+  const { booking: theme } = useEventPageTheme(variant);
 
   const [step, setStep] = useState<FlowStep>("schedule");
   const [selectedDayIndex, setSelectedDayIndex] = useState(0);
@@ -118,18 +103,32 @@ export default function EventBookingFlow({
   useEffect(() => {
     if (step !== "seats" || !hasAssignedSeating || seatingLayout || seatingLoading) return;
 
-    setSeatingLoading(true);
-    fetch(`/api/events/${eventId}/seating-plan`)
+    let cancelled = false;
+    const loadingTimer = setTimeout(() => {
+      if (!cancelled) setSeatingLoading(true);
+    }, 0);
+
+    void fetch(`/api/events/${eventId}/seating-plan`)
       .then((res) => res.json())
       .then((data) => {
+        if (cancelled) return;
         if (data.hasSeatingPlan && data.layout) {
           setSeatingLayout(data.layout as SeatingLayout);
         } else {
           setStep("payment");
         }
       })
-      .catch(() => setStep("payment"))
-      .finally(() => setSeatingLoading(false));
+      .catch(() => {
+        if (!cancelled) setStep("payment");
+      })
+      .finally(() => {
+        if (!cancelled) setSeatingLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+      clearTimeout(loadingTimer);
+    };
   }, [step, eventId, hasAssignedSeating, seatingLayout, seatingLoading]);
 
   function toggleSeat(seatId: string) {
@@ -170,14 +169,12 @@ export default function EventBookingFlow({
 
   if (unavailable) {
     return (
-      <div className="rounded-3xl border border-white/10 bg-black/40 p-6 backdrop-blur-md">
-        <div className="flex items-center gap-2 mb-4">
-          <Ticket className="h-5 w-5 text-white/70" />
-          <h2 className="text-lg font-black">خرید بلیط</h2>
+      <div className={theme.unavailablePanel}>
+        <div className="mb-4 flex items-center gap-2">
+          <Ticket className={cn("h-5 w-5", theme.sectionIcon)} />
+          <h2 className={cn("text-lg font-black", theme.sectionTitle)}>خرید بلیط</h2>
         </div>
-        <div className="rounded-2xl bg-white/10 py-8 text-center text-base font-black text-white/70">
-          {unavailableMessage}
-        </div>
+        <div className={theme.unavailableBox}>{unavailableMessage}</div>
       </div>
     );
   }
@@ -185,7 +182,7 @@ export default function EventBookingFlow({
   if (schedule.length === 0) return null;
 
   return (
-    <div className="overflow-hidden rounded-3xl border border-white/10 bg-black/45 shadow-2xl backdrop-blur-md">
+    <div className={theme.panel}>
       <StepIndicator
         labels={stepLabels}
         currentIndex={stepIndex}
@@ -196,7 +193,7 @@ export default function EventBookingFlow({
       <div className="p-5 sm:p-6">
         {step === "schedule" ? (
           <div className="space-y-6">
-            <SectionTitle icon={CalendarDays} title="روز برگزاری" />
+            <SectionTitle icon={CalendarDays} title="روز برگزاری" theme={theme} />
             <div className="flex flex-wrap gap-2">
               {schedule.map((day, index) => (
                 <button
@@ -206,9 +203,10 @@ export default function EventBookingFlow({
                     setSelectedDayIndex(index);
                     setSelectedSessionIndex(0);
                   }}
-                  className={`rounded-2xl border px-4 py-3 text-sm font-bold transition ${
+                  className={cn(
+                    "rounded-2xl border px-4 py-3 text-sm font-bold transition",
                     selectedDayIndex === index ? theme.chipActive : theme.chipIdle
-                  }`}
+                  )}
                 >
                   {formatPersianDateLong(day.date)}
                 </button>
@@ -217,16 +215,17 @@ export default function EventBookingFlow({
 
             {selectedDay && selectedDay.sessions.length > 0 ? (
               <>
-                <SectionTitle icon={Clock} title={`سانس — ${dayLabel}`} />
+                <SectionTitle icon={Clock} title={`سانس — ${dayLabel}`} theme={theme} />
                 <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                   {selectedDay.sessions.map((session, index) => (
                     <button
                       key={`${selectedDay.date}-${session.time}-${index}`}
                       type="button"
                       onClick={() => setSelectedSessionIndex(index)}
-                      className={`rounded-2xl border px-3 py-3 text-center transition ${
+                      className={cn(
+                        "rounded-2xl border px-3 py-3 text-center transition",
                         selectedSessionIndex === index ? theme.chipActive : theme.chipIdle
-                      }`}
+                      )}
                     >
                       <div className="text-lg font-black">{session.time}</div>
                     </button>
@@ -236,6 +235,7 @@ export default function EventBookingFlow({
             ) : null}
 
             <SummaryCard
+              theme={theme}
               lines={[
                 { label: "روز", value: dayLabel },
                 { label: "سانس", value: selectedSession?.time ?? "—" },
@@ -246,7 +246,10 @@ export default function EventBookingFlow({
             <button
               type="button"
               onClick={goAfterSchedule}
-              className={`w-full rounded-2xl py-4 text-base font-black text-white transition ${theme.btn}`}
+              className={cn(
+                "w-full rounded-2xl py-4 text-base font-black text-white transition",
+                theme.btn
+              )}
             >
               ادامه
             </button>
@@ -255,9 +258,11 @@ export default function EventBookingFlow({
 
         {step === "seats" ? (
           <div className="space-y-5">
-            <SectionTitle icon={MapPin} title="انتخاب جایگاه" />
+            <SectionTitle icon={MapPin} title="انتخاب جایگاه" theme={theme} />
             {seatingLoading ? (
-              <p className="py-8 text-center text-sm text-white/60">در حال بارگذاری نقشه سالن...</p>
+              <p className={cn("py-8 text-center text-sm", theme.mutedText)}>
+                در حال بارگذاری نقشه سالن...
+              </p>
             ) : seatingLayout ? (
               <SeatingPlanPicker
                 layout={seatingLayout}
@@ -266,13 +271,13 @@ export default function EventBookingFlow({
                 variant={variant}
               />
             ) : (
-              <p className="text-sm text-white/60">نقشه سالن در دسترس نیست.</p>
+              <p className={cn("text-sm", theme.mutedText)}>نقشه سالن در دسترس نیست.</p>
             )}
             <div className="flex gap-3">
               <button
                 type="button"
                 onClick={() => setStep("schedule")}
-                className="rounded-2xl border border-white/15 px-5 py-3 text-sm font-bold text-white/80"
+                className={theme.ghostBtn}
               >
                 قبلی
               </button>
@@ -280,7 +285,10 @@ export default function EventBookingFlow({
                 type="button"
                 disabled={selectedSeatIds.length === 0}
                 onClick={() => setStep("payment")}
-                className={`flex-1 rounded-2xl py-3 text-sm font-black text-white disabled:opacity-40 ${theme.btn}`}
+                className={cn(
+                  "flex-1 rounded-2xl py-3 text-sm font-black text-white disabled:opacity-40",
+                  theme.btn
+                )}
               >
                 ادامه به پرداخت
               </button>
@@ -290,12 +298,13 @@ export default function EventBookingFlow({
 
         {step === "external" ? (
           <div className="space-y-6">
-            <SectionTitle icon={ExternalLink} title="خرید از سایت برگزارکننده" />
-            <p className="text-sm leading-7 text-white/75">
+            <SectionTitle icon={ExternalLink} title="خرید از سایت برگزارکننده" theme={theme} />
+            <p className={cn("text-sm leading-7", theme.mutedText)}>
               برای این رویداد، خرید بلیت از طریق سایت اصلی برگزارکننده انجام می‌شود. زمان
               انتخاب‌شده را یادداشت کنید و روی دکمه زیر بزنید.
             </p>
             <SummaryCard
+              theme={theme}
               lines={[
                 { label: "رویداد", value: eventTitle },
                 { label: "روز", value: dayLabel },
@@ -306,7 +315,7 @@ export default function EventBookingFlow({
               <button
                 type="button"
                 onClick={() => setStep("schedule")}
-                className="rounded-2xl border border-white/15 px-5 py-3 text-sm font-bold text-white/80"
+                className={theme.ghostBtn}
               >
                 قبلی
               </button>
@@ -314,7 +323,10 @@ export default function EventBookingFlow({
                 type="button"
                 onClick={openExternalLink}
                 disabled={!selectedSession?.purchaseUrl?.trim()}
-                className={`flex flex-1 items-center justify-center gap-2 rounded-2xl py-4 text-base font-black text-white disabled:opacity-40 ${theme.btn}`}
+                className={cn(
+                  "flex flex-1 items-center justify-center gap-2 rounded-2xl py-4 text-base font-black text-white disabled:opacity-40",
+                  theme.btn
+                )}
               >
                 <ExternalLink className="h-5 w-5" />
                 رفتن به صفحه خرید
@@ -325,8 +337,9 @@ export default function EventBookingFlow({
 
         {step === "payment" ? (
           <div className="space-y-6">
-            <SectionTitle icon={CreditCard} title="پرداخت" />
+            <SectionTitle icon={CreditCard} title="پرداخت" theme={theme} />
             <SummaryCard
+              theme={theme}
               lines={[
                 { label: "رویداد", value: eventTitle },
                 { label: "روز", value: dayLabel },
@@ -342,7 +355,7 @@ export default function EventBookingFlow({
                 { label: "تعداد", value: String(quantity) },
               ]}
             />
-            <p className="rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-xs text-white/55">
+            <p className={theme.infoBox}>
               پرداخت آنلاین امن — پس از تأیید، بلیت الکترونیکی صادر می‌شود.
             </p>
             <div className="flex gap-3">
@@ -351,7 +364,7 @@ export default function EventBookingFlow({
                 onClick={() =>
                   setStep(hasAssignedSeating && seatingLayout ? "seats" : "schedule")
                 }
-                className="rounded-2xl border border-white/15 px-5 py-3 text-sm font-bold text-white/80"
+                className={theme.ghostBtn}
               >
                 قبلی
               </button>
@@ -359,7 +372,10 @@ export default function EventBookingFlow({
                 type="button"
                 disabled={paying}
                 onClick={handlePayment}
-                className={`flex flex-1 items-center justify-center gap-2 rounded-2xl py-4 text-base font-black text-white disabled:opacity-60 ${theme.btn}`}
+                className={cn(
+                  "flex flex-1 items-center justify-center gap-2 rounded-2xl py-4 text-base font-black text-white disabled:opacity-60",
+                  theme.btn
+                )}
               >
                 <CreditCard className="h-5 w-5" />
                 {paying ? "در حال پردازش..." : "پرداخت و دریافت بلیت"}
@@ -370,20 +386,18 @@ export default function EventBookingFlow({
 
         {step === "success" ? (
           <div className="space-y-6 py-4 text-center">
-            <CheckCircle2
-              className={`mx-auto h-16 w-16 ${variant === "bilitmall" ? "text-red-400" : "text-emerald-400"}`}
-            />
-            <h2 className="text-xl font-black">بلیت شما صادر شد</h2>
-            <p className="text-sm text-white/70">
+            <CheckCircle2 className={cn("mx-auto h-16 w-16", theme.successIcon)} />
+            <h2 className={cn("text-xl font-black", theme.sectionTitle)}>بلیت شما صادر شد</h2>
+            <p className={cn("text-sm", theme.successSubtitle)}>
               {dayLabel} — سانس {selectedSession?.time}
             </p>
-            <div className="rounded-2xl border border-white/15 bg-white/10 px-6 py-5">
-              <p className="text-xs text-white/50">کد پیگیری</p>
+            <div className={theme.successCard}>
+              <p className={theme.successCodeLabel}>کد پیگیری</p>
               <p className="mt-2 font-mono text-2xl font-black tracking-wider" dir="ltr">
                 {ticketRef}
               </p>
             </div>
-            <p className="text-xs text-white/45">
+            <p className={cn("text-xs", theme.successFootnote)}>
               این کد را نگه دارید. بلیت الکترونیکی به زودی به حساب شما اضافه می‌شود.
             </p>
             <button
@@ -393,7 +407,7 @@ export default function EventBookingFlow({
                 setSelectedSeatIds([]);
                 setTicketRef("");
               }}
-              className={`rounded-2xl px-6 py-3 text-sm font-bold text-white ${theme.btn}`}
+              className={cn("rounded-2xl px-6 py-3 text-sm font-bold text-white", theme.btn)}
             >
               خرید بلیت دیگر
             </button>
@@ -407,26 +421,34 @@ export default function EventBookingFlow({
 function SectionTitle({
   icon: Icon,
   title,
+  theme,
 }: {
-  icon: React.ComponentType<{ className?: string }>;
+  icon: ComponentType<{ className?: string }>;
   title: string;
+  theme: BookingFlowTheme;
 }) {
   return (
     <div className="flex items-center gap-2">
-      <Icon className="h-4 w-4 text-white/70" />
-      <h3 className="text-sm font-black text-white/90">{title}</h3>
+      <Icon className={cn("h-4 w-4", theme.sectionIcon)} />
+      <h3 className={cn("text-sm font-black", theme.sectionTitle)}>{title}</h3>
     </div>
   );
 }
 
-function SummaryCard({ lines }: { lines: { label: string; value: string }[] }) {
+function SummaryCard({
+  lines,
+  theme,
+}: {
+  lines: { label: string; value: string }[];
+  theme: BookingFlowTheme;
+}) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+    <div className={theme.summaryCard}>
       <div className="space-y-2">
         {lines.map((line) => (
           <div key={line.label} className="flex justify-between gap-4 text-sm">
-            <span className="text-white/50">{line.label}</span>
-            <span className="font-bold text-white/90">{line.value}</span>
+            <span className={theme.summaryLabel}>{line.label}</span>
+            <span className={theme.summaryValue}>{line.value}</span>
           </div>
         ))}
       </div>
@@ -442,11 +464,11 @@ function StepIndicator({
 }: {
   labels: string[];
   currentIndex: number;
-  theme: (typeof themes)["bilitmall"];
+  theme: BookingFlowTheme;
   done: boolean;
 }) {
   return (
-    <div className="border-b border-white/10 bg-black/30 px-4 py-4 sm:px-6">
+    <div className={cn("px-4 py-4 sm:px-6", theme.panelHeader)}>
       <div className="flex items-center justify-between gap-1">
         {labels.map((label, index) => {
           const isActive = !done && index === currentIndex;
@@ -454,25 +476,21 @@ function StepIndicator({
           return (
             <div key={label} className="flex flex-1 flex-col items-center gap-1.5">
               <div
-                className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-black transition ${
+                className={cn(
+                  "flex h-8 w-8 items-center justify-center rounded-full text-xs font-black transition",
                   isActive ? theme.stepActive : isDone ? theme.stepDone : theme.stepIdle
-                }`}
+                )}
               >
                 {isDone && !isActive ? "✓" : index + 1}
               </div>
               <span
-                className={`hidden text-center text-[10px] font-bold leading-tight sm:block ${
-                  isActive ? "text-white" : "text-white/45"
-                }`}
+                className={cn(
+                  "hidden text-center text-[10px] font-bold leading-tight sm:block",
+                  isActive ? theme.stepLabelActive : theme.stepLabelIdle
+                )}
               >
                 {label}
               </span>
-              {index < labels.length - 1 ? (
-                <div
-                  className={`absolute hidden h-0.5 sm:block ${theme.line}`}
-                  aria-hidden
-                />
-              ) : null}
             </div>
           );
         })}

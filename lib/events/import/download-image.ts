@@ -3,12 +3,18 @@ import fs from "fs/promises";
 import path from "path";
 import sharp from "sharp";
 import { ensureUploadDir } from "@/lib/events/form-data";
-import { EVENT_CARD_IMAGE } from "@/lib/events/image-specs";
+import { EVENT_BANNER_IMAGE, EVENT_CARD_IMAGE } from "@/lib/events/image-specs";
+import { compositeImageFrame } from "@/lib/events/composite-image-frame";
 
 const MAX_IMAGE_BYTES = 8 * 1024 * 1024;
 const FETCH_TIMEOUT_MS = 15_000;
 
-export async function downloadEventImageFromUrl(imageUrl: string): Promise<string | null> {
+async function downloadAndProcessImage(
+  imageUrl: string,
+  target: typeof EVENT_CARD_IMAGE | typeof EVENT_BANNER_IMAGE,
+  fit: "card" | "banner",
+  prefix: string
+): Promise<string | null> {
   if (!imageUrl?.trim()) return null;
 
   let parsed: URL;
@@ -38,15 +44,10 @@ export async function downloadEventImageFromUrl(imageUrl: string): Promise<strin
     if (buffer.byteLength > MAX_IMAGE_BYTES) return null;
 
     await ensureUploadDir();
-    const filename = `${Date.now()}-${randomUUID().slice(0, 8)}.webp`;
+    const filename = `${prefix}-${Date.now()}-${randomUUID().slice(0, 8)}.webp`;
     const filepath = path.join(process.cwd(), "public", "uploads", "events", filename);
 
-    const processed = await sharp(buffer)
-      .rotate()
-      .resize(EVENT_CARD_IMAGE.width, EVENT_CARD_IMAGE.height, {
-        fit: "cover",
-        position: "centre",
-      })
+    const processed = await sharp(await compositeImageFrame(buffer, target, { fit }))
       .webp({ quality: 85 })
       .toBuffer();
 
@@ -57,4 +58,14 @@ export async function downloadEventImageFromUrl(imageUrl: string): Promise<strin
   } finally {
     clearTimeout(timer);
   }
+}
+
+export async function downloadEventImageFromUrl(imageUrl: string): Promise<string | null> {
+  return downloadAndProcessImage(imageUrl, EVENT_CARD_IMAGE, "card", "card");
+}
+
+export async function downloadEventBannerImageFromUrl(
+  imageUrl: string
+): Promise<string | null> {
+  return downloadAndProcessImage(imageUrl, EVENT_BANNER_IMAGE, "banner", "banner");
 }

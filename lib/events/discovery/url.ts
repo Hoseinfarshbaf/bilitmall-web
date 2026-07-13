@@ -2,7 +2,7 @@ import type { DiscoveryProviderId } from "./types";
 
 const PROVIDER_ORIGINS: Record<DiscoveryProviderId, string> = {
   honarticket: "https://www.honarticket.com",
-  melotik: "https://www.melotik.com",
+  tiwall: "https://www.tiwall.com",
 };
 
 export function getProviderOrigin(provider: DiscoveryProviderId): string {
@@ -42,7 +42,7 @@ export function isSkippableCatalogPath(pathname: string): boolean {
   const path = pathname.toLowerCase();
   return (
     path === "/" ||
-    /^\/(about|contact|archive|receipts|login|register|cart|api|resource|css|js|images|s|site\.webmanifest)(\/|$)/.test(
+    /^\/(about|contact|archive|receipts|login|register|cart|api|resource|css|js|images|s|site\.webmanifest|news|channels|divar|help)(\/|$)/.test(
       path
     )
   );

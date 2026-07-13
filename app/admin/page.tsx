@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function AdminPage() {
   return (
     <main
@@ -13,12 +15,12 @@ export default function AdminPage() {
             </p>
           </div>
 
-          <a
+          <Link
             href="/"
             className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
           >
             مشاهده سایت
-          </a>
+          </Link>
         </div>
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">

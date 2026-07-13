@@ -22,7 +22,7 @@ export default function AuthCard({
   footer,
 }: AuthCardProps) {
   return (
-    <Card className="rounded-3xl border-neutral-200 shadow-sm ring-0">
+    <Card className="rounded-3xl border-neutral-200 bg-white shadow-sm ring-0 dark:border-neutral-800 dark:bg-neutral-900">
       <CardHeader className="items-center text-center">
         <Link
           href="/"
@@ -31,16 +31,16 @@ export default function AuthCard({
           <Ticket className="h-7 w-7" />
           <span>بلیت‌مال</span>
         </Link>
-        <CardTitle className="text-xl font-black text-neutral-900">
+        <CardTitle className="text-xl font-black text-neutral-900 dark:text-neutral-100">
           {title}
         </CardTitle>
-        <CardDescription className="text-neutral-500">
+        <CardDescription className="text-neutral-500 dark:text-neutral-400">
           {description}
         </CardDescription>
       </CardHeader>
       <CardContent>{children}</CardContent>
       {footer && (
-        <div className="border-t border-neutral-100 px-6 py-4 text-center text-sm text-neutral-600">
+        <div className="border-t border-neutral-100 px-6 py-4 text-center text-sm text-neutral-600 dark:border-neutral-800 dark:text-neutral-400">
           {footer}
         </div>
       )}

@@ -40,7 +40,7 @@ export default function Home() {
     lifestyleEvents.length > 0;
 
   return (
-    <main className="min-h-screen bg-neutral-50 pb-20">
+    <main className="min-h-screen bg-neutral-50 pb-20 dark:bg-neutral-950">
       <SpecialOffers />
 
       <section className="py-6">
@@ -54,13 +54,13 @@ export default function Home() {
       <section className="mt-10">
         <div className="mx-auto max-w-6xl px-4">
           {loading ? (
-            <p className="py-20 text-center text-neutral-500">در حال بارگذاری رویدادها...</p>
+            <p className="py-20 text-center text-neutral-500 dark:text-neutral-400">در حال بارگذاری رویدادها...</p>
           ) : !hasAnySection ? (
-            <div className="rounded-3xl border-2 border-dashed border-neutral-200 bg-white py-20 text-center">
-              <p className="text-lg font-black text-neutral-800">
+            <div className="rounded-3xl border-2 border-dashed border-neutral-200 bg-white py-20 text-center dark:border-neutral-700 dark:bg-neutral-900">
+              <p className="text-lg font-black text-neutral-800 dark:text-neutral-100">
                 رویدادی برای شهر {selectedCity} موجود نیست.
               </p>
-              <p className="mt-2 text-sm text-neutral-500">
+              <p className="mt-2 text-sm text-neutral-500 dark:text-neutral-400">
                 شهر دیگری از منوی بالا انتخاب کنید یا بعداً سر بزنید.
               </p>
             </div>

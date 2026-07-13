@@ -1,8 +1,8 @@
 /** ابعاد نمایش بنر پیشنهاد ویژه در صفحه اصلی (SpecialOffers) */
 export const SPECIAL_OFFERS_CAROUSEL = {
   maxWidthPx: 1152,
-  heightPx: 288,
-  heightSmPx: 320,
+  heightPx: 224,
+  heightSmPx: 256,
 } as const;
 
 export const EVENT_CARD_IMAGE = {
@@ -35,11 +35,27 @@ export const EVENT_IMAGE_MIN_HEIGHT =
 export const EVENT_BANNER_MIN_WIDTH = 1000;
 export const EVENT_BANNER_MIN_HEIGHT = 210;
 
+/** پس‌زمینه قاب کارت/بنر هنگام فیت contain */
+export const EVENT_IMAGE_FRAME_BACKGROUND = "#171717" as const;
+
+/** شدت محوی پس‌زمینه قاب (sharp sigma) */
+export const EVENT_IMAGE_FRAME_BLUR_SIGMA = 42;
+
+/** پاس دوم blur برای پخش نرم‌تر رنگ‌ها */
+export const EVENT_IMAGE_FRAME_BLUR_SIGMA_FINE = 16;
+
+/** بزرگ‌نمایی پس‌زمینه محو برای پوشش لبه‌های blur */
+export const EVENT_IMAGE_FRAME_BLUR_OVERSCAN = 1.28;
+
+/** اشباع و روشنایی لایه محو — رنگ زنده‌تر، نه تک‌رنگ تیره */
+export const EVENT_IMAGE_FRAME_BLUR_SATURATION = 1.34;
+export const EVENT_IMAGE_FRAME_BLUR_BRIGHTNESS = 1.05;
+
 export const EVENT_CARD_IMAGE_RECOMMENDED_TEXT =
-  `تصویر کارت به‌صورت خودکار به نسبت ${EVENT_CARD_IMAGE.aspectLabel} (${EVENT_CARD_IMAGE.width}×${EVENT_CARD_IMAGE.height}) برش و بهینه می‌شود. ترجیحاً ${EVENT_IMAGE_IDEAL_MIN_WIDTH}×${EVENT_IMAGE_IDEAL_MIN_HEIGHT} پیکسل؛ تا ${EVENT_IMAGE_SIZE_TOLERANCE_PX} پیکسل کمتر از هر بعد هم قابل قبول است.`;
+  `تصویر کارت در قاب ثابت ${EVENT_CARD_IMAGE.aspectLabel} (${EVENT_CARD_IMAGE.width}×${EVENT_CARD_IMAGE.height}) قرار می‌گیرد؛ سیستم خودکار ابعاد را تنظیم می‌کند تا قاب کامل پر شود و فضای خالی با رنگ محو خود تصویر پر گردد. ترجیحاً ${EVENT_IMAGE_IDEAL_MIN_WIDTH}×${EVENT_IMAGE_IDEAL_MIN_HEIGHT} پیکسل؛ تا ${EVENT_IMAGE_SIZE_TOLERANCE_PX} پیکسل کمتر از هر بعد هم قابل قبول است.`;
 
 export const EVENT_BANNER_IMAGE_RECOMMENDED_TEXT =
-  `تصویر بنر به‌صورت خودکار به نسبت ${EVENT_BANNER_IMAGE.aspectLabel} (${EVENT_BANNER_IMAGE.width}×${EVENT_BANNER_IMAGE.height}) برش و در باکس کروسل پیشنهاد ویژه صفحه اصلی فیت می‌شود. حداقل ابعاد: ${EVENT_BANNER_MIN_WIDTH}×${EVENT_BANNER_MIN_HEIGHT} پیکسل.`;
+  `تصویر بنر در قاب ثابت ${EVENT_BANNER_IMAGE.aspectLabel} (${EVENT_BANNER_IMAGE.width}×${EVENT_BANNER_IMAGE.height}) قرار می‌گیرد؛ سیستم خودکار ابعاد را تنظیم می‌کند تا قاب کامل پر شود و فضای خالی با رنگ محو خود تصویر پر گردد. حداقل ابعاد: ${EVENT_BANNER_MIN_WIDTH}×${EVENT_BANNER_MIN_HEIGHT} پیکسل.`;
 
 /** @deprecated Use EVENT_CARD_IMAGE_RECOMMENDED_TEXT */
 export const EVENT_IMAGE_RECOMMENDED_TEXT = EVENT_CARD_IMAGE_RECOMMENDED_TEXT;

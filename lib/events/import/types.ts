@@ -1,6 +1,6 @@
 import type { EventDay, EventFormData } from "@/lib/events/types";
 
-export type ImportProvider = "honarticket" | "melotik" | "generic";
+export type ImportProvider = "honarticket" | "tiwall";
 
 export type ImportQuestion = {
   id: "city" | "category";

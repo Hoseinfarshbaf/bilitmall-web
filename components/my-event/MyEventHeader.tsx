@@ -87,13 +87,13 @@ export default function MyEventHeader() {
 
           <ThemeToggle />
 
-          <a
+          <Link
             href="/"
             className="inline-flex items-center gap-1.5 rounded-full border border-neutral-200 px-3 py-1.5 text-xs text-neutral-600 hover:border-emerald-500/40 hover:text-emerald-600 dark:border-white/10 dark:text-slate-300 dark:hover:border-emerald-500/30 dark:hover:text-emerald-200"
           >
             <ExternalLink className="h-3.5 w-3.5" />
             <span className="hidden sm:inline">بازدید از سایت بلیت‌مال</span>
-          </a>
+          </Link>
         </nav>
       </div>
     </header>

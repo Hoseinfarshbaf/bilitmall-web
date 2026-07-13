@@ -1,7 +1,7 @@
 import type { ImportProvider } from "@/lib/events/import/types";
 
-/** Providers that support catalog discovery (extensible — add new ids + provider module). */
-export type DiscoveryProviderId = Extract<ImportProvider, "honarticket" | "melotik">;
+/** Providers that support catalog discovery (add new ids + provider module when needed). */
+export type DiscoveryProviderId = ImportProvider;
 
 export type DiscoveredCatalogItem = {
   externalId: string;
@@ -12,6 +12,15 @@ export type DiscoveredCatalogItem = {
   dateHint?: string;
   imageUrl?: string;
   categoryHint?: string;
+  /** true = دکمه «خرید بلیت»؛ false = فروش زمان‌بندی‌شده مثل «فروش از فردا» */
+  onSale?: boolean;
+  saleHint?: string;
+  /** تیوال: تعداد نظر کاربران */
+  reviewCount?: number;
+  /** تیوال: میانگین امتیاز */
+  avgRating?: number;
+  /** رتبه در فید پرفروش/امتیاز */
+  popularityRank?: number;
 };
 
 export type DiscoveryMatchStatus = "unregistered" | "registered";

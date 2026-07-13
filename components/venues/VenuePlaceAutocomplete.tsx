@@ -81,8 +81,8 @@ export default function VenuePlaceAutocomplete({
   useEffect(() => {
     const cityName = city.trim();
     if (!cityName) {
-      setSuggestions([]);
-      return;
+      const clearTimer = setTimeout(() => setSuggestions([]), 0);
+      return () => clearTimeout(clearTimer);
     }
 
     const timer = setTimeout(async () => {

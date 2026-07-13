@@ -130,10 +130,10 @@ const CategorySlider = ({
           href={listHref}
           className="group/title min-w-0 transition-opacity hover:opacity-90"
         >
-          <h2 className="text-[26px] font-extrabold leading-tight tracking-tight text-neutral-900 group-hover/title:text-red-600 sm:text-[28px]">
+          <h2 className="text-[26px] font-extrabold leading-tight tracking-tight text-neutral-900 group-hover/title:text-red-600 dark:text-neutral-100 dark:group-hover/title:text-red-400 sm:text-[28px]">
             {displayTitle}
           </h2>
-          <p className="mt-1 text-sm font-normal leading-relaxed tracking-tight text-neutral-400 group-hover/title:text-neutral-500 sm:text-[15px]">
+          <p className="mt-1 text-sm font-normal leading-relaxed tracking-tight text-neutral-400 group-hover/title:text-neutral-500 dark:text-neutral-500 dark:group-hover/title:text-neutral-400 sm:text-[15px]">
             {subtitle}
           </p>
         </Link>
@@ -141,7 +141,7 @@ const CategorySlider = ({
         {visibleData.length >= 4 ? (
           <Link
             href={listHref}
-            className="flex shrink-0 items-center gap-2 rounded-full bg-neutral-100 px-4 py-2 text-xs font-bold transition-all duration-300 hover:bg-neutral-900 hover:text-white"
+            className="flex shrink-0 items-center gap-2 rounded-full bg-neutral-100 px-4 py-2 text-xs font-bold transition-all duration-300 hover:bg-neutral-900 hover:text-white dark:bg-neutral-800 dark:text-neutral-200 dark:hover:bg-red-600 dark:hover:text-white"
           >
             <span>مشاهده همه</span>
             <ArrowLeft className="h-3 w-3" />
@@ -155,16 +155,16 @@ const CategorySlider = ({
             <button
               type="button"
               onClick={() => scroll("right")}
-              className="absolute right-0 top-1/2 z-30 -mr-4 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-neutral-100 bg-white shadow-lg transition-all hover:scale-110 md:flex"
+              className="absolute right-0 top-1/2 z-30 -mr-4 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-neutral-100 bg-white shadow-lg transition-all hover:scale-110 dark:border-neutral-700 dark:bg-neutral-900 md:flex"
             >
-              <ChevronRight className="h-5 w-5 text-neutral-800" />
+              <ChevronRight className="h-5 w-5 text-neutral-800 dark:text-neutral-200" />
             </button>
             <button
               type="button"
               onClick={() => scroll("left")}
-              className="absolute left-0 top-1/2 z-30 -ml-4 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-neutral-100 bg-white shadow-lg transition-all hover:scale-110 md:flex"
+              className="absolute left-0 top-1/2 z-30 -ml-4 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-neutral-100 bg-white shadow-lg transition-all hover:scale-110 dark:border-neutral-700 dark:bg-neutral-900 md:flex"
             >
-              <ChevronLeft className="h-5 w-5 text-neutral-800" />
+              <ChevronLeft className="h-5 w-5 text-neutral-800 dark:text-neutral-200" />
             </button>
           </>
         )}

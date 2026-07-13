@@ -1,10 +1,13 @@
 import { lookup } from "dns/promises";
 
+import type { ImportProvider } from "./types";
+
 const ALLOWED_HOSTS = new Set([
   "honarticket.com",
   "www.honarticket.com",
-  "melotik.com",
-  "www.melotik.com",
+  "tiwall.com",
+  "www.tiwall.com",
+  "sb.tiwall.com",
 ]);
 
 const MAX_HTML_BYTES = 2 * 1024 * 1024;
@@ -81,7 +84,7 @@ function wrapFetchError(error: unknown): Error {
 async function assertSafeHost(hostname: string): Promise<void> {
   const lower = hostname.toLowerCase();
   if (!ALLOWED_HOSTS.has(lower)) {
-    throw new Error("این دامنه برای import مجاز نیست.");
+    throw new Error("این دامنه برای import مجاز نیست. فقط هنر تیکت و تیوال پشتیبانی می‌شوند.");
   }
 
   let addresses: string[];
@@ -118,11 +121,11 @@ export function normalizeImportUrl(raw: string): string {
   return parsed.toString();
 }
 
-export function detectProvider(url: string): "honarticket" | "melotik" | "generic" {
+export function detectProvider(url: string): ImportProvider {
   const host = new URL(url).hostname.toLowerCase();
   if (host.includes("honarticket")) return "honarticket";
-  if (host.includes("melotik")) return "melotik";
-  return "generic";
+  if (host.includes("tiwall")) return "tiwall";
+  throw new Error("فقط لینک‌های هنر تیکت و تیوال پشتیبانی می‌شوند.");
 }
 
 export async function fetchEventPage(url: string): Promise<{ html: string; finalUrl: string }> {

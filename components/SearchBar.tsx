@@ -11,10 +11,10 @@ import {
 import { Search, X, CalendarDays, MapPin, CornerDownLeft } from "lucide-react";
 import { useCity } from "@/components/CityContext";
 import { useEvents } from "@/hooks/useEvents";
+import EventFramedImage from "@/components/EventFramedImage";
 import {
   buildDiscoveryPageUrl,
   getCityEventsFromList,
-  getEventImageStyle,
   getEventUrl,
 } from "@/lib/events/helpers";
 import { formatEventDateDisplay } from "@/lib/events/date-utils";
@@ -93,10 +93,6 @@ export default function SearchBar() {
   }, [cityEvents, query]);
 
   useEffect(() => {
-    setActiveIndex(-1);
-  }, [query]);
-
-  useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (
         containerRef.current &&
@@ -154,6 +150,7 @@ export default function SearchBar() {
             value={query}
             onChange={(e) => {
               setQuery(e.target.value);
+              setActiveIndex(-1);
               setIsOpen(true);
             }}
             onFocus={() => setIsOpen(true)}
@@ -161,7 +158,7 @@ export default function SearchBar() {
             placeholder={`جستجوی رویداد در ${selectedCity}...`}
             aria-label="جستجوی رویداد"
             autoComplete="off"
-            className={`w-full border border-neutral-200 bg-white py-4 pr-12 pl-11 text-sm text-neutral-800 shadow-sm outline-none transition focus:border-red-500 focus:ring-2 focus:ring-red-100 ${
+            className={`w-full border border-neutral-200 bg-white py-4 pr-12 pl-11 text-sm text-neutral-800 shadow-sm outline-none transition focus:border-red-500 focus:ring-2 focus:ring-red-100 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:focus:border-red-500 dark:focus:ring-red-500/20 ${
               showDropdown && suggestions.length > 0
                 ? "rounded-t-3xl rounded-b-none border-b-transparent"
                 : "rounded-full"
@@ -173,9 +170,10 @@ export default function SearchBar() {
               aria-label="پاک کردن"
               onClick={() => {
                 setQuery("");
+                setActiveIndex(-1);
                 setIsOpen(false);
               }}
-              className="absolute left-3 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full text-neutral-400 transition hover:bg-neutral-100 hover:text-neutral-600"
+              className="absolute left-3 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full text-neutral-400 transition hover:bg-neutral-100 hover:text-neutral-600 dark:hover:bg-neutral-800 dark:hover:text-neutral-200"
             >
               <X className="h-4 w-4" />
             </button>
@@ -184,7 +182,7 @@ export default function SearchBar() {
       </form>
 
       {showDropdown ? (
-        <div className="absolute z-50 w-full overflow-hidden rounded-b-3xl border border-t-0 border-neutral-200 bg-white shadow-xl">
+        <div className="absolute z-50 w-full overflow-hidden rounded-b-3xl border border-t-0 border-neutral-200 bg-white shadow-xl dark:border-neutral-700 dark:bg-neutral-900 dark:shadow-[0_20px_50px_rgba(0,0,0,0.45)]">
           {suggestions.length > 0 ? (
             <ul className="max-h-88 overflow-y-auto py-1">
               {suggestions.map((event, index) => (
@@ -197,18 +195,19 @@ export default function SearchBar() {
                       setIsOpen(false);
                     }}
                     className={`flex w-full items-center gap-3 px-3 py-2.5 text-right transition ${
-                      index === activeIndex ? "bg-red-50" : "hover:bg-neutral-50"
+                      index === activeIndex
+                        ? "bg-red-50 dark:bg-red-500/10"
+                        : "hover:bg-neutral-50 dark:hover:bg-neutral-800"
                     }`}
                   >
-                    <span
-                      className="h-12 w-12 shrink-0 rounded-xl bg-neutral-100"
-                      style={getEventImageStyle(event.image)}
-                    />
+                    <span className="relative h-12 w-12 shrink-0 overflow-hidden rounded-xl bg-neutral-100 dark:bg-neutral-800">
+                      <EventFramedImage image={event.image} />
+                    </span>
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate text-sm font-bold text-neutral-800">
+                      <span className="block truncate text-sm font-bold text-neutral-800 dark:text-neutral-100">
                         {event.title}
                       </span>
-                      <span className="mt-1 flex items-center gap-3 text-xs text-neutral-400">
+                      <span className="mt-1 flex items-center gap-3 text-xs text-neutral-400 dark:text-neutral-500">
                         <span className="inline-flex items-center gap-1">
                           <CalendarDays className="h-3 w-3" />
                           {formatEventDateDisplay(event)}
@@ -219,7 +218,7 @@ export default function SearchBar() {
                         </span>
                       </span>
                     </span>
-                    <span className="shrink-0 rounded-full bg-neutral-100 px-2 py-0.5 text-[11px] font-bold text-neutral-500">
+                    <span className="shrink-0 rounded-full bg-neutral-100 px-2 py-0.5 text-[11px] font-bold text-neutral-500 dark:bg-neutral-800 dark:text-neutral-400">
                       {event.category}
                     </span>
                   </button>
@@ -227,7 +226,7 @@ export default function SearchBar() {
               ))}
             </ul>
           ) : (
-            <div className="px-4 py-6 text-center text-sm text-neutral-500">
+            <div className="px-4 py-6 text-center text-sm text-neutral-500 dark:text-neutral-400">
               رویدادی با این نام در {selectedCity} پیدا نشد.
             </div>
           )}
@@ -235,7 +234,7 @@ export default function SearchBar() {
           <button
             type="button"
             onClick={() => goToSearchPage(query)}
-            className="flex w-full items-center justify-between gap-2 border-t border-neutral-100 bg-neutral-50 px-4 py-3 text-sm font-bold text-red-600 transition hover:bg-red-50"
+            className="flex w-full items-center justify-between gap-2 border-t border-neutral-100 bg-neutral-50 px-4 py-3 text-sm font-bold text-red-600 transition hover:bg-red-50 dark:border-neutral-800 dark:bg-neutral-900/80 dark:text-red-400 dark:hover:bg-red-500/10"
           >
             <span className="inline-flex items-center gap-2">
               <Search className="h-4 w-4" />

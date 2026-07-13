@@ -14,9 +14,9 @@ export default function MyEventRegisterPage() {
   const [slugInput, setSlugInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const [slugStatus, setSlugStatus] = useState<"idle" | "checking" | "ok" | "taken" | "invalid">(
-    "idle"
-  );
+  const [remoteSlugStatus, setRemoteSlugStatus] = useState<
+    "idle" | "checking" | "ok" | "taken" | "invalid"
+  >("idle");
 
   const slug = useMemo(
     () => normalizeMyEventSlug(slugInput || displayName),
@@ -24,23 +24,30 @@ export default function MyEventRegisterPage() {
   );
 
   const previewUrl = slug ? getMyEventPublicUrl(slug) : "";
+  const slugStatus = !slug ? ("invalid" as const) : remoteSlugStatus;
 
   useEffect(() => {
-    if (!slug) {
-      setSlugStatus("invalid");
-      return;
-    }
+    if (!slug) return;
 
-    setSlugStatus("checking");
-    const timer = setTimeout(async () => {
+    let cancelled = false;
+    const checkingTimer = setTimeout(() => {
+      if (!cancelled) setRemoteSlugStatus("checking");
+    }, 0);
+
+    const fetchTimer = setTimeout(async () => {
       const res = await fetch(`/api/my-event/slug-check?slug=${encodeURIComponent(slug)}`);
       const data = await res.json();
-      if (!data.valid) setSlugStatus("invalid");
-      else if (data.available) setSlugStatus("ok");
-      else setSlugStatus("taken");
+      if (cancelled) return;
+      if (!data.valid) setRemoteSlugStatus("invalid");
+      else if (data.available) setRemoteSlugStatus("ok");
+      else setRemoteSlugStatus("taken");
     }, 400);
 
-    return () => clearTimeout(timer);
+    return () => {
+      cancelled = true;
+      clearTimeout(checkingTimer);
+      clearTimeout(fetchTimer);
+    };
   }, [slug]);
 
   async function handleSubmit(e: React.FormEvent) {

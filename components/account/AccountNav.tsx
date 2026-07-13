@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 
 const tabs = [
   { href: "/account", label: "بلیت‌های من" },
+  { href: "/account/favorites", label: "علاقه‌مندی‌ها" },
   { href: "/account/payments", label: "پرداخت‌ها" },
   { href: "/account/profile", label: "ویرایش حساب" },
 ];

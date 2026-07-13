@@ -1,7 +1,8 @@
 import type { CSSProperties } from "react";
 import type { EventItem } from "./types";
 import { EVENT_PLACEHOLDER_IMAGE } from "./types";
-import { getEventSchedule, getUpcomingEventSchedule, isEventEnded } from "./date-utils";
+import { EVENT_IMAGE_FRAME_BACKGROUND } from "./image-specs";
+import { getUpcomingEventSchedule, isEventEnded } from "./date-utils";
 import { getMyEventPublicUrl } from "@/lib/my-event/domains";
 import { MY_EVENT_EVENT_SOURCE } from "@/lib/my-event/constants";
 import { buildPublicEventSlug } from "@/lib/my-event/public-slugs";
@@ -112,9 +113,10 @@ export function getEventImageStyle(image?: string | null): CSSProperties {
 
   return {
     backgroundImage: `url(${url})`,
-    backgroundSize: "cover",
+    backgroundSize: "contain",
+    backgroundRepeat: "no-repeat",
     backgroundPosition: "center center",
-    backgroundColor: "#171717",
+    backgroundColor: EVENT_IMAGE_FRAME_BACKGROUND,
   };
 }
 
@@ -123,9 +125,10 @@ export function getEventBannerImageStyle(image?: string | null): CSSProperties {
 
   return {
     backgroundImage: `url(${url})`,
-    backgroundSize: "cover",
-    backgroundPosition: "center 32%",
-    backgroundColor: "#171717",
+    backgroundSize: "contain",
+    backgroundRepeat: "no-repeat",
+    backgroundPosition: "center center",
+    backgroundColor: EVENT_IMAGE_FRAME_BACKGROUND,
   };
 }
 

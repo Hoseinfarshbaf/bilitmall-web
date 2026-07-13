@@ -1,5 +1,4 @@
 import type { EventDay, ManagedEvent } from "./types";
-import { resolveTicketingType } from "./types";
 import { prisma } from "@/lib/prisma";
 import { normalizeEventDays } from "./date-utils";
 

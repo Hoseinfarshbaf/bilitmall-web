@@ -6,6 +6,7 @@ import type { EventDay, EventFormData, EventPricingMode, TicketingType } from "@
 import { hasUploadedImage } from "@/lib/events/helpers";
 import { normalizeEventDays } from "@/lib/events/date-utils";
 import { EVENT_BANNER_IMAGE, EVENT_CARD_IMAGE } from "@/lib/events/image-specs";
+import { compositeImageFrame, type ImageFrameFit } from "@/lib/events/composite-image-frame";
 
 const UPLOAD_DIR = path.join(process.cwd(), "public", "uploads", "events");
 const MAX_FILE_SIZE = 8 * 1024 * 1024;
@@ -17,7 +18,8 @@ export async function ensureUploadDir(): Promise<void> {
 
 async function saveProcessedImage(
   file: File,
-  target: { width: number; height: number }
+  target: { width: number; height: number },
+  fit: ImageFrameFit = "card"
 ): Promise<string> {
   if (!ALLOWED_TYPES.has(file.type)) {
     throw new Error("فرمت تصویر مجاز نیست. JPG، PNG یا WebP انتخاب کن.");
@@ -33,14 +35,8 @@ async function saveProcessedImage(
   const filepath = path.join(UPLOAD_DIR, filename);
   const buffer = Buffer.from(await file.arrayBuffer());
 
-  const processed = await sharp(buffer)
-    .rotate()
-    .resize(target.width, target.height, {
-      fit: "cover",
-      position: "centre",
-    })
-    .webp({ quality: 85 })
-    .toBuffer();
+  const composited = await compositeImageFrame(buffer, target, { fit });
+  const processed = await sharp(composited).webp({ quality: 85 }).toBuffer();
 
   await fs.writeFile(filepath, processed);
 
@@ -52,7 +48,7 @@ export async function saveEventImage(file: File): Promise<string> {
 }
 
 export async function saveEventBannerImage(file: File): Promise<string> {
-  return saveProcessedImage(file, EVENT_BANNER_IMAGE);
+  return saveProcessedImage(file, EVENT_BANNER_IMAGE, "banner");
 }
 
 function parseDays(value: unknown): EventDay[] {

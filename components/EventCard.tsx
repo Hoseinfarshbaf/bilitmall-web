@@ -1,33 +1,67 @@
-import { CalendarDays, MapPin, Heart } from "lucide-react";
+"use client";
+
+import { CalendarDays, Heart, MapPin } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import type { EventItem } from "@/lib/events/types";
-import { getEventImageStyle, getEventUrl } from "@/lib/events/helpers";
+import { getEventUrl } from "@/lib/events/helpers";
+import EventFramedImage from "@/components/EventFramedImage";
+import { useFavorites } from "@/components/FavoritesProvider";
+import { useToast } from "@/components/ToastProvider";
 import { formatEventDateDisplay } from "@/lib/events/date-utils";
-import { getEventStatusLabel, isEventUnavailable, resolveEventStatus } from "@/lib/events/status";
+import { getEventStatusLabel, isEventUnavailable } from "@/lib/events/status";
+import { cn } from "@/lib/utils";
 
 export default function EventCard({ event }: { event: EventItem }) {
-  const status = resolveEventStatus(event);
+  const router = useRouter();
+  const { isFavorite, toggleFavorite } = useFavorites();
+  const { showToast } = useToast();
+
   const unavailable = isEventUnavailable(event);
   const statusLabel = getEventStatusLabel(event);
   const href = getEventUrl(event);
   const isExternal = href.startsWith("http");
+  const favorited = isFavorite(event.id);
+
+  async function handleFavoriteClick(e: React.MouseEvent<HTMLButtonElement>) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const result = await toggleFavorite(event.id);
+    if (result === "login_required") {
+      const next = encodeURIComponent(
+        typeof window !== "undefined" ? window.location.pathname + window.location.search : "/"
+      );
+      router.push(`/auth/login?next=${next}`);
+      return;
+    }
+
+    if (result === "added") {
+      showToast("به علاقه‌مندی‌های حساب شخصی شما اضافه شد.", {
+        action: { label: "مشاهده", href: "/account/favorites" },
+      });
+    }
+  }
 
   const article = (
     <article className="relative w-[88vw] sm:w-[300px] shrink-0 overflow-hidden rounded-3xl bg-neutral-900 shadow-sm transition hover:-translate-y-1 hover:shadow-xl aspect-[3/4]">
-      <div
-        className="absolute inset-0 bg-neutral-800 bg-cover bg-center"
-        style={getEventImageStyle(event.image)}
-      />
+      <EventFramedImage image={event.image} />
 
       <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-transparent" />
 
       <button
         type="button"
-        onClick={(e) => e.preventDefault()}
-        className="absolute left-4 top-4 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-black/20 backdrop-blur-sm text-white transition hover:bg-black/40"
-        aria-label="افزودن به علاقه‌مندی‌ها"
+        onClick={(e) => void handleFavoriteClick(e)}
+        className={cn(
+          "absolute left-4 top-4 z-10 flex h-9 w-9 cursor-pointer items-center justify-center rounded-full backdrop-blur-sm transition",
+          favorited
+            ? "bg-red-600 text-white hover:bg-red-700"
+            : "bg-black/20 text-white hover:bg-black/40"
+        )}
+        aria-label={favorited ? "حذف از علاقه‌مندی‌ها" : "افزودن به علاقه‌مندی‌ها"}
+        aria-pressed={favorited}
       >
-        <Heart className="h-5 w-5" />
+        <Heart className={cn("h-5 w-5", favorited && "fill-current")} />
       </button>
 
       {unavailable ? (

@@ -27,6 +27,7 @@ export function CitiesProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   const refresh = useCallback(async () => {
+    setLoading(true);
     try {
       const res = await fetch("/api/cities");
       const data = await res.json();
@@ -41,8 +42,27 @@ export function CitiesProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
-    void refresh();
-  }, [refresh]);
+    let cancelled = false;
+
+    void fetch("/api/cities")
+      .then(async (res) => {
+        if (cancelled) return;
+        const data = await res.json();
+        if (!cancelled && res.ok && Array.isArray(data)) {
+          setCityRows(data as CityRecord[]);
+        }
+      })
+      .catch(() => {
+        /* keep fallback */
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const value = useMemo<CitiesContextType>(() => {
     const activeCityRows = cityRows.filter((c) => (c.eventCount ?? 0) > 0);

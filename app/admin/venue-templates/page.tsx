@@ -80,8 +80,45 @@ export default function AdminVenueTemplatesPage() {
   }, [loadAdmin, loadCatalog, loadOrganizer]);
 
   useEffect(() => {
-    void load();
-  }, [load]);
+    let cancelled = false;
+
+    void Promise.all([
+      fetch(`/api/admin/venue-templates${buildQuery({ q: search, city })}`).then((r) =>
+        r.json().then((data) => ({ ok: r.ok, data }))
+      ),
+      fetch(
+        `/api/admin/venues/catalog${buildQuery({
+          q: search,
+          city,
+          source: sourceFilter === "همه" ? undefined : sourceFilter,
+        })}`
+      ).then((r) => r.json().then((data) => ({ ok: r.ok, data }))),
+      fetch(
+        `/api/admin/organizer-seating-plans${buildQuery({
+          q: search,
+          city,
+          organizer: organizerFilter,
+        })}`
+      ).then((r) => r.json().then((data) => ({ ok: r.ok, data }))),
+    ])
+      .then(([adminRes, catalogRes, organizerRes]) => {
+        if (cancelled) return;
+        if (adminRes.ok && Array.isArray(adminRes.data)) setAdminVenues(adminRes.data);
+        else setAdminVenues([]);
+        if (catalogRes.ok && Array.isArray(catalogRes.data)) setCatalogVenues(catalogRes.data);
+        else setCatalogVenues([]);
+        if (organizerRes.ok && Array.isArray(organizerRes.data))
+          setOrganizerPlans(organizerRes.data);
+        else setOrganizerPlans([]);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [search, city, sourceFilter, organizerFilter]);
 
   function startCreating() {
     setCreating(true);

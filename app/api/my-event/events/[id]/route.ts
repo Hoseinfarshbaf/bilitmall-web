@@ -1,9 +1,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { slugify, normalizeEventDays, parseDaysFromRecord } from "@/lib/events/date-utils";
+import { normalizeEventDays, parseDaysFromRecord } from "@/lib/events/date-utils";
 import { resolveTicketingType } from "@/lib/events/types";
 import { isValidMyEventCategory } from "@/lib/my-event/categories";
-import { MY_EVENT_EVENT_SOURCE } from "@/lib/my-event/constants";
 import { getMyEventSession } from "@/lib/my-event/session";
 import {
   deleteMyEventOrganizerEvent,

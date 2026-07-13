@@ -2,12 +2,7 @@ import { NextResponse } from "next/server";
 import { importEventFromUrl } from "@/lib/events/import";
 import type { ImportProvider } from "@/lib/events/import/types";
 
-const PROVIDERS = new Set<ImportProvider | "auto">([
-  "auto",
-  "honarticket",
-  "melotik",
-  "generic",
-]);
+const PROVIDERS = new Set<ImportProvider | "auto">(["auto", "honarticket", "tiwall"]);
 
 export async function POST(request: Request) {
   try {

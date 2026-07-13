@@ -4,23 +4,15 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Link2, Loader2, SearchCheck, Sparkles } from "lucide-react";
 import type { EventFormData } from "@/lib/events/types";
-import type { ImportProvider, ImportQuestion, ImportResult } from "@/lib/events/import/types";
+import type { ImportQuestion, ImportResult } from "@/lib/events/import/types";
 import EventImagePreviews from "@/components/admin/EventImagePreviews";
 
 const PROVIDER_LABELS: Record<string, string> = {
   honarticket: "هنر تیکت",
-  melotik: "ملوتیک",
-  generic: "عمومی",
+  tiwall: "تیوال",
 };
 
 const ASSETS_DOWNLOAD_STORAGE_KEY = "event-assets-download";
-
-const PROVIDER_OPTIONS: { value: ImportProvider | "auto"; label: string }[] = [
-  { value: "auto", label: "تشخیص خودکار از لینک" },
-  { value: "honarticket", label: "هنر تیکت" },
-  { value: "melotik", label: "ملوتیک" },
-  { value: "generic", label: "سایر / عمومی" },
-];
 
 type EventImportPanelProps = {
   onApply: (draft: EventFormData) => void;
@@ -28,8 +20,12 @@ type EventImportPanelProps = {
 };
 
 export default function EventImportPanel({ onApply, initialImportUrl }: EventImportPanelProps) {
-  const [url, setUrl] = useState("");
-  const [provider, setProvider] = useState<ImportProvider | "auto">("auto");
+  const [url, setUrl] = useState(() => initialImportUrl?.trim() ?? "");
+  const [trackedImportUrl, setTrackedImportUrl] = useState(initialImportUrl);
+  if (initialImportUrl !== trackedImportUrl) {
+    setTrackedImportUrl(initialImportUrl);
+    if (initialImportUrl?.trim()) setUrl(initialImportUrl.trim());
+  }
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [result, setResult] = useState<ImportResult | null>(null);
@@ -40,26 +36,24 @@ export default function EventImportPanel({ onApply, initialImportUrl }: EventImp
   } | null>(null);
 
   useEffect(() => {
-    if (initialImportUrl?.trim()) {
-      setUrl(initialImportUrl.trim());
-    }
-  }, [initialImportUrl]);
-
-  useEffect(() => {
-    try {
-      const raw = sessionStorage.getItem(ASSETS_DOWNLOAD_STORAGE_KEY);
-      if (!raw) return;
-      sessionStorage.removeItem(ASSETS_DOWNLOAD_STORAGE_KEY);
-      const parsed = JSON.parse(raw) as { folderPath?: string; warnings?: string[] };
-      if (parsed.folderPath) {
-        setAssetsDownloadNotice({
-          folderPath: parsed.folderPath,
-          warnings: parsed.warnings ?? [],
-        });
+    const timer = setTimeout(() => {
+      try {
+        const raw = sessionStorage.getItem(ASSETS_DOWNLOAD_STORAGE_KEY);
+        if (!raw) return;
+        sessionStorage.removeItem(ASSETS_DOWNLOAD_STORAGE_KEY);
+        const parsed = JSON.parse(raw) as { folderPath?: string; warnings?: string[] };
+        if (parsed.folderPath) {
+          setAssetsDownloadNotice({
+            folderPath: parsed.folderPath,
+            warnings: parsed.warnings ?? [],
+          });
+        }
+      } catch {
+        sessionStorage.removeItem(ASSETS_DOWNLOAD_STORAGE_KEY);
       }
-    } catch {
-      sessionStorage.removeItem(ASSETS_DOWNLOAD_STORAGE_KEY);
-    }
+    }, 0);
+
+    return () => clearTimeout(timer);
   }, []);
 
   async function runImport(answerOverrides?: Record<string, string>) {
@@ -77,7 +71,7 @@ export default function EventImportPanel({ onApply, initialImportUrl }: EventImp
       const response = await fetch("/api/admin/events/import", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url: trimmed, answers: mergedAnswers, provider }),
+        body: JSON.stringify({ url: trimmed, answers: mergedAnswers }),
       });
 
       const data = (await response.json()) as ImportResult & { error?: string };
@@ -132,8 +126,8 @@ export default function EventImportPanel({ onApply, initialImportUrl }: EventImp
 
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm text-slate-600 dark:text-slate-400">
-          لینک رویداد از هنر تیکت یا ملوتیک را وارد کنید. فیلدهای فرم پر می‌شوند و لینک
-          خرید هر سانس به صفحه مبدأ اشاره می‌کند.
+          لینک رویداد از هنر تیکت یا تیوال را وارد کنید. فیلدهای فرم پر می‌شوند و لینک خرید هر سانس
+          به صفحه مبدأ اشاره می‌کند.
         </p>
         <Link
           href="/admin/events/discover"
@@ -144,25 +138,6 @@ export default function EventImportPanel({ onApply, initialImportUrl }: EventImp
         </Link>
       </div>
 
-      <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-        <div>
-          <label className="mb-1 block text-xs font-bold text-slate-600 dark:text-slate-300">
-            سایت مبدأ
-          </label>
-          <select
-            value={provider}
-            onChange={(e) => setProvider(e.target.value as ImportProvider | "auto")}
-            className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none focus:border-blue-500 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
-          >
-            {PROVIDER_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
-
       <div className="flex flex-wrap gap-2">
         <div className="relative min-w-0 flex-1">
           <Link2 className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
@@ -171,7 +146,7 @@ export default function EventImportPanel({ onApply, initialImportUrl }: EventImp
             dir="ltr"
             value={url}
             onChange={(e) => setUrl(e.target.value)}
-            placeholder="https://www.honarticket.com/macan185"
+            placeholder="https://www.honarticket.com/macan185 یا https://www.tiwall.com/p/..."
             className="w-full rounded-xl border border-slate-300 bg-white py-3 pl-4 pr-10 text-sm text-slate-900 outline-none focus:border-blue-500 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
           />
         </div>

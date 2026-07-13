@@ -10,15 +10,8 @@ const EXCLUDED_SLUGS = new Set([
   "s",
 ]);
 
-/** Honarticket marks non-sellable listings with these CSS classes on the card link. */
-const NON_SELLABLE_CLASS_TOKENS = [
-  "scheduled",
-  "soon",
-  "canceled",
-  "inactive",
-  "soldout",
-  "sch-started",
-] as const;
+/** Honarticket marks unavailable listings with these CSS classes on the card link. */
+const NON_SELLABLE_CLASS_TOKENS = ["canceled", "inactive", "soldout"] as const;
 
 function cleanHonarticketCardTitle(raw: string): string {
   return stripHtmlTags(raw)
@@ -42,13 +35,29 @@ function isSellableStoreCard(classAttr: string): boolean {
   return !NON_SELLABLE_CLASS_TOKENS.some((blocked) => tokens.includes(blocked));
 }
 
+function parseSaleState(cardHtml: string): { onSale: boolean; saleHint?: string } {
+  const btnText = stripHtmlTags(
+    cardHtml.match(/<span class=['"]btn['"][^>]*>([\s\S]*?)<\/span>/i)?.[1] ?? ""
+  )
+    .replace(/\s+/g, " ")
+    .trim();
+
+  if (!btnText) return { onSale: true };
+
+  const onSale = btnText.includes("خرید بلیت") && !btnText.includes("فروش از");
+  return { onSale, saleHint: btnText };
+}
+
 function extractHonarticketStoreSections(html: string): string[] {
   const sections: string[] = [];
   const sectionRegex =
-    /class=['"]events-list item-tiles store[^'"]*['"][^>]*>([\s\S]*?)<\/div>\s*<!-- end of \.events-list -->/gi;
+    /<div[^>]*class=['"][^'"]*events-list item-tiles store[^'"]*['"][^>]*>([\s\S]*?)<\/div>\s*<!-- end of \.events-list -->/gi;
 
   let match: RegExpExecArray | null;
   while ((match = sectionRegex.exec(html)) !== null) {
+    const openingTag = html.slice(match.index, html.indexOf(">", match.index) + 1);
+    if (/id=['"]scheduled-section['"]/i.test(openingTag)) continue;
+
     sections.push(match[1]);
   }
 
@@ -64,8 +73,8 @@ function extractHonarticketStoreSections(html: string): string[] {
 }
 
 /**
- * Parse only live store tiles from honarticket homepage (برنامه‌های فعال فروش).
- * Does not include festival tables, archive, or scheduled/unavailable listings.
+ * Parse live store tiles from honarticket homepage.
+ * Includes active sales and scheduled upcoming sales; excludes canceled/sold-out cards.
  */
 export function parseHonarticketStoreCards(html: string): DiscoveredCatalogItem[] {
   const items: DiscoveredCatalogItem[] = [];
@@ -100,6 +109,7 @@ export function parseHonarticketStoreCards(html: string): DiscoveredCatalogItem[
 
       const location = parseLocationLine(match[7] ?? "");
       const dateHint = stripHtmlTags(match[8] ?? "").trim() || undefined;
+      const { onSale, saleHint } = parseSaleState(match[0]);
 
       items.push({
         externalId: slug,
@@ -109,6 +119,8 @@ export function parseHonarticketStoreCards(html: string): DiscoveredCatalogItem[
         city: location.city,
         place: location.place,
         dateHint,
+        onSale,
+        saleHint,
         categoryHint: h2Title.includes("کنسرت")
           ? "کنسرت"
           : h2Title.includes("نمایش")

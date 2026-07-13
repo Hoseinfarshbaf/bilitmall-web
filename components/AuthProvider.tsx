@@ -29,6 +29,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   const refresh = useCallback(async () => {
+    setLoading(true);
     try {
       const res = await fetch("/api/auth/me", { cache: "no-store" });
       if (!res.ok) {
@@ -50,8 +51,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
-    void refresh();
-  }, [refresh]);
+    let cancelled = false;
+
+    void fetch("/api/auth/me", { cache: "no-store" })
+      .then(async (res) => {
+        if (cancelled) return;
+        if (!res.ok) {
+          setUser(null);
+          return;
+        }
+        const data = await res.json();
+        if (!cancelled) setUser(data?.user ?? null);
+      })
+      .catch(() => {
+        if (!cancelled) setUser(null);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const value = useMemo(
     () => ({ user, loading, refresh, logout }),

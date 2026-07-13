@@ -14,21 +14,21 @@ export function useCityOptions(includeAllCities = false) {
     if (!includeAllCities) return;
 
     let cancelled = false;
-    setAllLoading(true);
 
-    void (async () => {
-      try {
-        const res = await fetch("/api/admin/cities");
+    void fetch("/api/admin/cities")
+      .then(async (res) => {
+        if (cancelled) return;
         const data = await res.json();
         if (!cancelled && res.ok && Array.isArray(data)) {
           setAllCities((data as AdminCityRow[]).map((city) => city.name));
         }
-      } catch {
+      })
+      .catch(() => {
         /* keep previous */
-      } finally {
+      })
+      .finally(() => {
         if (!cancelled) setAllLoading(false);
-      }
-    })();
+      });
 
     return () => {
       cancelled = true;

@@ -59,18 +59,17 @@ const SOCIALS = [
 
 export default function ContactPage() {
   return (
-    <main className="min-h-screen bg-neutral-50 pb-20" dir="rtl">
-      {/* Hero */}
-      <section className="bg-linear-to-b from-white to-neutral-50">
+    <main className="min-h-screen bg-neutral-50 pb-20 dark:bg-neutral-950" dir="rtl">
+      <section className="bg-linear-to-b from-white to-neutral-50 dark:from-neutral-950 dark:to-neutral-950">
         <div className="mx-auto max-w-6xl px-4 py-14 text-center">
-          <span className="mb-4 inline-flex items-center gap-2 rounded-full bg-red-50 px-4 py-1.5 text-sm font-bold text-red-600">
+          <span className="mb-4 inline-flex items-center gap-2 rounded-full bg-red-50 px-4 py-1.5 text-sm font-bold text-red-600 dark:bg-red-500/10 dark:text-red-400">
             <Headset className="h-4 w-4" />
             همیشه کنار شما هستیم
           </span>
-          <h1 className="text-3xl font-black text-neutral-900 sm:text-4xl">
+          <h1 className="text-3xl font-black text-neutral-900 sm:text-4xl dark:text-neutral-100">
             تماس و پشتیبانی
           </h1>
-          <p className="mx-auto mt-4 max-w-2xl text-sm leading-8 text-neutral-500 sm:text-base">
+          <p className="mx-auto mt-4 max-w-2xl text-sm leading-8 text-neutral-500 sm:text-base dark:text-neutral-400">
             چه به‌دنبال خرید بلیت هستید و چه برگزارکننده‌ای که می‌خواهد رویدادش را روی
             بلیت‌مال ارائه دهد، تیم ما آماده پاسخگویی است. کافی است از یکی از راه‌های
             زیر با ما در ارتباط باشید.
@@ -82,14 +81,14 @@ export default function ContactPage() {
       <section className="mx-auto max-w-6xl px-4">
         <div className="grid gap-6 md:grid-cols-2">
           {/* Buyers */}
-          <div className="flex flex-col rounded-3xl border border-neutral-200 bg-white p-7 shadow-sm">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-red-50 text-red-600">
+          <div className="flex flex-col rounded-3xl border border-neutral-200 bg-white p-7 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-400">
               <Ticket className="h-6 w-6" />
             </div>
-            <h2 className="mt-5 text-xl font-black text-neutral-900">
+            <h2 className="mt-5 text-xl font-black text-neutral-900 dark:text-neutral-100">
               خریداران بلیت
             </h2>
-            <p className="mt-3 flex-1 text-sm leading-7 text-neutral-500">
+            <p className="mt-3 flex-1 text-sm leading-7 text-neutral-500 dark:text-neutral-400">
               سوالی درباره خرید بلیت، استرداد وجه، ورود به حساب یا وضعیت سفارش دارید؟
               کارشناسان پشتیبانی ما در سریع‌ترین زمان پاسخگوی شما هستند.
             </p>
@@ -103,7 +102,7 @@ export default function ContactPage() {
               </a>
               <Link
                 href="/account"
-                className="inline-flex items-center gap-2 rounded-full border border-neutral-200 px-5 py-2.5 text-sm font-bold text-neutral-700 transition hover:border-red-200 hover:text-red-600"
+                className="inline-flex items-center gap-2 rounded-full border border-neutral-200 px-5 py-2.5 text-sm font-bold text-neutral-700 transition hover:border-red-200 hover:text-red-600 dark:border-neutral-700 dark:text-neutral-200 dark:hover:border-red-500/40 dark:hover:text-red-400"
               >
                 پیگیری سفارش‌ها
                 <ArrowLeft className="h-4 w-4" />
@@ -112,14 +111,14 @@ export default function ContactPage() {
           </div>
 
           {/* Organizers */}
-          <div className="flex flex-col rounded-3xl border border-red-100 bg-linear-to-b from-red-50/60 to-white p-7 shadow-sm">
+          <div className="flex flex-col rounded-3xl border border-red-100 bg-linear-to-b from-red-50/60 to-white p-7 shadow-sm dark:border-red-500/20 dark:from-red-500/10 dark:to-neutral-900">
             <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-red-600 text-white">
               <Handshake className="h-6 w-6" />
             </div>
-            <h2 className="mt-5 text-xl font-black text-neutral-900">
+            <h2 className="mt-5 text-xl font-black text-neutral-900 dark:text-neutral-100">
               برگزارکنندگان و همکاری
             </h2>
-            <p className="mt-3 flex-1 text-sm leading-7 text-neutral-500">
+            <p className="mt-3 flex-1 text-sm leading-7 text-neutral-500 dark:text-neutral-400">
               رویداد، کنسرت یا نمایشی برگزار می‌کنید و می‌خواهید بلیت‌ها را روی بلیت‌مال
               بفروشید؟ با ساخت صفحه اختصاصی در My Event Studio یا تماس با تیم همکاری،
               رویدادتان را به هزاران مخاطب برسانید.
@@ -146,19 +145,19 @@ export default function ContactPage() {
 
       {/* Channels */}
       <section className="mx-auto max-w-6xl px-4 pt-12">
-        <h2 className="mb-6 text-lg font-black text-neutral-900">راه‌های ارتباطی</h2>
+        <h2 className="mb-6 text-lg font-black text-neutral-900 dark:text-neutral-100">راه‌های ارتباطی</h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {CHANNELS.map((channel) => {
             const Icon = channel.icon;
             const content = (
-              <div className="flex h-full items-start gap-3 rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm transition hover:border-red-200 hover:shadow-md">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-red-50 text-red-600">
+              <div className="flex h-full items-start gap-3 rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm transition hover:border-red-200 hover:shadow-md dark:border-neutral-800 dark:bg-neutral-900 dark:hover:border-red-500/40">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-400">
                   <Icon className="h-5 w-5" />
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-neutral-400">{channel.label}</p>
+                  <p className="text-xs font-bold text-neutral-400 dark:text-neutral-500">{channel.label}</p>
                   <p
-                    className="mt-1 text-sm font-bold text-neutral-800"
+                    className="mt-1 text-sm font-bold text-neutral-800 dark:text-neutral-100"
                     dir={channel.ltr ? "ltr" : "rtl"}
                   >
                     {channel.value}
@@ -182,12 +181,12 @@ export default function ContactPage() {
 
       {/* Socials */}
       <section className="mx-auto max-w-6xl px-4 pt-12">
-        <div className="flex flex-col items-center justify-between gap-6 rounded-3xl border border-neutral-200 bg-white p-8 text-center shadow-sm sm:flex-row sm:text-right">
+        <div className="flex flex-col items-center justify-between gap-6 rounded-3xl border border-neutral-200 bg-white p-8 text-center shadow-sm sm:flex-row sm:text-right dark:border-neutral-800 dark:bg-neutral-900">
           <div>
-            <h2 className="text-lg font-black text-neutral-900">
+            <h2 className="text-lg font-black text-neutral-900 dark:text-neutral-100">
               ما را در شبکه‌های اجتماعی دنبال کنید
             </h2>
-            <p className="mt-2 text-sm text-neutral-500">
+            <p className="mt-2 text-sm text-neutral-500 dark:text-neutral-400">
               از جدیدترین رویدادها و تخفیف‌ها باخبر شوید.
             </p>
           </div>
@@ -202,7 +201,7 @@ export default function ContactPage() {
                   rel="noopener noreferrer"
                   aria-label={social.label}
                   title={social.label}
-                  className="flex h-11 w-11 items-center justify-center rounded-full border border-neutral-200 text-neutral-600 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600"
+                  className="flex h-11 w-11 items-center justify-center rounded-full border border-neutral-200 text-neutral-600 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600 dark:border-neutral-700 dark:text-neutral-300 dark:hover:border-red-500/40 dark:hover:bg-red-500/10 dark:hover:text-red-400"
                 >
                   <Icon className="h-5 w-5" />
                 </a>

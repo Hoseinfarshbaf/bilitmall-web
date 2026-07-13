@@ -16,6 +16,12 @@ html {
 body {
   margin: 0;
   font-family: Vazirmatn, Arial, sans-serif;
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
+html.dark {
+  color-scheme: dark;
 }
 
 @theme inline {
@@ -129,4 +135,43 @@ body {
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
 }
+
+/* Unlayered + !important: wins over Tailwind utilities and browser defaults site-wide. */
+html body button:not(:disabled),
+html body [role="button"]:not([aria-disabled="true"]),
+html body a[href],
+html body label[for],
+html body label:has(> input[type="checkbox"]),
+html body label:has(> input[type="radio"]),
+html body select:not(:disabled),
+html body summary,
+html body option:not(:disabled),
+html body input[type="checkbox"]:not(:disabled),
+html body input[type="radio"]:not(:disabled),
+html body input[type="file"]:not(:disabled),
+html body input[type="submit"]:not(:disabled),
+html body input[type="button"]:not(:disabled),
+html body input[type="reset"]:not(:disabled),
+html body input[type="image"]:not(:disabled),
+html body [data-slot="button"],
+html body [data-slot="select-trigger"],
+html body [data-slot="dropdown-menu-item"],
+html body [data-slot="checkbox"],
+html body [data-slot="switch"],
+html body [data-slot="tabs-trigger"],
+html body [tabindex]:not([tabindex="-1"]):not(input):not(textarea):not([contenteditable="true"]) {
+  cursor: pointer !important;
+}
+
+html body button:disabled,
+html body select:disabled,
+html body input:disabled,
+html body textarea:disabled,
+html body option:disabled,
+html body [aria-disabled="true"],
+html body [data-disabled] {
+  cursor: not-allowed !important;
+}
+
+
 

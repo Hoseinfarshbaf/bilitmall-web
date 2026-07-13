@@ -4,7 +4,6 @@ import {
   createContext,
   useCallback,
   useContext,
-  useEffect,
   useState,
 } from "react";
 
@@ -27,14 +26,11 @@ export default function MyEventThemeProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const [theme, setThemeState] = useState<Theme>("light");
-
-  useEffect(() => {
+  const [theme, setThemeState] = useState<Theme>(() => {
+    if (typeof window === "undefined") return "light";
     const stored = window.localStorage.getItem(STORAGE_KEY);
-    if (stored === "dark" || stored === "light") {
-      setThemeState(stored);
-    }
-  }, []);
+    return stored === "dark" || stored === "light" ? stored : "light";
+  });
 
   const setTheme = useCallback((next: Theme) => {
     setThemeState(next);

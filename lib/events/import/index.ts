@@ -3,13 +3,17 @@ import { EVENT_PRICE_EXTERNAL_LABEL } from "@/lib/events/pricing";
 import { EVENT_CATEGORIES } from "@/lib/events/types";
 import { normalizeEventDays } from "@/lib/events/date-utils";
 import { getCityNames } from "@/lib/cities";
-import { downloadEventImageFromUrl } from "./download-image";
+import { downloadEventBannerImageFromUrl, downloadEventImageFromUrl } from "./download-image";
 import { detectProvider, fetchEventPage } from "./fetch-page";
+import { extractEventAssetUrls } from "./extract-assets";
 import { inferCategory } from "./map-category";
 import { resolveCity } from "./map-city";
-import { parseGenericPage } from "./providers/generic";
 import { parseHonarticketPage } from "./providers/honarticket";
-import { parseMelotikPage } from "./providers/melotik";
+import {
+  extractTiwallSaleUrl,
+  parseTiwallPage,
+  tiwallSellsExternally,
+} from "./providers/tiwall";
 import type { ImportProvider, ImportQuestion, ImportResult, ParsedEventPartial } from "./types";
 
 function computeConfidence(partial: ParsedEventPartial): number {
@@ -86,7 +90,7 @@ function mergeAnswers(
     merged.city = answers.city;
   } else if (!merged.city && cityNames) {
     const resolved = resolveCity(
-      `${merged.title ?? ""} ${merged.place ?? ""} ${merged.placeAddress ?? ""}`,
+      `${merged.placeAddress ?? ""} ${merged.place ?? ""}`,
       cityNames
     );
     merged.city = resolved.city;
@@ -107,7 +111,8 @@ function mergeAnswers(
 function toDraft(
   partial: ParsedEventPartial,
   sourceUrl: string,
-  localImage?: string | null
+  localImage?: string | null,
+  localBanner?: string | null
 ): EventFormData {
   const days = partial.days?.length
     ? normalizeEventDays(
@@ -129,7 +134,7 @@ function toDraft(
     placeAddress: partial.placeAddress ?? "",
     venueTemplateId: null,
     image: localImage ?? "",
-    bannerImage: "",
+    bannerImage: localBanner ?? "",
     badge: "",
     days,
     published: true,
@@ -150,40 +155,55 @@ export async function importEventFromUrl(
   options?: { provider?: ImportProvider | "auto" }
 ): Promise<ImportResult> {
   const warnings: string[] = [];
+  const cityNames = await getCityNames();
   const { html, finalUrl } = await fetchEventPage(rawUrl);
   const detected = detectProvider(finalUrl);
-  const provider =
+  const provider: ImportProvider =
     options?.provider && options.provider !== "auto" ? options.provider : detected;
 
-  let partial: ParsedEventPartial;
-  switch (provider) {
-    case "honarticket":
-      partial = parseHonarticketPage(html, finalUrl);
-      break;
-    case "melotik":
-      partial = parseMelotikPage(html, finalUrl);
-      break;
-    default:
-      partial = parseGenericPage(html, finalUrl);
-      break;
+  if (provider !== "honarticket" && provider !== "tiwall") {
+    throw new Error("فقط لینک‌های هنر تیکت و تیوال پشتیبانی می‌شوند.");
   }
 
-  const cityNames = await getCityNames();
-  partial = mergeAnswers(partial, answers, cityNames);
+  let partial =
+    provider === "honarticket"
+      ? parseHonarticketPage(html, finalUrl)
+      : parseTiwallPage(html, finalUrl, undefined, cityNames);
 
-  if (!partial.title) {
+  if (provider === "tiwall") {
+    const saleUrl = extractTiwallSaleUrl(html, finalUrl);
+    if (saleUrl) {
+      try {
+        const { html: saleHtml } = await fetchEventPage(saleUrl);
+        partial = parseTiwallPage(html, finalUrl, saleHtml, cityNames);
+      } catch {
+        // Keep event-page parsing if the sale page cannot be fetched.
+      }
+    }
+  }
+
+  const assets = extractEventAssetUrls(html, finalUrl);
+  const mergedPartial = mergeAnswers(partial, answers, cityNames);
+
+  if (!mergedPartial.title) {
     warnings.push("عنوان رویداد به‌طور خودکار شناسایی نشد.");
   }
-  if (!partial.days?.length) {
+  if (!mergedPartial.days?.length) {
     warnings.push("سانسی شناسایی نشد — بازه تاریخ را دستی در فرم انتخاب کنید.");
   }
-  if (!partial.price) {
+  if (provider === "tiwall" && tiwallSellsExternally(html)) {
+    warnings.push(
+      "فروش بلیت این رویداد روی سایت دیگری انجام می‌شود — در صورت نیاز لینک هنر تیکت را هم بررسی کنید."
+    );
+  }
+  if (!mergedPartial.price) {
     warnings.push("قیمت شناسایی نشد — قبل از ذخیره قیمت را وارد کنید.");
   }
 
   let localImage: string | null = null;
-  if (partial.imageUrl) {
-    localImage = await downloadEventImageFromUrl(partial.imageUrl);
+  const cardImageUrl = mergedPartial.imageUrl ?? assets.cardImageUrl;
+  if (cardImageUrl) {
+    localImage = await downloadEventImageFromUrl(cardImageUrl);
     if (!localImage) {
       warnings.push("کاور رویداد دانلود نشد — تصویر را دستی آپلود کنید.");
     }
@@ -191,7 +211,17 @@ export async function importEventFromUrl(
     warnings.push("تصویر کاور شناسایی نشد — تصویر را دستی آپلود کنید.");
   }
 
-  const questions = buildQuestions(partial, answers);
+  let localBanner: string | null = null;
+  if (assets.bannerImageUrl) {
+    localBanner = await downloadEventBannerImageFromUrl(assets.bannerImageUrl);
+    if (!localBanner) {
+      warnings.push("بنر افقی دانلود نشد — برای پیشنهاد ویژه تصویر بنر را دستی آپلود کنید.");
+    }
+  } else {
+    warnings.push("بنر افقی شناسایی نشد — برای پیشنهاد ویژه تصویر بنر را دستی آپلود کنید.");
+  }
+
+  const questions = buildQuestions(mergedPartial, answers);
 
   if (questions.some((q) => q.id === "city") && cityNames.length > 0) {
     const cityQ = questions.find((q) => q.id === "city");
@@ -200,10 +230,13 @@ export async function importEventFromUrl(
     }
   }
 
-  const draft = toDraft(partial, finalUrl, localImage);
-  const confidence = computeConfidence({ ...partial, imageUrl: localImage ?? partial.imageUrl });
+  const draft = toDraft(mergedPartial, finalUrl, localImage, localBanner);
+  const confidence = computeConfidence({
+    ...mergedPartial,
+    imageUrl: localImage ?? mergedPartial.imageUrl,
+  });
 
-  if (partial.price) {
+  if (mergedPartial.price) {
     warnings.push("قیمت از صفحه مبدأ استخراج شد — در صورت نیاز اصلاح کنید.");
   }
 

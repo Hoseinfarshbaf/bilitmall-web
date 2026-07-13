@@ -12,7 +12,14 @@ import type {
 
 const PROVIDER_LABELS: Record<DiscoveryProviderId, string> = {
   honarticket: "هنر تیکت",
-  melotik: "ملوتیک",
+  tiwall: "تیوال",
+};
+
+const PROVIDER_HINTS: Record<DiscoveryProviderId, string> = {
+  honarticket:
+    "رویدادهای فعال و آینده در هنر تیکت که هنوز در بلیت‌مال ثبت نشده‌اند؛ شامل رویدادهای در حال فروش و فروش به‌زودی.",
+  tiwall:
+    "فقط رویدادهای محبوب و پرفروش تیوال با فروش باز، خرید مستقیم از تیوال، تاریخ و سانس و آدرس مشخص که هنوز برگزار نشده‌اند.",
 };
 
 const ASSETS_DOWNLOAD_STORAGE_KEY = "event-assets-download";
@@ -36,7 +43,7 @@ function formatScanTime(iso: string): string {
 export default function AdminEventDiscoveryPage() {
   const [activeProvider, setActiveProvider] = useState<DiscoveryProviderId>("honarticket");
   const [scan, setScan] = useState<DiscoveryScanResult | null>(null);
-  const [loadingProvider, setLoadingProvider] = useState<DiscoveryProviderId | null>(null);
+  const [loadingProvider, setLoadingProvider] = useState<DiscoveryProviderId | null>("honarticket");
   const [registeringUrl, setRegisteringUrl] = useState<string | null>(null);
   const [error, setError] = useState("");
 
@@ -54,10 +61,13 @@ export default function AdminEventDiscoveryPage() {
 
         const data = (await response.json()) as DiscoveryScanResult & { error?: string };
         if (!response.ok) throw new Error(data.error ?? "خطا در اسکن");
+        if (!Array.isArray(data.providers)) {
+          throw new Error("پاسخ سرور نامعتبر است.");
+        }
 
         setScan((prev) => {
           if (!prev) return data;
-          const merged = new Map(prev.providers.map((p) => [p.provider, p]));
+          const merged = new Map((prev.providers ?? []).map((p) => [p.provider, p]));
           for (const p of data.providers) merged.set(p.provider, p);
           return {
             scannedAt: data.scannedAt,
@@ -120,8 +130,45 @@ export default function AdminEventDiscoveryPage() {
   );
 
   useEffect(() => {
-    void runScan(activeProvider, false);
-  }, [activeProvider, runScan]);
+    let cancelled = false;
+
+    void fetch("/api/admin/events/discover", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ provider: activeProvider, refresh: false, unregisteredOnly: true }),
+    })
+      .then(async (response) => {
+        if (cancelled) return;
+        const data = (await response.json()) as DiscoveryScanResult & { error?: string };
+        if (!response.ok) throw new Error(data.error ?? "خطا در اسکن");
+        if (!Array.isArray(data.providers)) {
+          throw new Error("پاسخ سرور نامعتبر است.");
+        }
+
+        setScan((prev) => {
+          if (!prev) return data;
+          const merged = new Map((prev.providers ?? []).map((p) => [p.provider, p]));
+          for (const p of data.providers) merged.set(p.provider, p);
+          return {
+            scannedAt: data.scannedAt,
+            fromCache: data.fromCache,
+            providers: [...merged.values()],
+          };
+        });
+      })
+      .catch((err) => {
+        if (!cancelled) {
+          setError(err instanceof Error ? err.message : "خطا در اسکن");
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingProvider(null);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [activeProvider]);
 
   const providerResult: ProviderDiscoveryResult | undefined = useMemo(
     () => scan?.providers.find((p) => p.provider === activeProvider),
@@ -130,6 +177,7 @@ export default function AdminEventDiscoveryPage() {
 
   const events = providerResult?.events ?? [];
   const isLoading = loadingProvider === activeProvider;
+  const providerLabel = PROVIDER_LABELS[activeProvider];
 
   return (
     <main
@@ -151,8 +199,7 @@ export default function AdminEventDiscoveryPage() {
                 رویدادهای ثبت‌نشده
               </h1>
               <p className="mt-2 max-w-2xl text-sm leading-7 text-slate-500 dark:text-slate-400">
-                فقط رویدادهایی که الان روی سایت فروشنده فعال و قابل خرید هستند و هنوز در بلیت‌مال
-                ثبت نشده‌اند (نه آرشیو و نه جدول جشنواره).
+                {PROVIDER_HINTS[activeProvider]}
               </p>
             </div>
           </div>
@@ -166,7 +213,11 @@ export default function AdminEventDiscoveryPage() {
               <button
                 key={id}
                 type="button"
-                onClick={() => setActiveProvider(id)}
+                onClick={() => {
+                  setActiveProvider(id);
+                  setLoadingProvider(id);
+                  setError("");
+                }}
                 className={`rounded-xl px-4 py-2.5 text-sm font-bold transition ${
                   activeProvider === id
                     ? "bg-blue-600 text-white"
@@ -188,14 +239,19 @@ export default function AdminEventDiscoveryPage() {
           <div className="text-sm text-slate-600 dark:text-slate-300">
             {providerResult?.scannedAt ? (
               <>
-                آخرین اسکن:{" "}
+                آخرین اسکن {providerLabel}:{" "}
                 <span className="font-bold">{formatScanTime(providerResult.scannedAt)}</span>
                 {providerResult.fromCache ? (
                   <span className="mr-2 text-xs text-amber-600 dark:text-amber-400">(از حافظه موقت)</span>
                 ) : null}
+                {typeof providerResult.unregisteredCount === "number" ? (
+                  <span className="mr-2 text-xs font-bold text-blue-600 dark:text-blue-400">
+                    {providerResult.unregisteredCount.toLocaleString("fa-IR")} رویداد ثبت‌نشده
+                  </span>
+                ) : null}
               </>
             ) : (
-              "هنوز اسکن نشده"
+              `هنوز ${providerLabel} اسکن نشده`
             )}
             {providerResult?.status === "error" ? (
               <p className="mt-1 text-red-600 dark:text-red-400">{providerResult.error}</p>
@@ -207,12 +263,17 @@ export default function AdminEventDiscoveryPage() {
             onClick={() => void runScan(activeProvider, true)}
             className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-blue-700 disabled:opacity-60"
           >
-            {isLoading ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <RefreshCw className="h-4 w-4" />
-            )}
-            تازه‌سازی {PROVIDER_LABELS[activeProvider]}
+            <span className="relative inline-flex h-4 w-4 shrink-0 items-center justify-center">
+              <Loader2
+                className={`absolute h-4 w-4 ${isLoading ? "animate-spin opacity-100" : "opacity-0"}`}
+                aria-hidden={!isLoading}
+              />
+              <RefreshCw
+                className={`absolute h-4 w-4 ${isLoading ? "opacity-0" : "opacity-100"}`}
+                aria-hidden={isLoading}
+              />
+            </span>
+            تازه‌سازی {providerLabel}
           </button>
         </div>
 
@@ -224,14 +285,14 @@ export default function AdminEventDiscoveryPage() {
 
         <div className={adminTableClasses.panel}>
           {isLoading && events.length === 0 ? (
-            <p className={adminTableClasses.emptyInPanel}>در حال اسکن {PROVIDER_LABELS[activeProvider]}...</p>
+            <p className={adminTableClasses.emptyInPanel}>در حال اسکن {providerLabel}...</p>
           ) : providerResult?.status === "error" && events.length === 0 ? (
             <p className={adminTableClasses.emptyInPanel}>
               اسکن ناموفق بود. دکمه تازه‌سازی را بزنید یا بعداً دوباره تلاش کنید.
             </p>
           ) : events.length === 0 ? (
             <p className={adminTableClasses.emptyInPanel}>
-              رویداد ثبت‌نشده‌ای در {PROVIDER_LABELS[activeProvider]} یافت نشد.
+              رویداد ثبت‌نشده‌ای در {providerLabel} یافت نشد.
             </p>
           ) : (
             <div className={adminTableClasses.panelInner}>
@@ -249,6 +310,26 @@ export default function AdminEventDiscoveryPage() {
                     <tr key={event.url} className={adminTableClasses.tr}>
                       <td className={adminTableClasses.td}>
                         <div className="font-bold text-slate-800 dark:text-slate-100">{event.title}</div>
+                        <div className="mt-1 flex flex-wrap items-center gap-1.5">
+                          {event.onSale === false ? (
+                            <span className="inline-block rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-bold text-amber-800 dark:bg-amber-500/20 dark:text-amber-300">
+                              {event.saleHint ?? "فروش به‌زودی"}
+                            </span>
+                          ) : null}
+                          {typeof event.reviewCount === "number" && event.reviewCount > 0 ? (
+                            <span className="inline-block rounded-full bg-violet-100 px-2 py-0.5 text-[11px] font-bold text-violet-800 dark:bg-violet-500/20 dark:text-violet-300">
+                              {event.reviewCount.toLocaleString("fa-IR")} نظر
+                              {typeof event.avgRating === "number"
+                                ? ` · ${event.avgRating.toLocaleString("fa-IR")}★`
+                                : ""}
+                            </span>
+                          ) : null}
+                          {event.dateHint ? (
+                            <span className="inline-block rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-bold text-slate-700 dark:bg-slate-700 dark:text-slate-200">
+                              {event.dateHint}
+                            </span>
+                          ) : null}
+                        </div>
                         <a
                           href={event.url}
                           target="_blank"
@@ -276,14 +357,19 @@ export default function AdminEventDiscoveryPage() {
                           }
                           className="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-blue-700 disabled:opacity-60"
                         >
-                          {registeringUrl === event.url ? (
-                            <>
-                              <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                              در حال دانلود...
-                            </>
-                          ) : (
-                            "ثبت در بلیت‌مال"
-                          )}
+                          <Loader2
+                            className={`h-3.5 w-3.5 shrink-0 ${
+                              registeringUrl === event.url
+                                ? "animate-spin opacity-100"
+                                : "opacity-0"
+                            }`}
+                            aria-hidden={registeringUrl !== event.url}
+                          />
+                          <span>
+                            {registeringUrl === event.url
+                              ? "در حال دانلود..."
+                              : "ثبت در بلیت‌مال"}
+                          </span>
                         </button>
                       </td>
                     </tr>

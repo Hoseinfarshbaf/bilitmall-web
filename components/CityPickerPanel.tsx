@@ -13,7 +13,7 @@ type CityPickerPanelProps = {
 };
 
 const panelShellClass =
-  "overflow-hidden rounded-2xl border border-white/20 bg-white/90 shadow-[0_8px_32px_rgba(0,0,0,0.12)] backdrop-blur-xl animate-in fade-in zoom-in duration-150";
+  "overflow-hidden rounded-2xl border border-neutral-200/80 bg-white/95 shadow-[0_8px_32px_rgba(0,0,0,0.12)] backdrop-blur-xl animate-in fade-in zoom-in duration-150 dark:border-neutral-700/80 dark:bg-neutral-900/95 dark:shadow-[0_8px_32px_rgba(0,0,0,0.45)]";
 
 export default function CityPickerPanel({
   cities,
@@ -43,44 +43,44 @@ export default function CityPickerPanel({
   function cityChipClass(isSelected: boolean) {
     if (isSelected) {
       return accent
-        ? "border-red-500 bg-red-600 text-white shadow-sm shadow-red-100"
-        : "border-red-300 bg-red-50 text-red-600";
+        ? "border-red-500 bg-red-600 text-white shadow-sm shadow-red-100 dark:shadow-red-900/30"
+        : "border-red-300 bg-red-50 text-red-600 dark:border-red-500/40 dark:bg-red-500/15 dark:text-red-400";
     }
     return accent
-      ? "border-gray-200/80 bg-white/80 text-gray-700 hover:border-red-300 hover:bg-red-50 hover:text-red-600"
-      : "border-gray-200/60 bg-white/70 text-gray-700 hover:border-red-200 hover:bg-red-50/80 hover:text-red-600";
+      ? "border-neutral-200/80 bg-white/80 text-neutral-700 hover:border-red-300 hover:bg-red-50 hover:text-red-600 dark:border-neutral-700 dark:bg-neutral-800/80 dark:text-neutral-200 dark:hover:border-red-500/40 dark:hover:bg-red-500/10 dark:hover:text-red-400"
+      : "border-neutral-200/60 bg-white/70 text-neutral-700 hover:border-red-200 hover:bg-red-50/80 hover:text-red-600 dark:border-neutral-700 dark:bg-neutral-800/70 dark:text-neutral-200 dark:hover:border-red-500/30 dark:hover:bg-red-500/10 dark:hover:text-red-400";
   }
 
   function listItemClass(isSelected: boolean) {
     if (isSelected) {
       return accent
         ? "bg-red-600 font-bold text-white"
-        : "bg-red-50 font-bold text-red-600";
+        : "bg-red-50 font-bold text-red-600 dark:bg-red-500/15 dark:text-red-400";
     }
     return accent
-      ? "font-bold text-gray-600 hover:bg-red-50 hover:text-red-600"
-      : "text-gray-700 hover:bg-black/5 hover:text-red-600";
+      ? "font-bold text-neutral-600 hover:bg-red-50 hover:text-red-600 dark:text-neutral-300 dark:hover:bg-red-500/10 dark:hover:text-red-400"
+      : "text-neutral-700 hover:bg-black/5 hover:text-red-600 dark:text-neutral-300 dark:hover:bg-white/5 dark:hover:text-red-400";
   }
 
   return (
     <div className={`${panelShellClass} w-64`}>
-      <div className="flex items-center gap-2 border-b border-gray-200/50 bg-white/90 px-3 py-2">
+      <div className="flex items-center gap-2 border-b border-neutral-200/50 bg-white/90 px-3 py-2 dark:border-neutral-700/60 dark:bg-neutral-900/90">
         {showAllCities && !isSearching ? (
           <button
             type="button"
             onClick={() => setShowAllCities(false)}
-            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-gray-500 transition hover:bg-gray-100 hover:text-gray-800"
+            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-neutral-500 transition hover:bg-neutral-100 hover:text-neutral-800 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-neutral-200"
             aria-label="بازگشت به شهرهای پربازدید"
           >
             <ChevronRight className="h-4 w-4" />
           </button>
         ) : (
-          <Search className="h-4 w-4 shrink-0 text-gray-500" />
+          <Search className="h-4 w-4 shrink-0 text-neutral-500 dark:text-neutral-400" />
         )}
         <input
           type="text"
           placeholder={showAllCities && !isSearching ? "جستجو در همه شهرها..." : "جستجوی شهر..."}
-          className="w-full bg-transparent text-right text-sm text-gray-700 outline-none placeholder:text-gray-400"
+          className="w-full bg-transparent text-right text-sm text-neutral-700 outline-none placeholder:text-neutral-400 dark:text-neutral-200 dark:placeholder:text-neutral-500"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />

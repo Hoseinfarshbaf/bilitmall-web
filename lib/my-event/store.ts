@@ -1,8 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import type { MyEventSession } from "./auth";
-import { MY_EVENT_EVENT_SOURCE, isMyEventEventApproved } from "./constants";
+import { MY_EVENT_EVENT_SOURCE } from "./constants";
 import {
-  buildPublicCitySlug,
   buildPublicEventSlug,
   isValidPublicEventSlug,
   normalizePublicEventSlug,
@@ -209,7 +208,7 @@ export async function updateMyEventOrganizerProfile(
     passwordHash = hashPassword(input.newPassword);
   }
 
-  const updated = await prisma.$transaction(async (tx) => {
+  await prisma.$transaction(async (tx) => {
     await tx.myEventUser.update({
       where: { id: userId },
       data: {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Upload, X } from "lucide-react";
 import MyEventShell from "@/components/my-event/MyEventShell";
 import { getMyEventPublicUrl, normalizeMyEventSlug } from "@/lib/my-event/auth";
@@ -38,9 +38,9 @@ export default function MyEventProfilePage() {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [slugStatus, setSlugStatus] = useState<"idle" | "checking" | "ok" | "taken" | "invalid">(
-    "idle"
-  );
+  const [remoteSlugStatus, setRemoteSlugStatus] = useState<
+    "idle" | "checking" | "ok" | "taken" | "invalid"
+  >("idle");
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState<"logo" | "cover" | null>(null);
   const logoInputRef = useRef<HTMLInputElement>(null);
@@ -50,57 +50,65 @@ export default function MyEventProfilePage() {
   const previewUrl = slug ? getMyEventPublicUrl(slug) : "";
 
   useEffect(() => {
-    async function load() {
-      const response = await fetch("/api/my-event/me");
-      if (!response.ok) {
-        router.replace("/my-event/login");
-        return;
-      }
-      const data = await response.json();
-      const org = data.organizer as MyEventOrganizerProfile;
-      setOrganizerId(org.id);
-      setFirstName(data.user.firstName ?? "");
-      setLastName(data.user.lastName ?? "");
-      setPhone(data.user.phone ?? "");
-      setDisplayName(org.displayName);
-      setSlugInput(org.slug);
-      setOriginalSlug(org.slug);
-      setBio(org.bio ?? "");
-      setEmail(org.email ?? "");
-      setCoverImage(org.coverImage);
-      setLogoImage(org.logoImage);
-    }
+    let cancelled = false;
 
-    void load();
+    void fetch("/api/my-event/me")
+      .then(async (response) => {
+        if (cancelled) return;
+        if (!response.ok) {
+          router.replace("/my-event/login");
+          return;
+        }
+        const data = await response.json();
+        const org = data.organizer as MyEventOrganizerProfile;
+        setOrganizerId(org.id);
+        setFirstName(data.user.firstName ?? "");
+        setLastName(data.user.lastName ?? "");
+        setPhone(data.user.phone ?? "");
+        setDisplayName(org.displayName);
+        setSlugInput(org.slug);
+        setOriginalSlug(org.slug);
+        setBio(org.bio ?? "");
+        setEmail(org.email ?? "");
+        setCoverImage(org.coverImage);
+        setLogoImage(org.logoImage);
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, [router]);
 
+  const slugStatus = useMemo(() => {
+    if (!slug) return "invalid" as const;
+    if (slug === originalSlug) return "ok" as const;
+    return remoteSlugStatus;
+  }, [slug, originalSlug, remoteSlugStatus]);
+
   useEffect(() => {
-    if (!slug) {
-      setSlugStatus("invalid");
-      return;
-    }
+    if (!slug || slug === originalSlug) return;
 
-    if (slug === originalSlug) {
-      setSlugStatus("ok");
-      return;
-    }
+    let cancelled = false;
+    const checkingTimer = setTimeout(() => {
+      if (!cancelled) setRemoteSlugStatus("checking");
+    }, 0);
 
-    setSlugStatus("checking");
-    const timer = setTimeout(async () => {
+    const fetchTimer = setTimeout(async () => {
       const params = new URLSearchParams({ slug });
       if (organizerId) params.set("excludeOrganizerId", String(organizerId));
       const res = await fetch(`/api/my-event/slug-check?${params}`);
       const data = await res.json();
-      if (!data.valid) {
-        setSlugStatus("invalid");
-      } else if (data.available) {
-        setSlugStatus("ok");
-      } else {
-        setSlugStatus("taken");
-      }
+      if (cancelled) return;
+      if (!data.valid) setRemoteSlugStatus("invalid");
+      else if (data.available) setRemoteSlugStatus("ok");
+      else setRemoteSlugStatus("taken");
     }, 400);
 
-    return () => clearTimeout(timer);
+    return () => {
+      cancelled = true;
+      clearTimeout(checkingTimer);
+      clearTimeout(fetchTimer);
+    };
   }, [slug, originalSlug, organizerId]);
 
   async function handleImageUpload(file: File | null, kind: "logo" | "cover") {

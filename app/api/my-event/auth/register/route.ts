@@ -68,7 +68,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const organizer = await prisma.myEventOrganizer.create({
+    await prisma.myEventOrganizer.create({
       data: {
         slug,
         displayName,

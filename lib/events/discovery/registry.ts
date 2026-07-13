@@ -1,7 +1,7 @@
 import { fetchEventPage } from "@/lib/events/import/fetch-page";
 import type { DiscoveredCatalogItem, DiscoveryProviderId, EventDiscoveryProvider } from "./types";
 import { HONARTICKET_CATALOG_URLS, parseHonarticketStoreCards } from "./providers/honarticket";
-import { MELOTIK_CATALOG_URLS, parseMelotikCatalog } from "./providers/melotik";
+import { TIWALL_CATALOG_URLS, discoverTiwallPopularEvents } from "./providers/tiwall";
 
 function dedupeCatalogItems(items: DiscoveredCatalogItem[]): DiscoveredCatalogItem[] {
   const byUrl = new Map<string, DiscoveredCatalogItem>();
@@ -35,23 +35,18 @@ const honarticketProvider: EventDiscoveryProvider = {
   },
 };
 
-const melotikProvider: EventDiscoveryProvider = {
-  id: "melotik",
-  label: "ملوتیک",
-  catalogUrls: MELOTIK_CATALOG_URLS,
+const tiwallProvider: EventDiscoveryProvider = {
+  id: "tiwall",
+  label: "تیوال",
+  catalogUrls: TIWALL_CATALOG_URLS,
   async discoverCatalog() {
-    const collected: DiscoveredCatalogItem[] = [];
-    for (const catalogUrl of MELOTIK_CATALOG_URLS) {
-      const html = await fetchHtml(catalogUrl);
-      collected.push(...parseMelotikCatalog(html));
-    }
-    return dedupeCatalogItems(collected);
+    return discoverTiwallPopularEvents(fetchHtml);
   },
 };
 
 const PROVIDERS: Record<DiscoveryProviderId, EventDiscoveryProvider> = {
   honarticket: honarticketProvider,
-  melotik: melotikProvider,
+  tiwall: tiwallProvider,
 };
 
 export const DISCOVERY_PROVIDER_IDS = Object.keys(PROVIDERS) as DiscoveryProviderId[];

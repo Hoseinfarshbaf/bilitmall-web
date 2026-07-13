@@ -13,6 +13,7 @@ import { useCities } from "@/components/CitiesProvider";
 import { useCity } from "@/components/CityContext";
 import EventCard from "@/components/EventCard";
 import CityPickerPanel from "@/components/CityPickerPanel";
+import ThemeToggle from "@/components/ThemeToggle";
 import { MapPin, ChevronDown, Home, Search } from "lucide-react";
 import Link from "next/link";
 
@@ -37,15 +38,16 @@ export default function DiscoveryPage() {
   const initialQuery = searchParams.get("q") ?? "";
 
   const [searchQuery, setSearchQuery] = useState(initialQuery);
+  const [trackedInitialQuery, setTrackedInitialQuery] = useState(initialQuery);
+  if (initialQuery !== trackedInitialQuery) {
+    setTrackedInitialQuery(initialQuery);
+    setSearchQuery(initialQuery);
+  }
   const [isCityOpen, setIsCityOpen] = useState(false);
 
   useEffect(() => {
     setSelectedCity(cityParam);
   }, [cityParam, setSelectedCity]);
-
-  useEffect(() => {
-    setSearchQuery(initialQuery);
-  }, [initialQuery]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -82,24 +84,24 @@ export default function DiscoveryPage() {
         : categoryParam;
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20 font-sans" dir="rtl">
-      <div className="bg-white/90 border-b border-gray-100 sticky top-0 z-50 backdrop-blur-md">
+    <div className="min-h-screen bg-neutral-50 pb-20 font-sans dark:bg-neutral-950" dir="rtl">
+      <div className="sticky top-0 z-50 border-b border-neutral-100 bg-white/90 backdrop-blur-md dark:border-neutral-800 dark:bg-neutral-950/90">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <div className="flex items-center gap-3">
             <Link
               href="/"
               title="بازگشت به صفحه اصلی"
-              className="flex shrink-0 items-center gap-2 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-sm font-bold text-gray-600 transition-all hover:border-red-200 hover:bg-red-50 hover:text-red-600"
+              className="flex shrink-0 items-center gap-2 rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-2 text-sm font-bold text-neutral-600 transition-all hover:border-red-200 hover:bg-red-50 hover:text-red-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300 dark:hover:border-red-500/40 dark:hover:bg-red-500/10 dark:hover:text-red-400"
             >
               <Home className="w-4 h-4" />
               <span className="hidden sm:inline">صفحه اصلی</span>
             </Link>
 
             <div className="min-w-0 flex items-center gap-2">
-              <h1 className="text-lg font-black text-neutral-900 leading-none truncate">
+              <h1 className="truncate text-lg font-black leading-none text-neutral-900 dark:text-neutral-100">
                 {pageTitle}
               </h1>
-              <span className="hidden sm:inline-flex items-center gap-1.5 shrink-0 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700">
+              <span className="hidden shrink-0 items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700 sm:inline-flex dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-300">
                 <span className="relative flex h-2 w-2">
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
                   <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
@@ -108,14 +110,15 @@ export default function DiscoveryPage() {
               </span>
             </div>
 
-            <div className="relative mr-auto shrink-0" ref={dropdownRef}>
+            <div className="relative mr-auto flex shrink-0 items-center gap-2" ref={dropdownRef}>
+              <ThemeToggle size="sm" showLabel={false} />
               <button
                 onClick={() => setIsCityOpen((open) => !open)}
-                className="flex items-center gap-1.5 rounded-xl border border-gray-200 px-3 py-2 text-sm font-bold text-gray-700 transition-all hover:border-red-600 hover:text-red-600"
+                className="flex items-center gap-1.5 rounded-xl border border-neutral-200 px-3 py-2 text-sm font-bold text-neutral-700 transition-all hover:border-red-600 hover:text-red-600 dark:border-neutral-700 dark:text-neutral-200 dark:hover:border-red-500 dark:hover:text-red-400"
               >
                 <MapPin className="w-4 h-4 text-red-600" />
                 <span>{cityParam}</span>
-                <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${isCityOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown className={`h-4 w-4 text-neutral-400 transition-transform dark:text-neutral-500 ${isCityOpen ? "rotate-180" : ""}`} />
               </button>
 
               {isCityOpen ? (
@@ -137,13 +140,13 @@ export default function DiscoveryPage() {
 
           <div className="mt-3 flex items-center gap-3">
             <div className="relative w-full md:w-72 shrink-0">
-              <Search className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Search className="absolute right-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400 dark:text-neutral-500" />
               <input
                 type="text"
                 placeholder="نام رویداد یا هنرمند..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-gray-50 border border-gray-100 rounded-xl py-2.5 pr-10 pl-4 focus:ring-2 focus:ring-red-600/10 focus:border-red-600 focus:bg-white outline-none transition-all text-sm font-bold"
+                className="w-full rounded-xl border border-neutral-100 bg-neutral-50 py-2.5 pr-10 pl-4 text-sm font-bold outline-none transition-all focus:border-red-600 focus:bg-white focus:ring-2 focus:ring-red-600/10 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:focus:border-red-500 dark:focus:bg-neutral-900 dark:focus:ring-red-500/20"
               />
             </div>
             <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide">
@@ -151,10 +154,10 @@ export default function DiscoveryPage() {
                 <button
                   key={cat.id}
                   onClick={() => router.push(buildDiscoveryPageUrl(cityParam, cat.value))}
-                  className={`px-4 py-2.5 rounded-xl text-sm font-bold transition-all shrink-0 ${
+                  className={`shrink-0 rounded-xl px-4 py-2.5 text-sm font-bold transition-all ${
                     categoryParam.trim() === cat.value.trim()
-                      ? "bg-red-600 text-white shadow-sm shadow-red-100"
-                      : "bg-white border border-gray-200 text-gray-500 hover:border-red-600 hover:text-red-600"
+                      ? "bg-red-600 text-white shadow-sm shadow-red-100 dark:shadow-red-900/30"
+                      : "border border-neutral-200 bg-white text-neutral-500 hover:border-red-600 hover:text-red-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-400 dark:hover:border-red-500 dark:hover:text-red-400"
                   }`}
                 >
                   {cat.label}
@@ -167,7 +170,7 @@ export default function DiscoveryPage() {
 
       <div className="max-w-6xl mx-auto px-4 mt-8">
         {loading ? (
-          <p className="py-20 text-center font-bold text-gray-500">در حال بارگذاری رویدادها...</p>
+          <p className="py-20 text-center font-bold text-neutral-500 dark:text-neutral-400">در حال بارگذاری رویدادها...</p>
         ) : filteredEvents.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredEvents.map((event) => (
@@ -177,19 +180,19 @@ export default function DiscoveryPage() {
             ))}
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center py-40 bg-white rounded-[3rem] border-2 border-dashed border-gray-100">
-            <div className="bg-red-50 p-8 rounded-full mb-6">
-              <Search className="w-12 h-12 text-red-300" />
+          <div className="flex flex-col items-center justify-center rounded-[3rem] border-2 border-dashed border-neutral-100 bg-white py-40 dark:border-neutral-800 dark:bg-neutral-900">
+            <div className="mb-6 rounded-full bg-red-50 p-8 dark:bg-red-500/10">
+              <Search className="h-12 w-12 text-red-300 dark:text-red-400" />
             </div>
             {searchQuery.trim() ? (
               <>
-                <p className="text-gray-900 font-black text-xl">نتیجه‌ای برای «{searchQuery}» در {cityParam} یافت نشد</p>
-                <p className="text-gray-400 text-sm mt-2 font-bold">عبارت جستجو را تغییر دهید یا دسته دیگری را امتحان کنید.</p>
+                <p className="text-xl font-black text-neutral-900 dark:text-neutral-100">نتیجه‌ای برای «{searchQuery}» در {cityParam} یافت نشد</p>
+                <p className="mt-2 text-sm font-bold text-neutral-400 dark:text-neutral-500">عبارت جستجو را تغییر دهید یا دسته دیگری را امتحان کنید.</p>
               </>
             ) : (
               <>
-                <p className="text-gray-900 font-black text-xl">رویدادی برای شهر {cityParam} موجود نیست</p>
-                <p className="text-gray-400 text-sm mt-2 font-bold">شهر دیگری انتخاب کنید یا بعداً دوباره سر بزنید.</p>
+                <p className="text-xl font-black text-neutral-900 dark:text-neutral-100">رویدادی برای شهر {cityParam} موجود نیست</p>
+                <p className="mt-2 text-sm font-bold text-neutral-400 dark:text-neutral-500">شهر دیگری انتخاب کنید یا بعداً دوباره سر بزنید.</p>
               </>
             )}
             {searchQuery.trim() ? (
@@ -199,7 +202,7 @@ export default function DiscoveryPage() {
                   setSearchQuery("");
                   router.push(buildDiscoveryPageUrl(cityParam, "همه"));
                 }}
-                className="mt-6 text-red-600 font-bold border-b-2 border-red-600 hover:text-red-800 transition-colors"
+                className="mt-6 border-b-2 border-red-600 font-bold text-red-600 transition-colors hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
               >
                 مشاهده همه رویدادهای {cityParam}
               </button>

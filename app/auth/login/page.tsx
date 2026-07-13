@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useState } from "react";
 import AuthCard from "@/components/auth/AuthCard";
 import { useAuth } from "@/components/AuthProvider";
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,17 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 export default function LoginPage() {
+  return (
+    <Suspense fallback={<p className="p-8 text-center text-neutral-500">در حال بارگذاری...</p>}>
+      <LoginPageContent />
+    </Suspense>
+  );
+}
+
+function LoginPageContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const nextPath = searchParams.get("next");
   const { refresh } = useAuth();
   const [mobile, setMobile] = useState("");
   const [password, setPassword] = useState("");
@@ -33,7 +43,11 @@ export default function LoginPage() {
       if (!response.ok) throw new Error(data.error ?? "خطا در ورود");
 
       await refresh();
-      router.push("/");
+      const destination =
+        nextPath && nextPath.startsWith("/") && !nextPath.startsWith("//")
+          ? nextPath
+          : "/";
+      router.push(destination);
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "خطا در ورود");

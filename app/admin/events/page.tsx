@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { Suspense, useEffect, useMemo, useState } from "react";
+import { Loader2 } from "lucide-react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import DatePicker, { DateObject } from "react-multi-date-picker";
 import persian from "react-date-object/calendars/persian";
@@ -27,7 +28,17 @@ import {
   getUpcomingEventSchedule,
 } from "@/lib/events/date-utils";
 import { resolveFormPrice } from "@/lib/events/pricing";
-import { getEventImageStyle, getEventUrl } from "@/lib/events/helpers";
+import EventFramedImage from "@/components/EventFramedImage";
+import EventOriginBadge from "@/components/admin/EventOriginBadge";
+import {
+  EXTERNAL_SITE_LABELS,
+  OWNERSHIP_LABELS,
+  eventMatchesOwnershipFilter,
+  eventMatchesSiteFilter,
+  type OwnershipFilter,
+  type SiteFilter,
+} from "@/lib/events/admin-origin";
+import { getEventUrl } from "@/lib/events/helpers";
 import { cn } from "@/lib/utils";
 
 type ViewMode = "list" | "create" | "edit";
@@ -36,8 +47,20 @@ type HighlightFilter = "همه" | "popular" | "featured" | "both";
 function AdminEventsPageContent() {
   const searchParams = useSearchParams();
   const { events, loading, error, refetch } = useAdminEvents();
-  const [view, setView] = useState<ViewMode>("list");
+  const initialImportUrl = searchParams.get("importUrl") ?? "";
+  const createFromUrl = searchParams.get("create") === "1";
+
+  const [view, setView] = useState<ViewMode>(() => (createFromUrl ? "create" : "list"));
   const [selectedEvent, setSelectedEvent] = useState<EventItem | null>(null);
+  const [trackedCreateFromUrl, setTrackedCreateFromUrl] = useState(createFromUrl);
+  if (createFromUrl !== trackedCreateFromUrl) {
+    setTrackedCreateFromUrl(createFromUrl);
+    if (createFromUrl) {
+      setSelectedEvent(null);
+      setView("create");
+    }
+  }
+
   const [submitting, setSubmitting] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [cityFilter, setCityFilter] = useState("همه");
@@ -45,15 +68,11 @@ function AdminEventsPageContent() {
   const [statusFilter, setStatusFilter] = useState("همه");
   const [dateFilter, setDateFilter] = useState<DateObject | null>(null);
   const [highlightFilter, setHighlightFilter] = useState<HighlightFilter>("همه");
-
-  const initialImportUrl = searchParams.get("importUrl") ?? "";
-
-  useEffect(() => {
-    if (searchParams.get("create") === "1") {
-      setSelectedEvent(null);
-      setView("create");
-    }
-  }, [searchParams]);
+  const [ownershipFilter, setOwnershipFilter] = useState<OwnershipFilter>("همه");
+  const [siteFilter, setSiteFilter] = useState<SiteFilter>("همه");
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(() => new Set());
+  const [bulkDeleting, setBulkDeleting] = useState(false);
+  const selectAllRef = useRef<HTMLInputElement>(null);
 
   const dateFilterValue = dateFilter?.format("YYYY/MM/DD") ?? "";
 
@@ -77,6 +96,8 @@ function AdminEventsPageContent() {
         (highlightFilter === "both" &&
           event.popular === true &&
           event.featured === true);
+      const matchOwnership = eventMatchesOwnershipFilter(event, ownershipFilter);
+      const matchSite = eventMatchesSiteFilter(event, siteFilter);
 
       return (
         matchSearch &&
@@ -84,7 +105,9 @@ function AdminEventsPageContent() {
         matchCategory &&
         matchStatus &&
         matchDate &&
-        matchHighlight
+        matchHighlight &&
+        matchOwnership &&
+        matchSite
       );
     });
   }, [
@@ -95,7 +118,60 @@ function AdminEventsPageContent() {
     statusFilter,
     dateFilterValue,
     highlightFilter,
+    ownershipFilter,
+    siteFilter,
   ]);
+
+  const filteredEventIds = useMemo(
+    () => filteredEvents.map((event) => event.id),
+    [filteredEvents]
+  );
+
+  const selectedCount = selectedIds.size;
+  const allFilteredSelected =
+    filteredEventIds.length > 0 &&
+    filteredEventIds.every((id) => selectedIds.has(id));
+  const someFilteredSelected =
+    filteredEventIds.some((id) => selectedIds.has(id)) && !allFilteredSelected;
+
+  useEffect(() => {
+    const input = selectAllRef.current;
+    if (input) {
+      input.indeterminate = someFilteredSelected;
+    }
+  }, [someFilteredSelected]);
+
+  const toggleEventSelection = (eventId: number) => {
+    setSelectedIds((current) => {
+      const next = new Set(current);
+      if (next.has(eventId)) {
+        next.delete(eventId);
+      } else {
+        next.add(eventId);
+      }
+      return next;
+    });
+  };
+
+  const toggleSelectAllFiltered = () => {
+    setSelectedIds((current) => {
+      const next = new Set(current);
+      if (allFilteredSelected) {
+        for (const id of filteredEventIds) {
+          next.delete(id);
+        }
+      } else {
+        for (const id of filteredEventIds) {
+          next.add(id);
+        }
+      }
+      return next;
+    });
+  };
+
+  const clearSelection = () => {
+    setSelectedIds(new Set());
+  };
 
   const openCreate = () => {
     setSelectedEvent(null);
@@ -191,6 +267,54 @@ function AdminEventsPageContent() {
     }
 
     await refetch();
+    setSelectedIds((current) => {
+      if (!current.has(event.id)) return current;
+      const next = new Set(current);
+      next.delete(event.id);
+      return next;
+    });
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedCount === 0) return;
+
+    const ids = [...selectedIds];
+    if (
+      !confirm(
+        `${ids.length.toLocaleString("fa-IR")} رویداد انتخاب‌شده به‌طور کامل حذف شوند؟ این عمل قابل بازگشت نیست.`
+      )
+    ) {
+      return;
+    }
+
+    setBulkDeleting(true);
+
+    try {
+      const response = await fetch("/api/admin/events/bulk-delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error ?? "خطا در حذف گروهی رویدادها");
+      }
+
+      clearSelection();
+      await refetch();
+
+      if (data.notFound?.length > 0) {
+        alert(
+          `${data.deleted.toLocaleString("fa-IR")} رویداد حذف شد؛ ${data.notFound.length.toLocaleString("fa-IR")} مورد یافت نشد.`
+        );
+      }
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "خطا در حذف گروهی رویدادها");
+    } finally {
+      setBulkDeleting(false);
+    }
   };
 
   return (
@@ -227,7 +351,7 @@ function AdminEventsPageContent() {
         {view === "list" ? (
           <div className="space-y-5">
             <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-8">
                 <div className="min-w-0">
                   <input
                     type="text"
@@ -298,6 +422,31 @@ function AdminEventsPageContent() {
                     <option value="draft">{EVENT_STATUS_LABELS.draft}</option>
                   </select>
                 </div>
+                <div className="min-w-0">
+                  <select
+                    value={ownershipFilter}
+                    onChange={(e) => setOwnershipFilter(e.target.value as OwnershipFilter)}
+                    className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                  >
+                    <option value="همه">همه مالکیت‌ها</option>
+                    <option value="bilitmall">{OWNERSHIP_LABELS.bilitmall}</option>
+                    <option value="linked">{OWNERSHIP_LABELS.linked}</option>
+                    <option value="organizer">{OWNERSHIP_LABELS.organizer}</option>
+                  </select>
+                </div>
+                <div className="min-w-0">
+                  <select
+                    value={siteFilter}
+                    onChange={(e) => setSiteFilter(e.target.value as SiteFilter)}
+                    className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                  >
+                    <option value="همه">همه سایت‌ها</option>
+                    <option value="bilitmall">{OWNERSHIP_LABELS.bilitmall}</option>
+                    <option value="honarticket">{EXTERNAL_SITE_LABELS.honarticket}</option>
+                    <option value="tiwall">{EXTERNAL_SITE_LABELS.tiwall}</option>
+                    <option value="other">{EXTERNAL_SITE_LABELS.other}</option>
+                  </select>
+                </div>
               </div>
               {dateFilter ? (
                 <button
@@ -317,6 +466,39 @@ function AdminEventsPageContent() {
               />
             ) : null}
 
+            {selectedCount > 0 ? (
+              <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 dark:border-red-500/30 dark:bg-red-500/10">
+                <p className="text-sm font-bold text-red-800 dark:text-red-200">
+                  {selectedCount.toLocaleString("fa-IR")} رویداد انتخاب شده
+                </p>
+                <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={clearSelection}
+                    disabled={bulkDeleting}
+                    className="rounded-lg border border-red-200 bg-white px-3 py-1.5 text-xs font-bold text-red-700 transition hover:bg-red-100 disabled:opacity-50 dark:border-red-500/30 dark:bg-slate-900 dark:text-red-300 dark:hover:bg-red-500/15"
+                  >
+                    لغو انتخاب
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleBulkDelete}
+                    disabled={bulkDeleting}
+                    className="inline-flex items-center gap-2 rounded-lg bg-red-600 px-3 py-1.5 text-xs font-bold text-white transition hover:bg-red-700 disabled:opacity-50"
+                  >
+                    {bulkDeleting ? (
+                      <>
+                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                        در حال حذف...
+                      </>
+                    ) : (
+                      `حذف کامل ${selectedCount.toLocaleString("fa-IR")} رویداد`
+                    )}
+                  </button>
+                </div>
+              </div>
+            ) : null}
+
             <div className={adminTableClasses.panel}>
               {loading ? (
                 <p className={adminTableClasses.emptyInPanel}>در حال بارگذاری...</p>
@@ -329,6 +511,16 @@ function AdminEventsPageContent() {
                   <table className={adminTableClasses.table}>
                     <thead className={adminTableClasses.thead}>
                       <tr>
+                        <th className={cn(adminTableClasses.th, "w-10 px-2")}>
+                          <input
+                            ref={selectAllRef}
+                            type="checkbox"
+                            checked={allFilteredSelected}
+                            onChange={toggleSelectAllFiltered}
+                            aria-label="انتخاب همه رویدادهای فیلترشده"
+                            className="h-4 w-4 accent-blue-600"
+                          />
+                        </th>
                         <th className={adminTableClasses.th}>رویداد</th>
                         <th className={adminTableClasses.th}>شهر</th>
                         <th className={adminTableClasses.th}>دسته</th>
@@ -347,16 +539,36 @@ function AdminEventsPageContent() {
                           0
                         );
 
+                        const isSelected = selectedIds.has(event.id);
+
                         return (
-                          <tr key={event.id} className={adminTableClasses.tr}>
+                          <tr
+                            key={event.id}
+                            className={cn(
+                              adminTableClasses.tr,
+                              isSelected &&
+                                "ring-2 ring-blue-400/70 dark:ring-blue-500/50"
+                            )}
+                          >
+                            <td className={cn(adminTableClasses.td, "w-10 px-2")}>
+                              <input
+                                type="checkbox"
+                                checked={isSelected}
+                                onChange={() => toggleEventSelection(event.id)}
+                                aria-label={`انتخاب ${event.title}`}
+                                className="h-4 w-4 accent-blue-600"
+                              />
+                            </td>
                             <td className={cn(adminTableClasses.td, adminTableClasses.tdAccent)}>
                               <div className="flex items-center gap-3">
-                                <div
-                                  className="h-12 w-12 shrink-0 rounded-xl"
-                                  style={getEventImageStyle(event.image)}
-                                />
-                                <div>
+                                <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-xl">
+                                  <EventFramedImage image={event.image} />
+                                </div>
+                                <div className="min-w-0">
                                   <div className="font-bold text-slate-800 dark:text-slate-100">{event.title}</div>
+                                  <div className="mt-1">
+                                    <EventOriginBadge event={event} />
+                                  </div>
                                   <div className="mt-1 text-xs text-slate-500 dark:text-slate-400">
                                     {event.place} • {sessionCount} سانس
                                   </div>

@@ -18,7 +18,7 @@ import {
   normalizeEventDays,
   slugify,
 } from "./date-utils";
-import { hasUploadedImage, isAdminListableEvent, MAX_FEATURED_EVENTS, POPULAR_CATEGORY_SLUG } from "./helpers";
+import { isAdminListableEvent, MAX_FEATURED_EVENTS } from "./helpers";
 import { runAdminEventMaintenance } from "./maintenance";
 import { MY_EVENT_EVENT_SOURCE } from "@/lib/my-event/constants";
 import { resolveEventPlaceAddress } from "./venue";
@@ -359,6 +359,24 @@ export async function updateEvent(
 
 export async function removeEvent(id: number): Promise<boolean> {
   return deleteEvent(id);
+}
+
+export async function removeEvents(
+  ids: number[]
+): Promise<{ deleted: number; notFound: number[] }> {
+  const uniqueIds = [...new Set(ids.filter((id) => Number.isInteger(id) && id > 0))];
+  let deleted = 0;
+  const notFound: number[] = [];
+
+  for (const id of uniqueIds) {
+    if (await deleteEvent(id)) {
+      deleted += 1;
+    } else {
+      notFound.push(id);
+    }
+  }
+
+  return { deleted, notFound };
 }
 
 /** حذف دائمی رویدادهای تمام‌شده، ناقص، تکراری و بدون سانس پیش‌رو */

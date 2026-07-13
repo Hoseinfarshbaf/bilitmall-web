@@ -5,7 +5,7 @@ export default function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="border-t border-neutral-200 bg-white" dir="rtl">
+    <footer className="border-t border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-950" dir="rtl">
       <div className="mx-auto max-w-6xl px-4 py-12">
         <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
           <div className="lg:col-span-1">
@@ -13,14 +13,14 @@ export default function Footer() {
               <Ticket className="h-7 w-7" />
               <span>بلیت‌مال</span>
             </Link>
-            <p className="mt-4 max-w-xs text-sm leading-7 text-neutral-500">
+            <p className="mt-4 max-w-xs text-sm leading-7 text-neutral-500 dark:text-neutral-400">
               خرید آنلاین بلیت کنسرت، تئاتر و رویداد در سراسر ایران — سریع، امن و مطمئن.
             </p>
           </div>
 
           <div>
-            <h3 className="mb-4 text-sm font-black text-neutral-900">دسته‌بندی‌ها</h3>
-            <ul className="space-y-3 text-sm text-neutral-600">
+            <h3 className="mb-4 text-sm font-black text-neutral-900 dark:text-neutral-100">دسته‌بندی‌ها</h3>
+            <ul className="space-y-3 text-sm text-neutral-600 dark:text-neutral-400">
               <li>
                 <Link href="/events/تهران/کنسرت" className="transition hover:text-red-600">
                   کنسرت
@@ -40,8 +40,8 @@ export default function Footer() {
           </div>
 
           <div>
-            <h3 className="mb-4 text-sm font-black text-neutral-900">حساب کاربری</h3>
-            <ul className="space-y-3 text-sm text-neutral-600">
+            <h3 className="mb-4 text-sm font-black text-neutral-900 dark:text-neutral-100">حساب کاربری</h3>
+            <ul className="space-y-3 text-sm text-neutral-600 dark:text-neutral-400">
               <li>
                 <Link href="/auth/login" className="transition hover:text-red-600">
                   ورود
@@ -61,12 +61,12 @@ export default function Footer() {
           </div>
 
           <div>
-            <h3 className="mb-4 text-sm font-black text-neutral-900">تماس با ما</h3>
-            <ul className="space-y-3 text-sm text-neutral-600">
+            <h3 className="mb-4 text-sm font-black text-neutral-900 dark:text-neutral-100">تماس با ما</h3>
+            <ul className="space-y-3 text-sm text-neutral-600 dark:text-neutral-400">
               <li>
                 <Link
                   href="/contact"
-                  className="inline-flex items-center gap-2 font-bold text-neutral-700 transition hover:text-red-600"
+                  className="inline-flex items-center gap-2 font-bold text-neutral-700 transition hover:text-red-600 dark:text-neutral-300 dark:hover:text-red-400"
                 >
                   <Headset className="h-4 w-4 shrink-0 text-red-500" />
                   تماس و پشتیبانی
@@ -88,13 +88,13 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-neutral-100 pt-8 sm:flex-row">
-          <p className="text-xs text-neutral-400">
+        <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-neutral-100 pt-8 sm:flex-row dark:border-neutral-800">
+          <p className="text-xs text-neutral-400 dark:text-neutral-500">
             © {year} بلیت‌مال. تمامی حقوق محفوظ است.
           </p>
-          <p className="text-xs text-neutral-400">
+          <p className="text-xs text-neutral-400 dark:text-neutral-500">
             برگزارکننده هستید؟{" "}
-            <Link href="/my-event" className="font-bold text-neutral-600 hover:text-red-600">
+            <Link href="/my-event" className="font-bold text-neutral-600 hover:text-red-600 dark:text-neutral-300 dark:hover:text-red-400">
               My Event Studio
             </Link>
           </p>

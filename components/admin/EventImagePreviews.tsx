@@ -1,11 +1,11 @@
 "use client";
 
+import EventFramedImage from "@/components/EventFramedImage";
 import {
   EVENT_BANNER_IMAGE,
   EVENT_CARD_IMAGE,
   SPECIAL_OFFERS_CAROUSEL,
 } from "@/lib/events/image-specs";
-import { getEventBannerImageStyle, getEventImageStyle } from "@/lib/events/helpers";
 
 type EventImagePreviewsProps = {
   imageUrl: string;
@@ -37,10 +37,7 @@ export default function EventImagePreviews({
             پیش‌نمایش کارت ({EVENT_CARD_IMAGE.aspectLabel})
           </p>
           <article className="relative mx-auto aspect-3/4 w-full max-w-[220px] overflow-hidden rounded-3xl bg-neutral-900 shadow-md">
-            <div
-              className="absolute inset-0 bg-cover bg-center"
-              style={getEventImageStyle(imageUrl)}
-            />
+            <EventFramedImage image={imageUrl} />
             <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/10 to-transparent" />
             <div className="absolute inset-x-0 bottom-0 p-4">
               <h3 className="line-clamp-2 text-sm font-black text-white">{title}</h3>
@@ -61,10 +58,7 @@ export default function EventImagePreviews({
               maxHeight: `${SPECIAL_OFFERS_CAROUSEL.heightSmPx}px`,
             }}
           >
-            <div
-              className="absolute inset-0 bg-cover"
-              style={getEventBannerImageStyle(imageUrl)}
-            />
+            <EventFramedImage variant="banner" image={imageUrl} />
             <div className="absolute inset-0 bg-linear-to-tl from-black/90 via-black/45 to-transparent" />
             <div className="absolute inset-x-0 bottom-0 p-4 sm:p-6">
               <p className="line-clamp-2 text-sm font-black text-white sm:text-base">{title}</p>

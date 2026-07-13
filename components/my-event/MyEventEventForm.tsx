@@ -104,40 +104,44 @@ export default function MyEventEventForm({
   }, [imagePreview]);
 
   useEffect(() => {
-    if (!initialValues) {
-      setFormData(emptyMyEventFormValues);
-      setSlugTouched(false);
-      setStartPickerValue(null);
-      setEndPickerValue(null);
+    const timer = setTimeout(() => {
+      if (!initialValues) {
+        setFormData(emptyMyEventFormValues);
+        setSlugTouched(false);
+        setStartPickerValue(null);
+        setEndPickerValue(null);
+        setImageFile(null);
+        setImagePreview(null);
+        return;
+      }
+
+      const days = normalizeEventDays(initialValues.days ?? []);
+      setFormData({
+        ...emptyMyEventFormValues,
+        ...initialValues,
+        days,
+      });
+      setSlugTouched(Boolean(initialValues.publicEventSlug));
       setImageFile(null);
       setImagePreview(null);
-      return;
-    }
 
-    const days = normalizeEventDays(initialValues.days ?? []);
-    setFormData({
-      ...emptyMyEventFormValues,
-      ...initialValues,
-      days,
-    });
-    setSlugTouched(Boolean(initialValues.publicEventSlug));
-    setImageFile(null);
-    setImagePreview(null);
+      if (days.length > 0) {
+        const firstDate = new DateObject({
+          date: normalizeDateString(days[0].date),
+          format: "YYYY/MM/DD",
+          calendar: persian,
+        });
+        const lastDate = new DateObject({
+          date: normalizeDateString(days[days.length - 1].date),
+          format: "YYYY/MM/DD",
+          calendar: persian,
+        });
+        setStartPickerValue(firstDate);
+        setEndPickerValue(lastDate);
+      }
+    }, 0);
 
-    if (days.length > 0) {
-      const firstDate = new DateObject({
-        date: normalizeDateString(days[0].date),
-        format: "YYYY/MM/DD",
-        calendar: persian,
-      });
-      const lastDate = new DateObject({
-        date: normalizeDateString(days[days.length - 1].date),
-        format: "YYYY/MM/DD",
-        calendar: persian,
-      });
-      setStartPickerValue(firstDate);
-      setEndPickerValue(lastDate);
-    }
+    return () => clearTimeout(timer);
   }, [initialValues]);
 
   useEffect(() => {
@@ -147,7 +151,8 @@ export default function MyEventEventForm({
     const end = new DateObject(endPickerValue).toDate();
     if (start > end) return;
 
-    setFormData((prev) => {
+    const timer = setTimeout(() => {
+      setFormData((prev) => {
       const generatedDays: EventDay[] = [];
       const current = new Date(start);
 
@@ -172,7 +177,10 @@ export default function MyEventEventForm({
       }
 
       return { ...prev, days: generatedDays };
-    });
+      });
+    }, 0);
+
+    return () => clearTimeout(timer);
   }, [startPickerValue, endPickerValue]);
 
   const handleImageSelect = async (file: File | null) => {

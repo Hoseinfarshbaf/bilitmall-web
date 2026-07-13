@@ -17,6 +17,7 @@ model BilitmallUser {
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
   orders       TicketOrder[]
+  favorites    FavoriteEvent[]
 
   @@map("BilitmallUser")
 }
@@ -113,6 +114,7 @@ model Event {
   venueTemplate      VenueTemplate?    @relation(fields: [venueTemplateId], references: [id], onDelete: SetNull)
   seatingPlan        EventSeatingPlan?
   orders             TicketOrder[]
+  favorites          FavoriteEvent[]
   createdAt          DateTime          @default(now())
   updatedAt          DateTime          @updatedAt
 
@@ -169,4 +171,19 @@ model City {
 
   @@index([sortOrder])
   @@map("City")
+}
+
+/// رویدادهای ذخیره‌شده در علاقه‌مندی‌های کاربر
+model FavoriteEvent {
+  id        Int           @id @default(autoincrement())
+  userId    Int
+  eventId   Int
+  createdAt DateTime      @default(now())
+  user      BilitmallUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event     Event         @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, eventId])
+  @@index([userId])
+  @@index([eventId])
+  @@map("FavoriteEvent")
 }

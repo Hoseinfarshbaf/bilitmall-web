@@ -53,9 +53,11 @@ export default function CityAutocomplete({
   const [activeIndex, setActiveIndex] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
+  const [trackedValue, setTrackedValue] = useState(value);
+  if (value !== trackedValue) {
+    setTrackedValue(value);
     setQuery(includeAll && value === allValue ? "" : value);
-  }, [value, includeAll, allValue]);
+  }
 
   const inputPlaceholder = includeAll ? allLabel : placeholder;
 
@@ -83,10 +85,6 @@ export default function CityAutocomplete({
 
     return showAll ? [allValue, ...cityMatches] : cityMatches;
   }, [cities, query, includeAll, allLabel, allValue]);
-
-  useEffect(() => {
-    setActiveIndex(0);
-  }, [query]);
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -143,6 +141,7 @@ export default function CityAutocomplete({
         disabled={loading}
         onChange={(e) => {
           setQuery(e.target.value);
+          setActiveIndex(0);
           setOpen(true);
           if (!e.target.value && includeAll) {
             onChange(allValue);

@@ -85,13 +85,13 @@ export default function MyEventLandingPage() {
           </div>
         </div>
 
-        <a
+        <Link
           href="/"
           className="mt-12 inline-flex items-center gap-2 text-sm font-bold text-neutral-500 hover:text-neutral-900 dark:text-slate-400 dark:hover:text-white"
         >
           <ArrowLeft className="h-4 w-4" />
           بازدید از سایت بلیت‌مال
-        </a>
+        </Link>
       </div>
     </div>
   );
