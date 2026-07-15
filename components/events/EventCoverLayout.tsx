@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { ArrowRight, CalendarDays, Clock, MapPin } from "lucide-react";
 import EventFramedImage from "@/components/EventFramedImage";
+import EventCoverAmbient from "@/components/events/EventCoverAmbient";
 import ThemeToggle from "@/components/ThemeToggle";
 import { getEventImageUrl } from "@/lib/events/helpers";
 import { useEventPageTheme } from "@/lib/events/event-page-theme";
@@ -55,33 +56,14 @@ export default function EventCoverLayout({
   return (
     <main
       className={cn(
-        "relative min-h-screen transition-colors duration-200",
+        "relative z-10 min-h-screen bg-transparent transition-colors duration-200",
         isDark ? "text-white" : "text-neutral-900"
       )}
       dir="rtl"
     >
-      <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden" aria-hidden>
-        <div
-          className={cn(
-            "absolute left-1/2 top-1/2 h-[150%] w-[150%] max-w-none -translate-x-1/2 -translate-y-1/2 bg-cover bg-center blur-3xl",
-            isDark ? "brightness-90 saturate-125" : "brightness-105 saturate-125"
-          )}
-          style={{ backgroundImage: `url(${coverUrl})` }}
-        />
-        <div
-          className={cn("absolute inset-0", isDark ? "bg-black/72" : "bg-white/84")}
-        />
-        <div
-          className={cn(
-            "absolute inset-0",
-            isDark
-              ? "bg-linear-to-b from-black/25 via-black/55 to-neutral-950"
-              : "bg-linear-to-b from-white/50 via-neutral-50/92 to-neutral-100"
-          )}
-        />
-      </div>
+      <EventCoverAmbient coverUrl={coverUrl} isDark={isDark} />
 
-      <div className="relative z-10 mx-auto max-w-3xl px-4 pb-12 pt-5">
+      <div className="relative mx-auto max-w-3xl px-4 pb-12 pt-5">
         <div className="mb-5 flex items-center justify-between gap-3">
           {backHref ? (
             <Link

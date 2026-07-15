@@ -13,5 +13,8 @@ export function shouldShowMarketplaceNavbar(pathname: string): boolean {
 }
 
 export function shouldShowMarketplaceFooter(pathname: string): boolean {
-  return shouldShowMarketplaceChrome(pathname);
+  if (!shouldShowMarketplaceChrome(pathname)) return false;
+  // Event purchase page: keep ambient full-bleed without marketplace footer
+  if (/^\/events\/[^/]+\/[^/]+\/[^/]+/.test(pathname)) return false;
+  return true;
 }
