@@ -8,7 +8,8 @@ type EventCoverAmbientProps = {
   isDark: boolean;
 };
 
-const TILES_PER_HALF = 8;
+/** هر کاشی = یک عرض کامل صفحه با contain — دو گروه برای لوپ */ 
+const TILES_PER_HALF = 4;
 const PX_PER_SECOND = 48;
 
 /**
@@ -84,6 +85,10 @@ export default function EventCoverAmbient({ coverUrl, isDark }: EventCoverAmbien
         <div ref={trackRef} className="event-cover-marquee__track">
           {tiles.map((i) => (
             <div key={i} className="event-cover-marquee__tile">
+              <div
+                className="event-cover-marquee__tile-blur"
+                style={{ backgroundImage: `url(${coverUrl})` }}
+              />
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={coverUrl}

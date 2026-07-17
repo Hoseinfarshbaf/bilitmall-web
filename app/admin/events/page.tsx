@@ -11,6 +11,7 @@ import EventForm from "@/components/admin/EventForm";
 import EventAdminStatsPanel from "@/components/admin/EventAdminStatsPanel";
 import EventScheduleCell from "@/components/admin/EventScheduleCell";
 import EventStatusBadge from "@/components/admin/EventStatusBadge";
+import AdminBackLink from "@/components/admin/AdminBackLink";
 import { adminTableClasses } from "@/components/admin/admin-table-classes";
 import CityAutocomplete from "@/components/CityAutocomplete";
 import { useAdminEvents } from "@/hooks/useEvents";
@@ -325,12 +326,7 @@ function AdminEventsPageContent() {
       <div className="mx-auto max-w-6xl">
         <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
-            <Link
-              href="/admin"
-              className="mb-2 inline-block text-sm font-bold text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
-            >
-              ← بازگشت به پنل
-            </Link>
+            <AdminBackLink className="mb-2" />
             <h1 className="text-3xl font-black text-slate-800 dark:text-slate-100">مدیریت رویدادها</h1>
             <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
               تعریف، ویرایش، فیلتر و انتشار رویدادها

@@ -44,7 +44,7 @@ export default function EventCard({ event }: { event: EventItem }) {
   }
 
   const article = (
-    <article className="relative w-[88vw] sm:w-[300px] shrink-0 overflow-hidden rounded-3xl bg-neutral-900 shadow-sm transition hover:-translate-y-1 hover:shadow-xl aspect-[3/4]">
+    <article className="relative aspect-[3/4] w-[min(82vw,280px)] shrink-0 overflow-hidden rounded-3xl bg-neutral-900 shadow-sm transition active:scale-[0.98] sm:w-[300px] sm:hover:-translate-y-1 sm:hover:shadow-xl">
       <EventFramedImage image={event.image} />
 
       <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-transparent" />
@@ -53,7 +53,7 @@ export default function EventCard({ event }: { event: EventItem }) {
         type="button"
         onClick={(e) => void handleFavoriteClick(e)}
         className={cn(
-          "absolute left-4 top-4 z-10 flex h-9 w-9 cursor-pointer items-center justify-center rounded-full backdrop-blur-sm transition",
+          "absolute left-3 top-3 z-10 flex h-11 w-11 cursor-pointer items-center justify-center rounded-full backdrop-blur-sm transition sm:left-4 sm:top-4 sm:h-9 sm:w-9",
           favorited
             ? "bg-red-600 text-white hover:bg-red-700"
             : "bg-black/20 text-white hover:bg-black/40"
@@ -65,17 +65,17 @@ export default function EventCard({ event }: { event: EventItem }) {
       </button>
 
       {unavailable ? (
-        <span className="absolute right-4 top-4 z-10 rounded-full bg-black/60 backdrop-blur-sm px-3 py-1 text-xs font-bold text-white">
+        <span className="absolute right-3 top-3 z-10 rounded-full bg-black/60 px-3 py-1 text-xs font-bold text-white backdrop-blur-sm sm:right-4 sm:top-4">
           {statusLabel}
         </span>
       ) : event.badge ? (
-        <span className="absolute right-4 top-4 z-10 rounded-full bg-red-600 px-3 py-1 text-xs font-bold text-white">
+        <span className="absolute right-3 top-3 z-10 rounded-full bg-red-600 px-3 py-1 text-xs font-bold text-white sm:right-4 sm:top-4">
           {event.badge}
         </span>
       ) : null}
 
-      <div className="absolute inset-x-0 bottom-0 z-10 p-5">
-        <h3 className="line-clamp-1 text-lg font-black text-white">{event.title}</h3>
+      <div className="absolute inset-x-0 bottom-0 z-10 p-4 sm:p-5">
+        <h3 className="line-clamp-2 text-base font-black text-white sm:line-clamp-1 sm:text-lg">{event.title}</h3>
         <div className="mt-2 flex items-center gap-1.5 text-sm font-medium text-white/80">
           <CalendarDays className="h-4 w-4" />
           <span>{formatEventDateDisplay(event)}</span>

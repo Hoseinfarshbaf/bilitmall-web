@@ -38,6 +38,9 @@ export type MyEventDashboardEvent = {
   hasAssignedSeating: boolean;
   listOnBilitmallRequested: boolean;
   listOnBilitmallApproved: boolean;
+  hasPendingChanges: boolean;
+  pendingEventChanges: boolean;
+  pendingVenueChanges: boolean;
   publicEventSlug: string | null;
   publicCitySlug: string | null;
   published: boolean;
@@ -268,6 +271,9 @@ export async function getMyEventOrganizerEvents(
     hasAssignedSeating: record.hasAssignedSeating,
     listOnBilitmallRequested: record.listOnBilitmallRequested,
     listOnBilitmallApproved: record.listOnBilitmallApproved,
+    hasPendingChanges: record.hasPendingChanges,
+    pendingEventChanges: record.pendingEventChanges,
+    pendingVenueChanges: record.pendingVenueChanges,
     publicEventSlug: record.publicEventSlug,
     publicCitySlug: record.publicCitySlug,
     published: record.published,
@@ -425,6 +431,11 @@ export async function listMyEventEventsForAdmin() {
     status: record.status,
     listOnBilitmallRequested: record.listOnBilitmallRequested,
     listOnBilitmallApproved: record.listOnBilitmallApproved,
+    hasPendingChanges: record.hasPendingChanges,
+    pendingEventChanges: record.pendingEventChanges,
+    pendingVenueChanges: record.pendingVenueChanges,
+    firstApprovedAt: record.firstApprovedAt?.toISOString() ?? null,
+    pendingChangesAt: record.pendingChangesAt?.toISOString() ?? null,
     createdAt: record.createdAt.toISOString(),
     organizer: record.myEventOrganizer
       ? {
@@ -464,6 +475,10 @@ export async function updateMyEventEventApproval(
         published: false,
         status: "rejected",
         listOnBilitmallApproved: false,
+        hasPendingChanges: false,
+        pendingEventChanges: false,
+        pendingVenueChanges: false,
+        pendingChangesAt: null,
       },
     });
   }
@@ -491,11 +506,21 @@ export async function updateMyEventEventApproval(
     published?: boolean;
     status?: string;
     listOnBilitmallApproved?: boolean;
+    firstApprovedAt?: Date;
+    hasPendingChanges?: boolean;
+    pendingEventChanges?: boolean;
+    pendingVenueChanges?: boolean;
+    pendingChangesAt?: Date | null;
   } = {};
 
   if (approvePage) {
     data.published = true;
     data.status = "active";
+    data.firstApprovedAt = event.firstApprovedAt ?? new Date();
+    data.hasPendingChanges = false;
+    data.pendingEventChanges = false;
+    data.pendingVenueChanges = false;
+    data.pendingChangesAt = null;
   }
 
   if (approveBilitmall) {

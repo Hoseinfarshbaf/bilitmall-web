@@ -7,6 +7,7 @@ import MyEventEventForm, {
 } from "@/components/my-event/MyEventEventForm";
 import MyEventShell from "@/components/my-event/MyEventShell";
 import type { EventDay } from "@/lib/events/types";
+import { eventToMyEventPricingFields } from "@/lib/events/pricing";
 
 async function uploadEventImage(file: File): Promise<string> {
   const formData = new FormData();
@@ -28,7 +29,6 @@ export default function MyEventEditEventPage({
   const [initialValues, setInitialValues] = useState<Partial<MyEventEventFormValues> | null>(null);
   const [loading, setLoading] = useState(false);
   const [pageLoading, setPageLoading] = useState(true);
-  const [eventApproved, setEventApproved] = useState(false);
   const [hasSeatingPlan, setHasSeatingPlan] = useState(false);
   const [message, setMessage] = useState("");
 
@@ -51,7 +51,6 @@ export default function MyEventEditEventPage({
       const meData = await meRes.json();
       const data = await eventRes.json();
       setOrganizerSlug(meData.organizer?.slug ?? "");
-      setEventApproved(data.status === "active" && data.published === true);
       setHasSeatingPlan(data.hasSeatingPlan === true);
       setInitialValues({
         title: data.title,
@@ -61,11 +60,14 @@ export default function MyEventEditEventPage({
         place: data.place,
         venueTemplateId: data.venueTemplateId ?? null,
         placeAddress: data.placeAddress ?? "",
-        price: data.price,
         description: data.description ?? "",
         image: data.image ?? "",
         days: data.days as EventDay[],
         hasAssignedSeating: data.hasAssignedSeating,
+        ...eventToMyEventPricingFields({
+          price: data.price ?? "",
+          hasAssignedSeating: data.hasAssignedSeating,
+        }),
         listOnBilitmall: data.listOnBilitmall,
       });
       setPageLoading(false);
@@ -93,6 +95,7 @@ export default function MyEventEditEventPage({
       const data = await response.json();
       if (!response.ok) throw new Error(data.error ?? "خطا در ذخیره");
       setMessage(data.message ?? "ذخیره شد.");
+      return { image: imageUrl };
     } catch (error) {
       alert(error instanceof Error ? error.message : "خطا در ذخیره");
     } finally {
@@ -118,12 +121,11 @@ export default function MyEventEditEventPage({
       <MyEventEventForm
         organizerSlug={organizerSlug}
         eventId={eventId ?? undefined}
-        eventApproved={eventApproved}
         hasSeatingPlan={hasSeatingPlan}
         initialValues={initialValues}
         onSubmit={handleSubmit}
         loading={loading}
-        submitLabel="ذخیره تغییرات"
+        submitLabel="تغییر و ثبت"
         isEdit
       />
       <button

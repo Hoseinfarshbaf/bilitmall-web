@@ -384,8 +384,6 @@ export async function saveOrganizerSeatingPlanById(id: number, layout: SeatingLa
 
 export async function searchVenueTemplates(query: string, city?: string) {
   const cityName = city?.trim();
-  if (!cityName) return [];
-
   const tokens = query
     .trim()
     .split(/\s+/)
@@ -394,11 +392,15 @@ export async function searchVenueTemplates(query: string, city?: string) {
 
   const records = await prisma.venueTemplate.findMany({
     where: {
-      city: cityName,
+      ...(cityName ? { city: cityName } : {}),
       ...(tokens.length > 0
         ? {
             AND: tokens.map((token) => ({
-              name: { contains: token, mode: "insensitive" as const },
+              OR: [
+                { name: { contains: token, mode: "insensitive" as const } },
+                { address: { contains: token, mode: "insensitive" as const } },
+                { slug: { contains: token, mode: "insensitive" as const } },
+              ],
             })),
           }
         : {}),
@@ -430,70 +432,95 @@ export async function promoteOrganizerSeatingPlanToVenueTemplate(planId: number)
     include: { event: { include: { myEventOrganizer: true } } },
   });
   if (!record || !record.event.myEventOrganizerId) return null;
-  if (record.approvalStatus === "approved") {
+  if (record.approvalStatus === "approved" && record.promotedVenueTemplateId) {
     throw new Error("این سالن قبلاً تأیید شده است.");
   }
   if (record.event.venueTemplateId != null) {
     throw new Error("رویداد از سالن تأییدشده استفاده می‌کند — نیازی به تأیید مجدد نیست.");
   }
 
+  const plan = record;
   const layout =
-    parseSeatingLayoutJson(record.layout) ??
-    createEmptyLayout(record.name || record.event.place);
-  const name = record.event.place.trim() || record.name.trim() || layout.name;
-  const city = record.event.city.trim();
-  const address = record.event.placeAddress?.trim() ?? "";
-  const organizerId = record.event.myEventOrganizerId;
+    parseSeatingLayoutJson(plan.layout) ??
+    createEmptyLayout(plan.name || plan.event.place);
+  const name = plan.event.place.trim() || plan.name.trim() || layout.name;
+  const city = plan.event.city.trim();
+  const address = plan.event.placeAddress?.trim() ?? "";
+  const organizerId = plan.event.myEventOrganizerId;
+  const catalogLayout = { ...layout, name };
+  const eventId = plan.eventId;
 
-  const existing = await prisma.venueTemplate.findFirst({
-    where: {
-      sourceSeatingPlanId: planId,
-    },
-  });
+  async function finalize(templateId: number, templateName: string, updated: boolean) {
+    await prisma.$transaction([
+      prisma.eventSeatingPlan.update({
+        where: { id: planId },
+        data: {
+          approvalStatus: "approved",
+          promotedVenueTemplateId: templateId,
+          name: templateName,
+        },
+      }),
+      prisma.event.update({
+        where: { id: eventId },
+        data: {
+          venueTemplateId: templateId,
+          place: templateName,
+          ...(address ? { placeAddress: address } : {}),
+        },
+      }),
+    ]);
 
-  if (existing) {
-    const updated = await saveVenueTemplate({
-      id: existing.id,
-      name: existing.name,
-      slug: existing.slug,
-      city: existing.city,
-      address: address || existing.address,
-      isDefault: existing.isDefault,
-      layout: { ...layout, name: existing.name },
+    const template = await prisma.venueTemplate.findUniqueOrThrow({
+      where: { id: templateId },
+      select: { id: true, name: true, slug: true, city: true, address: true },
     });
-    await prisma.eventSeatingPlan.update({
-      where: { id: planId },
-      data: {
-        approvalStatus: "approved",
-        promotedVenueTemplateId: updated.id,
-      },
-    });
+
     return {
-      id: updated.id,
-      name: updated.name,
-      slug: updated.slug,
-      city: updated.city,
-      address: updated.address,
-      updated: true,
+      id: template.id,
+      name: template.name,
+      slug: template.slug,
+      city: template.city,
+      address: template.address,
+      updated,
     };
   }
 
-  const byNameCity = await prisma.venueTemplate.findFirst({
+  const existingByPlan = await prisma.venueTemplate.findFirst({
+    where: { sourceSeatingPlanId: planId },
+  });
+
+  if (existingByPlan) {
+    const updated = await saveVenueTemplate({
+      id: existingByPlan.id,
+      name: existingByPlan.name,
+      slug: existingByPlan.slug,
+      city: existingByPlan.city,
+      address: address || existingByPlan.address,
+      isDefault: existingByPlan.isDefault,
+      layout: { ...catalogLayout, name: existingByPlan.name },
+    });
+    return finalize(updated.id, updated.name, true);
+  }
+
+  // فقط سالن‌های قبلی خود برگزارکننده با همان نام/شهر را به‌روز کن — سالن‌های مدیر را بازنویسی نکن
+  const existingOrganizerVenue = await prisma.venueTemplate.findFirst({
     where: {
       name: { equals: name, mode: "insensitive" },
       city,
+      source: "organizer",
+      myEventOrganizerId: organizerId,
     },
   });
 
-  if (byNameCity) {
+  if (existingOrganizerVenue) {
     const updated = await saveVenueTemplate({
-      id: byNameCity.id,
-      name: byNameCity.name,
-      slug: byNameCity.slug,
-      city: byNameCity.city,
-      address: address || byNameCity.address,
-      isDefault: byNameCity.isDefault,
-      layout: { ...layout, name: byNameCity.name },
+      id: existingOrganizerVenue.id,
+      name: existingOrganizerVenue.name,
+      slug: existingOrganizerVenue.slug,
+      city: existingOrganizerVenue.city,
+      address: address || existingOrganizerVenue.address,
+      isDefault: existingOrganizerVenue.isDefault,
+      layout: { ...catalogLayout, name: existingOrganizerVenue.name },
     });
     await prisma.venueTemplate.update({
       where: { id: updated.id },
@@ -503,21 +530,7 @@ export async function promoteOrganizerSeatingPlanToVenueTemplate(planId: number)
         sourceSeatingPlanId: planId,
       },
     });
-    await prisma.eventSeatingPlan.update({
-      where: { id: planId },
-      data: {
-        approvalStatus: "approved",
-        promotedVenueTemplateId: updated.id,
-      },
-    });
-    return {
-      id: updated.id,
-      name: updated.name,
-      slug: updated.slug,
-      city: updated.city,
-      address: updated.address,
-      updated: true,
-    };
+    return finalize(updated.id, updated.name, true);
   }
 
   const slug = await buildUniqueVenueSlug(name, city);
@@ -526,26 +539,12 @@ export async function promoteOrganizerSeatingPlanToVenueTemplate(planId: number)
     slug,
     city,
     address,
-    layout: { ...layout, name },
+    layout: catalogLayout,
     source: "organizer",
     myEventOrganizerId: organizerId,
     sourceSeatingPlanId: planId,
   });
-  await prisma.eventSeatingPlan.update({
-    where: { id: planId },
-    data: {
-      approvalStatus: "approved",
-      promotedVenueTemplateId: created.id,
-    },
-  });
-  return {
-    id: created.id,
-    name: created.name,
-    slug: created.slug,
-    city: created.city,
-    address: created.address,
-    updated: false,
-  };
+  return finalize(created.id, created.name, false);
 }
 
 export async function resolveInitialEventSeatingLayout(

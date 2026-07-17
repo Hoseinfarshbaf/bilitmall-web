@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import {
   X,
   Armchair,
@@ -27,6 +27,7 @@ import {
   rowLabel,
 } from "@/lib/seating/layout";
 import type { SeatCell, SeatingLayout, StagePosition } from "@/lib/seating/types";
+import { seatingLayoutIsFree } from "@/lib/events/pricing";
 
 type PaintMode = "seat" | "empty" | "blocked" | "aisle";
 type StudioTool = PaintMode | "stage";
@@ -37,6 +38,7 @@ type SeatingStudioProps = {
   onSave: () => void;
   onClose: () => void;
   saving?: boolean;
+  readOnly?: boolean;
 };
 
 const STAGE_OPTIONS: { value: StagePosition; label: string }[] = [
@@ -86,6 +88,7 @@ export default function SeatingStudio({
   onSave,
   onClose,
   saving = false,
+  readOnly = false,
 }: SeatingStudioProps) {
   const [tool, setTool] = useState<StudioTool>("seat");
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -94,6 +97,7 @@ export default function SeatingStudio({
   const [isDragging, setIsDragging] = useState(false);
 
   const normalized = useMemo(() => normalizeLayout(layout), [layout]);
+  const isFreePricing = seatingLayoutIsFree(normalized);
   const bookableCount = useMemo(() => countBookableSeats(normalized), [normalized]);
   const selected = normalized.cells.find((c) => c.id === selectedId) ?? null;
   const stageRect = normalized.stageRect!;
@@ -112,6 +116,20 @@ export default function SeatingStudio({
     [onChange]
   );
 
+  function setLayoutPricing(free: boolean) {
+    if (readOnly) return;
+    const price = free ? 0 : normalized.defaultPriceRial > 0 ? normalized.defaultPriceRial : 350_000;
+    update({
+      ...normalized,
+      defaultPriceRial: price,
+      cells: normalized.cells.map((c) =>
+        c.type === "seat"
+          ? { ...c, priceRial: price, priceLabel: formatPriceLabel(price) }
+          : c
+      ),
+    });
+  }
+
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if (e.key === "Escape") onClose();
@@ -121,6 +139,7 @@ export default function SeatingStudio({
   }, [onClose]);
 
   function paintCell(cell: SeatCell) {
+    if (readOnly) return;
     if (tool === "stage") {
       const rect = { ...stageRect };
       rect.rowStart = Math.min(rect.rowStart, cell.row);
@@ -252,21 +271,26 @@ export default function SeatingStudio({
     <div className="fixed inset-0 z-100 flex flex-col bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-white" dir="rtl">
       <header className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-slate-200 bg-white px-4 py-3 dark:border-white/10 dark:bg-slate-900">
         <div className="min-w-0">
-          <p className="truncate text-lg font-black">{normalized.name || "استودیو طراحی سالن"}</p>
+          <p className="truncate text-lg font-black">
+            {normalized.name || (readOnly ? "مشاهده صحنه سالن" : "استودیو طراحی سالن")}
+          </p>
           <p className="text-xs text-slate-500 dark:text-slate-400">
             {bookableCount.toLocaleString("fa-IR")} صندلی · {normalized.rows} ردیف × {normalized.cols} ستون
+            {readOnly ? " · فقط مشاهده" : ""}
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <button
-            type="button"
-            disabled={saving}
-            onClick={onSave}
-            className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2 text-sm font-black text-white hover:bg-emerald-500 disabled:opacity-60"
-          >
-            <Save className="h-4 w-4" />
-            {saving ? "در حال ذخیره..." : "ذخیره"}
-          </button>
+          {!readOnly ? (
+            <button
+              type="button"
+              disabled={saving}
+              onClick={onSave}
+              className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2 text-sm font-black text-white hover:bg-emerald-500 disabled:opacity-60"
+            >
+              <Save className="h-4 w-4" />
+              {saving ? "در حال ذخیره..." : "ذخیره"}
+            </button>
+          ) : null}
           <button
             type="button"
             onClick={onClose}
@@ -279,6 +303,7 @@ export default function SeatingStudio({
       </header>
 
       <div className="flex min-h-0 flex-1 overflow-hidden">
+        {!readOnly ? (
         <aside className="w-64 shrink-0 overflow-y-auto border-l border-slate-200 bg-white p-4 dark:border-white/10 dark:bg-slate-900/80">
           <p className="mb-2 text-xs font-bold text-slate-500 dark:text-slate-400">ابزارها</p>
           <div className="space-y-1">
@@ -454,6 +479,18 @@ export default function SeatingStudio({
             بازنشانی کل شبکه
           </button>
         </aside>
+        ) : (
+          <aside className="w-64 shrink-0 overflow-y-auto border-l border-slate-200 bg-white p-4 dark:border-white/10 dark:bg-slate-900/80">
+            <p className="text-sm font-black text-slate-800 dark:text-slate-100">سالن تأییدشده</p>
+            <p className="mt-2 text-xs leading-6 text-slate-500 dark:text-slate-400">
+              این نقشه توسط بلیت‌مال تعریف شده و فقط برای مشاهده است. تغییر چیدمان یا قیمت توسط
+              برگزارکننده امکان‌پذیر نیست.
+            </p>
+            <p className="mt-4 text-xs font-bold text-slate-600 dark:text-slate-300">
+              {bookableCount.toLocaleString("fa-IR")} صندلی قابل رزرو
+            </p>
+          </aside>
+        )}
 
         <main className="relative min-w-0 flex-1 overflow-auto p-4">
           <div className="mx-auto max-w-5xl">
@@ -489,7 +526,7 @@ export default function SeatingStudio({
               ))}
 
               {Array.from({ length: normalized.rows }, (_, row) => (
-                <div key={`row-wrap-${row}`} className="contents">
+                <Fragment key={`row-wrap-${row}`}>
                   <div
                     className="flex items-center justify-center text-[11px] font-black text-amber-600 dark:text-amber-400/90"
                     style={{ gridColumn: 1, gridRow: row + 2 }}
@@ -536,7 +573,7 @@ export default function SeatingStudio({
                       </button>
                     );
                   })}
-                </div>
+                </Fragment>
               ))}
             </div>
           </div>
@@ -549,6 +586,18 @@ export default function SeatingStudio({
               <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
                 ردیف {rowLabel(selected.row)} · ستون {selected.col + 1}
               </p>
+              {readOnly ? (
+                <div className="mt-4 space-y-2 text-sm">
+                  <p className="text-slate-700 dark:text-slate-200">
+                    قیمت:{" "}
+                    <span className="font-bold tabular-nums" dir="ltr">
+                      {isFreePricing
+                        ? "رایگان"
+                        : selected.priceLabel || formatPriceLabel(selected.priceRial)}
+                    </span>
+                  </p>
+                </div>
+              ) : (
               <div className="mt-4 space-y-3">
                 <div>
                   <label className="mb-1 block text-[10px] text-slate-500 dark:text-slate-400">برچسب</label>
@@ -558,65 +607,120 @@ export default function SeatingStudio({
                     className="w-full rounded-lg border border-slate-300 bg-white px-2 py-1.5 text-sm text-slate-900 outline-none focus:border-emerald-500 dark:border-white/10 dark:bg-slate-900 dark:text-white"
                   />
                 </div>
-                <div>
-                  <label className="mb-1 block text-[10px] text-slate-500 dark:text-slate-400">قیمت (ریال)</label>
-                  <input
-                    value={selected.priceRial}
-                    onChange={(e) =>
-                      updateSelected({
-                        priceRial: Number(e.target.value.replace(/\D/g, "") || 0),
-                      })
-                    }
-                    className="w-full rounded-lg border border-slate-300 bg-white px-2 py-1.5 text-sm text-slate-900 outline-none focus:border-emerald-500 dark:border-white/10 dark:bg-slate-900 dark:text-white"
-                    dir="ltr"
-                  />
-                </div>
-                <div className="flex gap-2">
-                  <input
-                    placeholder="قیمت ردیف"
-                    value={rowPrice}
-                    onChange={(e) => setRowPrice(e.target.value)}
-                    className="flex-1 rounded-lg border border-slate-300 bg-white px-2 py-1.5 text-xs text-slate-900 outline-none focus:border-emerald-500 dark:border-white/10 dark:bg-slate-900 dark:text-white"
-                    dir="ltr"
-                  />
-                  <button
-                    type="button"
-                    onClick={applyRowPrice}
-                    className="rounded-lg bg-slate-200 px-2 py-1.5 text-[10px] font-bold dark:bg-white/10"
-                  >
-                    ردیف {rowLabel(selected.row)}
-                  </button>
-                </div>
+                {isFreePricing ? (
+                  <p className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-xs font-bold text-emerald-700 dark:text-emerald-200">
+                    این رویداد رایگان است — قیمت صندلی‌ها صفر است.
+                  </p>
+                ) : (
+                  <>
+                    <div>
+                      <label className="mb-1 block text-[10px] text-slate-500 dark:text-slate-400">قیمت (ریال)</label>
+                      <input
+                        value={selected.priceRial}
+                        onChange={(e) =>
+                          updateSelected({
+                            priceRial: Number(e.target.value.replace(/\D/g, "") || 0),
+                          })
+                        }
+                        className="w-full rounded-lg border border-slate-300 bg-white px-2 py-1.5 text-sm text-slate-900 outline-none focus:border-emerald-500 dark:border-white/10 dark:bg-slate-900 dark:text-white"
+                        dir="ltr"
+                      />
+                    </div>
+                    <div className="flex gap-2">
+                      <input
+                        placeholder="قیمت ردیف"
+                        value={rowPrice}
+                        onChange={(e) => setRowPrice(e.target.value)}
+                        className="flex-1 rounded-lg border border-slate-300 bg-white px-2 py-1.5 text-xs text-slate-900 outline-none focus:border-emerald-500 dark:border-white/10 dark:bg-slate-900 dark:text-white"
+                        dir="ltr"
+                      />
+                      <button
+                        type="button"
+                        onClick={applyRowPrice}
+                        className="rounded-lg bg-slate-200 px-2 py-1.5 text-[10px] font-bold dark:bg-white/10"
+                      >
+                        ردیف {rowLabel(selected.row)}
+                      </button>
+                    </div>
+                  </>
+                )}
               </div>
+              )}
             </div>
           ) : (
             <div className="text-sm text-slate-500 dark:text-slate-400">
               <Maximize2 className="mb-3 h-8 w-8 text-slate-400 dark:text-slate-600" />
-              <p className="font-bold text-slate-700 dark:text-slate-300">راهنمای طراحی</p>
+              <p className="font-bold text-slate-700 dark:text-slate-300">
+                {readOnly ? "جزئیات صندلی" : "راهنمای طراحی"}
+              </p>
+              {readOnly ? (
+                <p className="mt-3 text-xs leading-6">
+                  روی هر صندلی کلیک کنید تا قیمت آن را ببینید.
+                </p>
+              ) : (
               <ul className="mt-3 space-y-2 text-xs leading-6">
                 <li>با ابزار صندلی، هر خانه را به صندلی تبدیل کنید یا با «خالی» جای خالی بگذارید.</li>
                 <li>صحنه را یکپارچه با ابزار صحنه یا دکمه‌های گسترش تنظیم کنید.</li>
                 <li>بالکن‌ها را از پنل چپ اضافه کنید و محدوده ردیف‌ها را مشخص کنید.</li>
+                <li>از پنل راست، رایگان یا قیمت‌دار بودن رویداد را مشخص کنید.</li>
                 <li>شماره ردیف‌ها در ستون طلایی و شماره ستون‌ها در بالای شبکه نمایش داده می‌شود.</li>
                 <li>برای رسم سریع، کلیک کرده و بکشید.</li>
               </ul>
+              )}
             </div>
           )}
 
-          <div className="mt-8 border-t border-slate-200 pt-4 dark:border-white/10">
-            <label className="mb-1 block text-[10px] text-slate-500 dark:text-slate-400">قیمت پیش‌فرض (ریال)</label>
-            <input
-              value={normalized.defaultPriceRial}
-              onChange={(e) =>
-                update({
-                  ...normalized,
-                  defaultPriceRial: Number(e.target.value.replace(/\D/g, "") || 0),
-                })
-              }
-              className="w-full rounded-lg border border-slate-300 bg-white px-2 py-1.5 text-sm text-slate-900 outline-none focus:border-emerald-500 dark:border-white/10 dark:bg-slate-900 dark:text-white"
-              dir="ltr"
-            />
+          {!readOnly ? (
+          <div className="mt-8 space-y-3 border-t border-slate-200 pt-4 dark:border-white/10">
+            <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400">قیمت‌گذاری رویداد</p>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => setLayoutPricing(true)}
+                className={`rounded-xl border px-3 py-2.5 text-xs font-black transition ${
+                  isFreePricing
+                    ? "border-emerald-500 bg-emerald-600 text-white"
+                    : "border-slate-300 bg-slate-50 text-slate-700 hover:border-emerald-400 dark:border-white/10 dark:bg-slate-950 dark:text-slate-300"
+                }`}
+              >
+                رایگان
+              </button>
+              <button
+                type="button"
+                onClick={() => setLayoutPricing(false)}
+                className={`rounded-xl border px-3 py-2.5 text-xs font-black transition ${
+                  !isFreePricing
+                    ? "border-emerald-500 bg-emerald-600 text-white"
+                    : "border-slate-300 bg-slate-50 text-slate-700 hover:border-emerald-400 dark:border-white/10 dark:bg-slate-950 dark:text-slate-300"
+                }`}
+              >
+                قیمت‌دار
+              </button>
+            </div>
+            {isFreePricing ? (
+              <p className="text-[11px] leading-6 text-slate-500 dark:text-slate-400">
+                همه صندلی‌ها رایگان می‌شوند. برای قیمت‌گذاری جداگانه، «قیمت‌دار» را انتخاب کنید.
+              </p>
+            ) : (
+              <div>
+                <label className="mb-1 block text-[10px] text-slate-500 dark:text-slate-400">
+                  قیمت پیش‌فرض (ریال)
+                </label>
+                <input
+                  value={normalized.defaultPriceRial}
+                  onChange={(e) =>
+                    update({
+                      ...normalized,
+                      defaultPriceRial: Number(e.target.value.replace(/\D/g, "") || 0),
+                    })
+                  }
+                  className="w-full rounded-lg border border-slate-300 bg-white px-2 py-1.5 text-sm text-slate-900 outline-none focus:border-emerald-500 dark:border-white/10 dark:bg-slate-900 dark:text-white"
+                  dir="ltr"
+                />
+              </div>
+            )}
           </div>
+          ) : null}
         </aside>
       </div>
     </div>

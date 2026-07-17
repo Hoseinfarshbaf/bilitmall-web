@@ -1,6 +1,8 @@
 "use client";
 
-import CitySelect from "@/components/CitySelect";
+import CityAutocomplete from "@/components/CityAutocomplete";
+import VenueSearchAutocomplete from "@/components/admin/VenueSearchAutocomplete";
+
 type VenueListFiltersBarProps = {
   search: string;
   city: string;
@@ -28,23 +30,23 @@ export default function VenueListFiltersBar({
 }: VenueListFiltersBarProps) {
   return (
     <div className="mt-6 flex flex-wrap gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-      <div className="min-w-[200px] flex-1">
+      <div className="min-w-[220px] flex-1">
         <label className="mb-1 block text-xs font-bold text-slate-500 dark:text-slate-400">جستجو</label>
-        <input
+        <VenueSearchAutocomplete
           value={search}
-          onChange={(e) => onSearchChange(e.target.value)}
-          placeholder="نام سالن، آدرس، رویداد..."
-          className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+          city={city}
+          onChange={onSearchChange}
+          placeholder="جستجوی نام سالن..."
         />
       </div>
-      <div className="w-36">
+      <div className="min-w-[180px] w-52">
         <label className="mb-1 block text-xs font-bold text-slate-500 dark:text-slate-400">شهر</label>
-        <CitySelect
+        <CityAutocomplete
           includeAllCities
-          value={city}
           includeAll
+          value={city}
           onChange={onCityChange}
-          className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+          placeholder="جستجوی شهر..."
         />
       </div>
       {showSourceFilter ? (

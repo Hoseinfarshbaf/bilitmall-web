@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { buildPublicCitySlug } from "@/lib/my-event/public-slugs";
 import { DEFAULT_CITIES } from "@/lib/cities/constants";
+import { validateIranCityOrCounty } from "@/lib/cities/iran-divisions";
 import type { CityRecord, CityWithUsage } from "@/lib/cities/types";
 import { getAllEvents } from "@/lib/events";
 
@@ -125,17 +126,24 @@ export async function createCity(
     throw new Error("نام شهر باید حداقل ۲ کاراکتر باشد.");
   }
 
-  const existing = await prisma.city.findUnique({ where: { name: trimmed } });
+  const validation = validateIranCityOrCounty(trimmed);
+  if (!validation.ok) {
+    throw new Error(validation.error);
+  }
+
+  const canonicalName = validation.canonicalName;
+
+  const existing = await prisma.city.findUnique({ where: { name: canonicalName } });
   if (existing) {
     throw new Error("این شهر قبلاً ثبت شده است.");
   }
 
   const maxOrder = await prisma.city.aggregate({ _max: { sortOrder: true } });
-  const slug = await resolveUniqueSlug(trimmed);
+  const slug = await resolveUniqueSlug(canonicalName);
 
   const row = await prisma.city.create({
     data: {
-      name: trimmed,
+      name: canonicalName,
       slug,
       isPopular: options?.isPopular ?? false,
       sortOrder: (maxOrder._max.sortOrder ?? 0) + 1,

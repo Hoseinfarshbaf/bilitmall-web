@@ -70,23 +70,14 @@ export default function AdminPage() {
 
           <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
             <h2 className="mb-2 text-xl font-bold">رویدادهای My Event</h2>
-            <p className="mb-4 text-slate-600 dark:text-slate-400">تأیید رویدادهای ثبت‌شده توسط برگزارکنندگان</p>
+            <p className="mb-4 text-slate-600 dark:text-slate-400">
+              تأیید صفحه اختصاصی، بررسی درخواست انتشار در بلیت‌مال، و حذف رویدادهای ردشده
+            </p>
             <a
               href="/admin/my-event/events"
               className="inline-block rounded-xl bg-emerald-600 px-4 py-3 text-white"
             >
-              رویدادهای در انتظار
-            </a>
-          </div>
-
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-            <h2 className="mb-2 text-xl font-bold">انتشار در بلیت‌مال</h2>
-            <p className="mb-4 text-slate-600 dark:text-slate-400">درخواست‌های نمایش رویداد در مارکت‌پلیس</p>
-            <a
-              href="/admin/bilitmall-listings"
-              className="inline-block rounded-xl bg-red-600 px-4 py-3 text-white"
-            >
-              درخواست‌های انتشار
+              مدیریت رویدادها
             </a>
           </div>
 

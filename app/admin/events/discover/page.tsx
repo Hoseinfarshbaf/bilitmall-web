@@ -1,8 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ExternalLink, Loader2, RefreshCw, SearchCheck } from "lucide-react";
+import AdminBackLink from "@/components/admin/AdminBackLink";
 import { adminTableClasses } from "@/components/admin/admin-table-classes";
 import type {
   DiscoveryProviderId,
@@ -186,12 +186,14 @@ export default function AdminEventDiscoveryPage() {
     >
       <div className="mx-auto max-w-6xl">
         <div className="mb-6">
-          <Link
-            href="/admin/events?create=1"
-            className="mb-2 inline-block text-sm font-bold text-blue-600 hover:text-blue-700 dark:text-blue-400"
-          >
-            ← بازگشت به ثبت رویداد
-          </Link>
+          <div className="mb-3 flex flex-wrap gap-2">
+            <AdminBackLink className="mb-0" />
+            <AdminBackLink
+              href="/admin/events?create=1"
+              label="بازگشت به ثبت رویداد"
+              className="mb-0"
+            />
+          </div>
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
               <h1 className="flex items-center gap-2 text-3xl font-black text-slate-800 dark:text-slate-100">

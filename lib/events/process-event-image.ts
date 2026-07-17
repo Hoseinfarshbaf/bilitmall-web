@@ -12,7 +12,7 @@ import {
   EVENT_IMAGE_MIN_HEIGHT,
   EVENT_IMAGE_MIN_WIDTH,
 } from "./image-specs";
-import { coverCropRect, resolveFrameLayout } from "./image-frame-layout";
+import { resolveFrameLayout } from "./image-frame-layout";
 
 function loadImageFromFile(file: File): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
@@ -80,36 +80,14 @@ async function processImageToFile(
   target: { width: number; height: number },
   min: { width: number; height: number },
   suffix: string,
-  fit: ImageFrameFit,
+  _fit: ImageFrameFit,
   tooSmallMessage: (min: { width: number; height: number }) => string
 ): Promise<File> {
   const image = await loadImageFromFile(file);
-
-  let fgX: number;
-  let fgY: number;
-  let fgWidth: number;
-  let fgHeight: number;
-  let useCoverCrop = false;
-  let cropRect = { cropWidth: 0, cropHeight: 0, offsetX: 0, offsetY: 0 };
-
   const layout = resolveFrameLayout(image.width, image.height, target);
 
   if (layout.fgW < min.width || layout.fgH < min.height) {
     throw new Error(tooSmallMessage(min));
-  }
-
-  if (layout.mode === "cover") {
-    useCoverCrop = true;
-    cropRect = coverCropRect(image.width, image.height, target.width, target.height);
-    fgX = 0;
-    fgY = 0;
-    fgWidth = target.width;
-    fgHeight = target.height;
-  } else {
-    fgX = layout.fgX;
-    fgY = layout.fgY;
-    fgWidth = layout.fgW;
-    fgHeight = layout.fgH;
   }
 
   const canvas = document.createElement("canvas");
@@ -126,31 +104,18 @@ async function processImageToFile(
   context.imageSmoothingEnabled = true;
   context.imageSmoothingQuality = "high";
 
-  if (useCoverCrop) {
-    context.drawImage(
-      image,
-      cropRect.offsetX,
-      cropRect.offsetY,
-      cropRect.cropWidth,
-      cropRect.cropHeight,
-      0,
-      0,
-      target.width,
-      target.height
-    );
-  } else {
-    context.drawImage(
-      image,
-      0,
-      0,
-      image.width,
-      image.height,
-      fgX,
-      fgY,
-      fgWidth,
-      fgHeight
-    );
-  }
+  // همیشه contain — کل تصویر بدون کات
+  context.drawImage(
+    image,
+    0,
+    0,
+    image.width,
+    image.height,
+    layout.fgX,
+    layout.fgY,
+    layout.fgW,
+    layout.fgH
+  );
 
   const blob = await new Promise<Blob>((resolve, reject) => {
     canvas.toBlob(

@@ -1,9 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import Link from "next/link";
 import SeatingPlanEditor from "@/components/seating/SeatingPlanEditor";
 import CitySelect from "@/components/CitySelect";
+import AdminBackLink from "@/components/admin/AdminBackLink";
 import VenueListFiltersBar from "@/components/admin/VenueListFiltersBar";
 import { createEmptyLayout } from "@/lib/seating/layout";
 import type { OrganizerSeatingPlanRow, VenueCatalogRow } from "@/lib/seating/store";
@@ -285,9 +285,7 @@ export default function AdminVenueTemplatesPage() {
       dir="rtl"
     >
       <div className="mx-auto max-w-6xl">
-        <Link href="/admin" className="mb-4 inline-block text-sm font-bold text-blue-600 dark:text-blue-400">
-          ← پنل ادمین
-        </Link>
+        <AdminBackLink />
         <h1 className="text-3xl font-black text-slate-800 dark:text-slate-100">مدیریت سالن و صحنه</h1>
         <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
           سالن‌های طراحی‌شده توسط برگزارکننده پس از تأیید به «کل سالن‌ها» منتقل می‌شوند. فقط

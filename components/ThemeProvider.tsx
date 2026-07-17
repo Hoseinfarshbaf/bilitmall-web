@@ -7,6 +7,7 @@ import {
   useEffect,
   useMemo,
   useState,
+  type ReactNode,
 } from "react";
 
 export type Theme = "light" | "dark";
@@ -38,9 +39,7 @@ function applyThemeClass(theme: Theme) {
   document.documentElement.style.colorScheme = theme === "dark" ? "dark" : "light";
 }
 
-const NO_FLASH_SCRIPT = `(function(){try{var k='${STORAGE_KEY}';var t=localStorage.getItem(k);var d=t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.classList.toggle('dark',d);document.documentElement.style.colorScheme=d?'dark':'light';}catch(_){}})();`;
-
-export function ThemeProvider({ children }: { children: React.ReactNode }) {
+export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<Theme>(readStoredTheme);
 
   useEffect(() => {
@@ -61,12 +60,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     [theme, setTheme, toggleTheme]
   );
 
-  return (
-    <ThemeContext.Provider value={value}>
-      <script dangerouslySetInnerHTML={{ __html: NO_FLASH_SCRIPT }} />
-      {children}
-    </ThemeContext.Provider>
-  );
+  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
 
 export function useTheme() {

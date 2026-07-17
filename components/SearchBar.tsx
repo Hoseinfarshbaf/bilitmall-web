@@ -158,7 +158,7 @@ export default function SearchBar() {
             placeholder={`جستجوی رویداد در ${selectedCity}...`}
             aria-label="جستجوی رویداد"
             autoComplete="off"
-            className={`w-full border border-neutral-200 bg-white py-4 pr-12 pl-11 text-sm text-neutral-800 shadow-sm outline-none transition focus:border-red-500 focus:ring-2 focus:ring-red-100 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:focus:border-red-500 dark:focus:ring-red-500/20 ${
+            className={`w-full border border-neutral-200 bg-white py-3.5 pr-12 pl-11 text-base text-neutral-800 shadow-sm outline-none transition focus:border-red-500 focus:ring-2 focus:ring-red-100 md:py-4 md:text-sm dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:focus:border-red-500 dark:focus:ring-red-500/20 ${
               showDropdown && suggestions.length > 0
                 ? "rounded-t-3xl rounded-b-none border-b-transparent"
                 : "rounded-full"
@@ -173,7 +173,7 @@ export default function SearchBar() {
                 setActiveIndex(-1);
                 setIsOpen(false);
               }}
-              className="absolute left-3 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full text-neutral-400 transition hover:bg-neutral-100 hover:text-neutral-600 dark:hover:bg-neutral-800 dark:hover:text-neutral-200"
+              className="absolute left-3 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full text-neutral-400 transition hover:bg-neutral-100 hover:text-neutral-600 md:h-7 md:w-7 dark:hover:bg-neutral-800 dark:hover:text-neutral-200"
             >
               <X className="h-4 w-4" />
             </button>
@@ -184,7 +184,7 @@ export default function SearchBar() {
       {showDropdown ? (
         <div className="absolute z-50 w-full overflow-hidden rounded-b-3xl border border-t-0 border-neutral-200 bg-white shadow-xl dark:border-neutral-700 dark:bg-neutral-900 dark:shadow-[0_20px_50px_rgba(0,0,0,0.45)]">
           {suggestions.length > 0 ? (
-            <ul className="max-h-88 overflow-y-auto py-1">
+            <ul className="max-h-[min(22rem,55dvh)] overflow-y-auto py-1 md:max-h-88">
               {suggestions.map((event, index) => (
                 <li key={event.id}>
                   <button
@@ -194,7 +194,7 @@ export default function SearchBar() {
                       router.push(getEventUrl(event));
                       setIsOpen(false);
                     }}
-                    className={`flex w-full items-center gap-3 px-3 py-2.5 text-right transition ${
+                    className={`flex w-full min-h-14 items-center gap-3 px-3 py-3 text-right transition md:min-h-0 md:py-2.5 ${
                       index === activeIndex
                         ? "bg-red-50 dark:bg-red-500/10"
                         : "hover:bg-neutral-50 dark:hover:bg-neutral-800"

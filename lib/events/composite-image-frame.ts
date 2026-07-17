@@ -40,7 +40,7 @@ async function buildBlurredBackground(
     .toBuffer();
 }
 
-/** تصویر واضح در قاب ثابت + پس‌زمینه رنگی محو از خود تصویر */
+/** تصویر کامل (contain) در قاب ثابت + پس‌زمینه محو — بدون کات */
 export async function compositeImageFrame(
   input: Buffer,
   target: FrameTarget,
@@ -56,22 +56,13 @@ export async function compositeImageFrame(
   const background = await buildBlurredBackground(base, target, blurSigma);
   const layout = resolveFrameLayout(sourceWidth, sourceHeight, target);
 
-  const foreground =
-    layout.mode === "cover"
-      ? await base
-          .clone()
-          .resize(target.width, target.height, {
-            fit: "cover",
-            position: "centre",
-          })
-          .toBuffer()
-      : await base
-          .clone()
-          .resize(Math.round(layout.fgW), Math.round(layout.fgH), {
-            fit: "inside",
-            background: { r: 0, g: 0, b: 0, alpha: 0 },
-          })
-          .toBuffer();
+  const foreground = await base
+    .clone()
+    .resize(Math.round(layout.fgW), Math.round(layout.fgH), {
+      fit: "inside",
+      withoutEnlargement: false,
+    })
+    .toBuffer();
 
   return sharp(background)
     .composite([{ input: foreground, gravity: "centre" }])

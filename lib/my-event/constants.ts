@@ -18,6 +18,11 @@ export const MY_EVENT_EVENT_STATUS_LABELS: Record<string, string> = {
   cancelled: "لغو شده",
 };
 
+export const MY_EVENT_PENDING_CHANGE_LABELS = {
+  event: "ویرایش‌شده رویداد",
+  venue: "ویرایش‌شده سالن",
+} as const;
+
 export const BILITMALL_LISTING_LABELS = {
   notRequested: "فقط صفحه اختصاصی",
   pending: "در انتظار تأیید بلیت‌مال",
@@ -31,11 +36,15 @@ export const MY_EVENT_REGISTRATION_SUCCESS_MESSAGE =
 export const MY_EVENT_EVENT_SUBMIT_SUCCESS_MESSAGE =
   "رویداد ثبت شد. پس از تأیید ادمین، از طریق پیامک به شما اعلام خواهد شد.";
 
-export const MY_EVENT_SEATING_AFTER_APPROVAL_HINT =
-  "پس از تأیید رویداد توسط ادمین، دکمه «ساخت صحنه» کنار «مشاهده صفحه» فعال می‌شود و می‌توانید نقشه سالن را طراحی کنید.";
+export const MY_EVENT_SEATING_DESIGN_HINT =
+  "محل اجرا را در استودیو طراحی کنید و قیمت صندلی‌ها را آنجا مشخص کنید.";
 
 export const MY_EVENT_LINKED_VENUE_SEATING_HINT =
-  "سالن از فهرست تأییدشده انتخاب شده — نقشه صندلی همان سالن برای رویداد اعمال می‌شود و نیازی به طراحی مجدد صحنه نیست.";
+  "سالن از فهرست تأییدشده بلیت‌مال انتخاب شده — نقشه صندلی همان سالن اعمال می‌شود و توسط برگزارکننده قابل تغییر نیست.";
+
+export const MY_EVENT_DESIGN_SEATING_CTA = "طراحی محل اجرا و قیمت‌گذاری";
+export const MY_EVENT_VIEW_LINKED_VENUE_CTA = (venueName: string) =>
+  `ورود به صحنه ${venueName}`;
 
 export function eventUsesLinkedVenueSeating(event: {
   hasAssignedSeating?: boolean;

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import AdminBackLink from "@/components/admin/AdminBackLink";
 import { adminTableClasses } from "@/components/admin/admin-table-classes";
 import { getMyEventPublicUrl } from "@/lib/my-event/auth";
 import { MY_EVENT_STATUS_LABELS } from "@/lib/my-event/constants";
@@ -156,9 +157,7 @@ export default function AdminMyEventPage() {
       dir="rtl"
     >
       <div className="mx-auto max-w-6xl">
-        <Link href="/admin" className="mb-4 inline-block text-sm font-bold text-emerald-600 dark:text-emerald-400">
-          ← بازگشت به پنل
-        </Link>
+        <AdminBackLink />
         <h1 className="text-3xl font-black text-slate-800 dark:text-slate-100">برگزارکنندگان My Event</h1>
         <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
           حساب‌های جدا از کاربران بلیت‌مال

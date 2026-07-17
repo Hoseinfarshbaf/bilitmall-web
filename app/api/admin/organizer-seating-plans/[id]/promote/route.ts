@@ -17,8 +17,8 @@ export async function POST(_request: Request, context: RouteContext) {
       name: result.name,
       updated: result.updated,
       message: result.updated
-        ? "سالن در فهرست کل سالن‌ها به‌روزرسانی شد و در جستجوی مکان برگزاری قابل انتخاب است."
-        : "سالن تأیید شد و به فهرست کل سالن‌ها اضافه شد.",
+        ? `سالن «${result.name}» در فهرست کل سالن‌ها به‌روزرسانی شد و برای شهر ${result.city} در جستجوی مکان برگزاری پیشنهاد می‌شود.`
+        : `سالن «${result.name}» تأیید شد، به «کل سالن‌ها» اضافه شد و از این پس برای شهر ${result.city} با همین چیدمان پیشنهاد می‌شود.`,
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "خطا در تأیید سالن";

@@ -12,6 +12,10 @@ import {
 } from "@/lib/my-event/store";
 import { normalizePublicEventSlug } from "@/lib/my-event/public-slugs";
 import {
+  resolveMyEventSubmittedPrice,
+  validateMyEventPricing,
+} from "@/lib/events/pricing";
+import {
   getEventSeatingPlan,
   getVenueTemplateById,
   syncEventSeatingFromVenueTemplate,
@@ -97,6 +101,8 @@ export async function PATCH(request: Request, context: RouteContext) {
     image?: string;
     days?: { date: string; sessions: { time: string; purchaseUrl?: string }[] }[];
     hasAssignedSeating?: boolean;
+    pricingMode?: "free" | "fixed" | "per_seat" | null;
+    fixedPriceAmount?: string;
     listOnBilitmall?: boolean;
     publicEventSlug?: string;
     venueTemplateId?: number | null;
@@ -106,11 +112,38 @@ export async function PATCH(request: Request, context: RouteContext) {
   const city = body.city?.trim();
   const category = body.category?.trim();
   const place = body.place?.trim();
-  const price = body.price?.trim();
 
   if (category && !isValidMyEventCategory(category)) {
     return NextResponse.json({ error: "دسته‌بندی نامعتبر است." }, { status: 400 });
   }
+
+  const nextHasAssignedSeating =
+    body.hasAssignedSeating !== undefined
+      ? body.hasAssignedSeating
+      : auth.event.hasAssignedSeating;
+  const pricingTouched =
+    body.hasAssignedSeating !== undefined ||
+    body.pricingMode !== undefined ||
+    body.fixedPriceAmount !== undefined;
+
+  if (pricingTouched) {
+    const pricingError = validateMyEventPricing({
+      hasAssignedSeating: nextHasAssignedSeating,
+      pricingMode: body.pricingMode ?? null,
+      fixedPriceAmount: body.fixedPriceAmount,
+    });
+    if (pricingError) {
+      return NextResponse.json({ error: pricingError }, { status: 400 });
+    }
+  }
+
+  const resolvedPrice = pricingTouched
+    ? resolveMyEventSubmittedPrice({
+        hasAssignedSeating: nextHasAssignedSeating,
+        pricingMode: body.pricingMode,
+        fixedPriceAmount: body.fixedPriceAmount,
+      })
+    : undefined;
 
   const days =
     body.days && body.days.length > 0
@@ -125,6 +158,8 @@ export async function PATCH(request: Request, context: RouteContext) {
   }
 
   const wasActive = auth.event.status === "active" && auth.event.published;
+  const wasPreviouslyApproved =
+    Boolean(auth.event.firstApprovedAt) || wasActive || auth.event.hasPendingChanges;
   const listingChanged =
     body.listOnBilitmall !== undefined &&
     body.listOnBilitmall !== auth.event.listOnBilitmallRequested;
@@ -167,6 +202,17 @@ export async function PATCH(request: Request, context: RouteContext) {
       )
     : undefined;
 
+  const finalPlaceAddress =
+    resolvedPlaceAddress !== undefined
+      ? resolvedPlaceAddress
+      : auth.event.placeAddress;
+  if (!nextVenueTemplateId && !(finalPlaceAddress ?? "").trim()) {
+    return NextResponse.json(
+      { error: "برای محل اجرای سفارشی، آدرس دقیق الزامی است." },
+      { status: 400 }
+    );
+  }
+
   const updated = await prisma.event.update({
     where: { id: eventId },
     data: {
@@ -178,14 +224,14 @@ export async function PATCH(request: Request, context: RouteContext) {
       ...(body.venueTemplateId !== undefined
         ? { venueTemplateId: body.venueTemplateId }
         : {}),
-      ...(price ? { price } : {}),
+      ...(body.hasAssignedSeating !== undefined
+        ? { hasAssignedSeating: body.hasAssignedSeating }
+        : {}),
+      ...(resolvedPrice !== undefined ? { price: resolvedPrice } : {}),
       ...(body.description !== undefined
         ? { description: body.description.trim() || null }
         : {}),
       ...(body.image !== undefined ? { image: body.image.trim() } : {}),
-      ...(body.hasAssignedSeating !== undefined
-        ? { hasAssignedSeating: body.hasAssignedSeating }
-        : {}),
       ...(body.listOnBilitmall !== undefined
         ? {
             listOnBilitmallRequested: body.listOnBilitmall,
@@ -196,7 +242,16 @@ export async function PATCH(request: Request, context: RouteContext) {
         ? { publicEventSlug, publicCitySlug }
         : {}),
       days: JSON.stringify(days),
-      ...(wasActive ? { published: false, status: "pending" } : {}),
+      ...(wasPreviouslyApproved
+        ? {
+            published: false,
+            status: "pending",
+            hasPendingChanges: true,
+            pendingEventChanges: true,
+            pendingChangesAt: new Date(),
+            listOnBilitmallApproved: false,
+          }
+        : {}),
     },
   });
 
@@ -207,8 +262,11 @@ export async function PATCH(request: Request, context: RouteContext) {
   return NextResponse.json({
     id: updated.id,
     status: updated.status,
-    message: wasActive
-      ? "تغییرات ذخیره شد. رویداد برای تأیید مجدد ادمین در انتظار است."
+    hasPendingChanges: updated.hasPendingChanges,
+    pendingEventChanges: updated.pendingEventChanges,
+    pendingVenueChanges: updated.pendingVenueChanges,
+    message: wasPreviouslyApproved
+      ? "تغییرات ذخیره شد. پس از بررسی، از طریق پیامک به شما اطلاع داده می‌شود."
       : "تغییرات ذخیره شد.",
   });
 }

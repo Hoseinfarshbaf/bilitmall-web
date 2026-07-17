@@ -31,10 +31,6 @@ function applyThemeClass(theme: Theme) {
   root.classList.toggle("dark", theme === "dark");
 }
 
-// اسکریپت مسدودکننده: پیش از رنگ‌آمیزی اولیهٔ صفحه، تم ذخیره‌شده را اعمال می‌کند
-// تا هنگام رفرش یا جابه‌جایی صفحه، فلش سفید رخ ندهد.
-const NO_FLASH_SCRIPT = `(function(){try{var t=localStorage.getItem('${STORAGE_KEY}');var e=document.getElementById('${ROOT_ID}');if(e&&t==='dark'){e.classList.add('dark');}}catch(_){}})();`;
-
 export function AdminThemeProvider({
   children,
 }: {
@@ -67,10 +63,7 @@ export function AdminThemeProvider({
 
   return (
     <AdminThemeContext.Provider value={{ theme, toggleTheme, setTheme }}>
-      <div id={ROOT_ID} suppressHydrationWarning>
-        <script dangerouslySetInnerHTML={{ __html: NO_FLASH_SCRIPT }} />
-        {children}
-      </div>
+      {children}
     </AdminThemeContext.Provider>
   );
 }

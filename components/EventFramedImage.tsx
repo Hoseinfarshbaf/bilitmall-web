@@ -2,6 +2,7 @@ import { getEventImageUrl } from "@/lib/events/helpers";
 import {
   EVENT_IMAGE_FRAME_BLUR_BRIGHTNESS,
   EVENT_IMAGE_FRAME_BLUR_SATURATION,
+  EVENT_IMAGE_FRAME_BACKGROUND,
 } from "@/lib/events/image-specs";
 import { cn } from "@/lib/utils";
 
@@ -27,7 +28,7 @@ function BlurredBackdrop({ url }: { url: string }) {
   );
 }
 
-/** قاب ثابت پر از تصویر — کارت ۳:۴ یا بنر پیشنهاد ویژه */
+/** قاب ثابت — تصویر کامل با contain (بدون کات)؛ فضای خالی با بلور همان تصویر پر می‌شود */
 export default function EventFramedImage({
   image,
   className,
@@ -35,13 +36,17 @@ export default function EventFramedImage({
   const url = getEventImageUrl(image);
 
   return (
-    <div className={cn("absolute inset-0 overflow-hidden", className)}>
+    <div
+      className={cn("absolute inset-0 overflow-hidden", className)}
+      style={{ backgroundColor: EVENT_IMAGE_FRAME_BACKGROUND }}
+    >
       <BlurredBackdrop url={url} />
-      <div
-        className="absolute inset-0 bg-cover bg-center"
-        style={{ backgroundImage: `url(${url})` }}
-        role="img"
-        aria-hidden
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={url}
+        alt=""
+        draggable={false}
+        className="absolute inset-0 z-1 h-full w-full object-contain object-center"
       />
     </div>
   );

@@ -9,6 +9,8 @@ import { CitiesProvider } from "@/components/CitiesProvider";
 import { CityProvider } from "@/components/CityContext";
 import CitySelectionSync from "@/components/CitySelectionSync";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import DomResilience from "@/components/DomResilience";
+import { THEME_NO_FLASH_SCRIPT } from "@/lib/theme-no-flash";
 
 export const metadata: Metadata = {
   title: "بلیت‌مال",
@@ -22,7 +24,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fa" dir="rtl" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_NO_FLASH_SCRIPT }} />
+      </head>
       <body className="min-h-screen bg-background text-foreground antialiased transition-colors duration-200">
+        <DomResilience />
         <ThemeProvider>
           <AuthProvider>
             <ToastProvider>

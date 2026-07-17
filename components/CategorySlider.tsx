@@ -120,20 +120,20 @@ const CategorySlider = ({
   const subtitle = buildSubtitle(cityName, categoryLabel, variant);
 
   const wrapperClass = isInfiniteDesktop
-    ? "flex flex-nowrap gap-4 pb-4 pt-2 px-2 overflow-x-auto snap-x snap-mandatory"
-    : "flex flex-nowrap gap-4 pb-4 pt-2 px-2 overflow-x-auto snap-x snap-mandatory touch-pan-x md:overflow-visible md:flex-wrap md:snap-none";
+    ? "home-slider-track flex flex-nowrap gap-3 overflow-x-auto pb-4 pt-2 px-4 snap-x snap-mandatory scroll-px-4 [-webkit-overflow-scrolling:touch] md:gap-4 md:px-2 md:scroll-px-2"
+    : "home-slider-track flex flex-nowrap gap-3 overflow-x-auto pb-4 pt-2 px-4 snap-x snap-mandatory scroll-px-4 touch-pan-x [-webkit-overflow-scrolling:touch] md:gap-4 md:px-2 md:scroll-px-2 md:overflow-visible md:flex-wrap md:snap-none";
 
   return (
-    <div className="mb-12">
-      <div className="mb-5 flex items-end justify-between gap-4 px-1">
+    <div className="mb-8 md:mb-12">
+      <div className="mb-4 flex flex-col gap-3 px-1 md:mb-5 md:flex-row md:items-end md:justify-between md:gap-4">
         <Link
           href={listHref}
           className="group/title min-w-0 transition-opacity hover:opacity-90"
         >
-          <h2 className="text-[26px] font-extrabold leading-tight tracking-tight text-neutral-900 group-hover/title:text-red-600 dark:text-neutral-100 dark:group-hover/title:text-red-400 sm:text-[28px]">
+          <h2 className="text-[22px] font-extrabold leading-tight tracking-tight text-neutral-900 group-hover/title:text-red-600 dark:text-neutral-100 dark:group-hover/title:text-red-400 md:text-[26px] lg:text-[28px]">
             {displayTitle}
           </h2>
-          <p className="mt-1 text-sm font-normal leading-relaxed tracking-tight text-neutral-400 group-hover/title:text-neutral-500 dark:text-neutral-500 dark:group-hover/title:text-neutral-400 sm:text-[15px]">
+          <p className="mt-1 text-[13px] font-normal leading-relaxed tracking-tight text-neutral-400 group-hover/title:text-neutral-500 dark:text-neutral-500 dark:group-hover/title:text-neutral-400 md:text-sm lg:text-[15px]">
             {subtitle}
           </p>
         </Link>
@@ -141,7 +141,7 @@ const CategorySlider = ({
         {visibleData.length >= 4 ? (
           <Link
             href={listHref}
-            className="flex shrink-0 items-center gap-2 rounded-full bg-neutral-100 px-4 py-2 text-xs font-bold transition-all duration-300 hover:bg-neutral-900 hover:text-white dark:bg-neutral-800 dark:text-neutral-200 dark:hover:bg-red-600 dark:hover:text-white"
+            className="flex min-h-11 w-fit shrink-0 items-center gap-2 self-start rounded-full bg-neutral-100 px-4 py-2.5 text-xs font-bold transition-all duration-300 hover:bg-neutral-900 hover:text-white md:min-h-0 md:py-2 dark:bg-neutral-800 dark:text-neutral-200 dark:hover:bg-red-600 dark:hover:text-white"
           >
             <span>مشاهده همه</span>
             <ArrowLeft className="h-3 w-3" />
@@ -149,7 +149,7 @@ const CategorySlider = ({
         ) : null}
       </div>
 
-      <div className="relative">
+      <div className="relative -mx-4 md:mx-0">
         {isInfiniteDesktop && (
           <>
             <button

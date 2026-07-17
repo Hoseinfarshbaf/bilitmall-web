@@ -1,6 +1,6 @@
 import type { FrameTarget } from "./image-frame-types";
 
-export type FrameLayoutMode = "cover" | "width" | "height";
+export type FrameLayoutMode = "width" | "height";
 
 export type FrameLayout = {
   mode: FrameLayoutMode;
@@ -10,7 +10,10 @@ export type FrameLayout = {
   fgY: number;
 };
 
-/** نسبت نزدیک → cover؛ عریض‌تر → پر کردن عرض؛ بلندتر → پر کردن ارتفاع */
+/**
+ * همیشه contain — تصویر کامل داخل قاب، بدون کات.
+ * عریض‌تر → عرض قاب را پر می‌کند؛ بلندتر → ارتفاع قاب را.
+ */
 export function resolveFrameLayout(
   sourceWidth: number,
   sourceHeight: number,
@@ -18,17 +21,6 @@ export function resolveFrameLayout(
 ): FrameLayout {
   const sourceAspect = sourceWidth / sourceHeight;
   const targetAspect = target.width / target.height;
-  const ratio = sourceAspect / targetAspect;
-
-  if (ratio >= 0.9 && ratio <= 1.1) {
-    return {
-      mode: "cover",
-      fgW: target.width,
-      fgH: target.height,
-      fgX: 0,
-      fgY: 0,
-    };
-  }
 
   if (sourceAspect >= targetAspect) {
     const fgH = (sourceHeight * target.width) / sourceWidth;
@@ -53,28 +45,3 @@ export function resolveFrameLayout(
 
 /** @deprecated Use resolveFrameLayout */
 export const resolveBannerLayout = resolveFrameLayout;
-
-export function coverCropRect(
-  sourceWidth: number,
-  sourceHeight: number,
-  targetWidth: number,
-  targetHeight: number
-) {
-  const sourceRatio = sourceWidth / sourceHeight;
-  const targetRatio = targetWidth / targetHeight;
-
-  let cropWidth = sourceWidth;
-  let cropHeight = sourceHeight;
-  let offsetX = 0;
-  let offsetY = 0;
-
-  if (sourceRatio > targetRatio) {
-    cropWidth = sourceHeight * targetRatio;
-    offsetX = (sourceWidth - cropWidth) / 2;
-  } else {
-    cropHeight = sourceWidth / targetRatio;
-    offsetY = (sourceHeight - cropHeight) / 2;
-  }
-
-  return { cropWidth, cropHeight, offsetX, offsetY };
-}

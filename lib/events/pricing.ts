@@ -35,6 +35,86 @@ export function inferPricingMode(event: {
   return "fixed";
 }
 
+export type MyEventPriceInput = {
+  hasAssignedSeating?: boolean | null;
+  pricingMode?: EventPricingMode | null;
+  fixedPriceAmount?: string;
+};
+
+/** قیمت ذخیره‌شده برای رویداد My Event. */
+export function resolveMyEventSubmittedPrice(input: MyEventPriceInput): string {
+  if (input.hasAssignedSeating === true) {
+    if (input.pricingMode === "free") return "رایگان";
+    return EVENT_PRICE_PER_SEAT_LABEL;
+  }
+
+  if (input.pricingMode === "fixed") {
+    return (input.fixedPriceAmount ?? "").trim();
+  }
+
+  return "رایگان";
+}
+
+export function validateMyEventPricing(input: MyEventPriceInput): string | null {
+  if (input.hasAssignedSeating === null || input.hasAssignedSeating === undefined) {
+    return "لطفاً نوع صندلی‌گذاری را مشخص کنید.";
+  }
+
+  if (input.hasAssignedSeating === true) {
+    return null;
+  }
+
+  if (input.pricingMode !== "free" && input.pricingMode !== "fixed") {
+    return "لطفاً مدل قیمت‌گذاری را مشخص کنید.";
+  }
+
+  if (input.pricingMode === "fixed" && !(input.fixedPriceAmount ?? "").trim()) {
+    return "لطفاً مبلغ بلیت را وارد کنید.";
+  }
+
+  return null;
+}
+
+export function eventToMyEventPricingFields(event: {
+  price: string;
+  hasAssignedSeating?: boolean;
+}): Pick<MyEventPriceInput, "pricingMode" | "fixedPriceAmount"> {
+  const pricingMode = inferPricingMode({
+    price: event.price,
+    hasAssignedSeating: event.hasAssignedSeating === true,
+    ticketingType: "INTERNAL",
+  });
+
+  if (event.hasAssignedSeating === true) {
+    return {
+      pricingMode: pricingMode === "free" ? "free" : "per_seat",
+      fixedPriceAmount: "",
+    };
+  }
+
+  if (pricingMode === "fixed") {
+    return { pricingMode: "fixed", fixedPriceAmount: event.price };
+  }
+
+  if (pricingMode === "free") {
+    return { pricingMode: "free", fixedPriceAmount: "" };
+  }
+
+  return { pricingMode: null, fixedPriceAmount: "" };
+}
+
+/** اگر همه صندلی‌های قابل رزرو قیمت صفر داشته باشند، رویداد رایگان است. */
+export function seatingLayoutIsFree(layout: {
+  defaultPriceRial?: number;
+  cells: { type: string; priceRial?: number }[];
+}): boolean {
+  const seats = layout.cells.filter((cell) => cell.type === "seat");
+  if (seats.length === 0) {
+    return (layout.defaultPriceRial ?? 0) <= 0;
+  }
+  return seats.every((seat) => (seat.priceRial ?? 0) <= 0);
+}
+
 export function resolveFormPrice(form: EventFormData): string {
   if (isExternalTicketing(form.ticketingType)) {
     return form.price.trim() || EVENT_PRICE_EXTERNAL_LABEL;

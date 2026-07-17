@@ -52,10 +52,10 @@ export const EVENT_IMAGE_FRAME_BLUR_SATURATION = 1.34;
 export const EVENT_IMAGE_FRAME_BLUR_BRIGHTNESS = 1.05;
 
 export const EVENT_CARD_IMAGE_RECOMMENDED_TEXT =
-  `تصویر کارت در قاب ثابت ${EVENT_CARD_IMAGE.aspectLabel} (${EVENT_CARD_IMAGE.width}×${EVENT_CARD_IMAGE.height}) قرار می‌گیرد؛ سیستم خودکار ابعاد را تنظیم می‌کند تا قاب کامل پر شود و فضای خالی با رنگ محو خود تصویر پر گردد. ترجیحاً ${EVENT_IMAGE_IDEAL_MIN_WIDTH}×${EVENT_IMAGE_IDEAL_MIN_HEIGHT} پیکسل؛ تا ${EVENT_IMAGE_SIZE_TOLERANCE_PX} پیکسل کمتر از هر بعد هم قابل قبول است.`;
+  `نسبت ${EVENT_CARD_IMAGE.aspectLabel} — تصویر بریده نمی‌شود. ترجیحاً ${EVENT_IMAGE_IDEAL_MIN_WIDTH}×${EVENT_IMAGE_IDEAL_MIN_HEIGHT} پیکسل (حداقل ${EVENT_IMAGE_MIN_WIDTH}×${EVENT_IMAGE_MIN_HEIGHT}).`;
 
 export const EVENT_BANNER_IMAGE_RECOMMENDED_TEXT =
-  `تصویر بنر در قاب ثابت ${EVENT_BANNER_IMAGE.aspectLabel} (${EVENT_BANNER_IMAGE.width}×${EVENT_BANNER_IMAGE.height}) قرار می‌گیرد؛ سیستم خودکار ابعاد را تنظیم می‌کند تا قاب کامل پر شود و فضای خالی با رنگ محو خود تصویر پر گردد. حداقل ابعاد: ${EVENT_BANNER_MIN_WIDTH}×${EVENT_BANNER_MIN_HEIGHT} پیکسل.`;
+  `تصویر بنر در قاب ثابت ${EVENT_BANNER_IMAGE.aspectLabel} (${EVENT_BANNER_IMAGE.width}×${EVENT_BANNER_IMAGE.height}) قرار می‌گیرد؛ تصویر کامل بدون کات (contain) داخل قاب می‌نشیند و فضای خالی با رنگ محو خود تصویر پر می‌شود. حداقل ابعاد: ${EVENT_BANNER_MIN_WIDTH}×${EVENT_BANNER_MIN_HEIGHT} پیکسل.`;
 
 /** @deprecated Use EVENT_CARD_IMAGE_RECOMMENDED_TEXT */
 export const EVENT_IMAGE_RECOMMENDED_TEXT = EVENT_CARD_IMAGE_RECOMMENDED_TEXT;

@@ -2,6 +2,7 @@ import {
   AdminThemeProvider,
   AdminThemeToggle,
 } from "@/components/admin/AdminThemeProvider";
+import { ADMIN_THEME_NO_FLASH_SCRIPT } from "@/lib/theme-no-flash";
 
 export default function AdminLayout({
   children,
@@ -9,9 +10,12 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   return (
-    <AdminThemeProvider>
-      {children}
-      <AdminThemeToggle />
-    </AdminThemeProvider>
+    <div id="admin-theme-root" suppressHydrationWarning>
+      <script dangerouslySetInnerHTML={{ __html: ADMIN_THEME_NO_FLASH_SCRIPT }} />
+      <AdminThemeProvider>
+        {children}
+        <AdminThemeToggle />
+      </AdminThemeProvider>
+    </div>
   );
 }

@@ -218,20 +218,35 @@ body.event-purchase-page {
 }
 
 .event-cover-marquee__tile {
-  flex: 0 0 auto;
+  position: relative;
+  flex: 0 0 100vw;
+  width: 100vw;
   height: 100%;
   height: 100svh;
-  width: calc(100svh * 3 / 4);
   overflow: hidden;
   margin: 0;
   padding: 0;
+  background-color: #171717;
+}
+
+/* فضای خالی با همان کاور (بلور + cover) پر می‌شود تا contain کادر خالی نشان ندهد */
+.event-cover-marquee__tile-blur {
+  position: absolute;
+  inset: 0;
+  background-position: center center;
+  background-size: cover;
+  filter: blur(40px) saturate(1.2) brightness(0.95);
+  transform: scale(1.12);
+  pointer-events: none;
 }
 
 .event-cover-marquee__tile img {
+  position: relative;
+  z-index: 1;
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   object-position: center center;
   user-select: none;
   pointer-events: none;
@@ -256,4 +271,21 @@ body.event-purchase-page {
     rgba(255, 255, 255, 0.1);
 }
 
+/* Homepage — mobile horizontal scroll (desktop unchanged at md+) */
+@media (max-width: 767px) {
+  .home-category-chips,
+  .home-slider-track {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .home-category-chips::-webkit-scrollbar,
+  .home-slider-track::-webkit-scrollbar {
+    display: none;
+  }
+
+  .home-slider-track {
+    overscroll-behavior-x: contain;
+  }
+}
 

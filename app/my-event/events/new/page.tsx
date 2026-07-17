@@ -6,7 +6,10 @@ import MyEventShell from "@/components/my-event/MyEventShell";
 import MyEventEventForm, {
   type MyEventEventFormValues,
 } from "@/components/my-event/MyEventEventForm";
-import { MY_EVENT_EVENT_SUBMIT_SUCCESS_MESSAGE, MY_EVENT_SEATING_AFTER_APPROVAL_HINT, MY_EVENT_LINKED_VENUE_SEATING_HINT } from "@/lib/my-event/constants";
+import {
+  MY_EVENT_EVENT_SUBMIT_SUCCESS_MESSAGE,
+  MY_EVENT_LINKED_VENUE_SEATING_HINT,
+} from "@/lib/my-event/constants";
 
 async function uploadEventImage(file: File): Promise<string> {
   const formData = new FormData();
@@ -24,6 +27,7 @@ export default function MyEventNewEventPage() {
   const [submitted, setSubmitted] = useState(false);
   const [hadSeating, setHadSeating] = useState(false);
   const [hadLinkedVenue, setHadLinkedVenue] = useState(false);
+  const [createdEventId, setCreatedEventId] = useState<number | null>(null);
   const [organizerSlug, setOrganizerSlug] = useState("");
 
   useEffect(() => {
@@ -46,18 +50,50 @@ export default function MyEventNewEventPage() {
         imageUrl = await uploadEventImage(imageFile);
       }
 
+      const payload = {
+        title: values.title,
+        publicEventSlug: values.publicEventSlug,
+        city: values.city,
+        category: values.category,
+        place: values.place,
+        venueTemplateId: values.venueTemplateId,
+        placeAddress: values.placeAddress,
+        description: values.description,
+        image: imageUrl,
+        days: values.days,
+        hasAssignedSeating: values.hasAssignedSeating,
+        pricingMode: values.pricingMode,
+        fixedPriceAmount: values.fixedPriceAmount,
+        listOnBilitmall: values.listOnBilitmall,
+        seatingLayout:
+          values.hasAssignedSeating === true && values.venueTemplateId == null
+            ? values.seatingLayout ?? null
+            : null,
+      };
+
       const response = await fetch("/api/my-event/events", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...values, image: imageUrl }),
+        body: JSON.stringify(payload),
       });
 
       const data = await response.json();
       if (!response.ok) throw new Error(data.error ?? "خطا در ثبت رویداد");
+
+      const usesCustomSeating =
+        values.hasAssignedSeating === true && values.venueTemplateId == null;
+      const usesLinkedVenue =
+        values.hasAssignedSeating === true && values.venueTemplateId != null;
+
+      // اگر صحنه هنوز طراحی نشده، مستقیم به استودیو برو
+      if (usesCustomSeating && !values.seatingLayout && typeof data.id === "number") {
+        router.push(`/my-event/events/${data.id}/seating`);
+        return;
+      }
+
       setHadSeating(values.hasAssignedSeating === true);
-      setHadLinkedVenue(
-        values.hasAssignedSeating === true && values.venueTemplateId != null
-      );
+      setHadLinkedVenue(usesLinkedVenue);
+      setCreatedEventId(typeof data.id === "number" ? data.id : null);
       setSubmitted(true);
     } catch (error) {
       alert(error instanceof Error ? error.message : "خطا در ثبت رویداد");
@@ -81,9 +117,17 @@ export default function MyEventNewEventPage() {
           <h2 className="text-xl font-black text-amber-700 dark:text-amber-200">رویداد ثبت شد</h2>
           <p className="text-sm text-neutral-600 dark:text-slate-300">{MY_EVENT_EVENT_SUBMIT_SUCCESS_MESSAGE}</p>
           {hadSeating && hadLinkedVenue ? (
-            <p className="text-sm leading-7 text-emerald-700 dark:text-emerald-200">{MY_EVENT_LINKED_VENUE_SEATING_HINT}</p>
-          ) : hadSeating ? (
-            <p className="text-sm leading-7 text-violet-700 dark:text-violet-200">{MY_EVENT_SEATING_AFTER_APPROVAL_HINT}</p>
+            <p className="text-sm leading-7 text-emerald-700 dark:text-emerald-200">
+              {MY_EVENT_LINKED_VENUE_SEATING_HINT}
+            </p>
+          ) : hadSeating && createdEventId ? (
+            <button
+              type="button"
+              onClick={() => router.push(`/my-event/events/${createdEventId}/seating`)}
+              className="rounded-xl bg-violet-600 px-4 py-2 text-sm font-bold text-white hover:bg-violet-500"
+            >
+              ویرایش صحنه و قیمت‌گذاری
+            </button>
           ) : null}
           <button
             type="button"

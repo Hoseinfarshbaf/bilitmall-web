@@ -3,6 +3,12 @@ import { prisma } from "@/lib/prisma";
 import { slugify, normalizeEventDays } from "@/lib/events/date-utils";
 import { MY_EVENT_EVENT_SOURCE, MY_EVENT_EVENT_SUBMIT_SUCCESS_MESSAGE } from "@/lib/my-event/constants";
 import { isValidMyEventCategory } from "@/lib/my-event/categories";
+import {
+  EVENT_PRICE_PER_SEAT_LABEL,
+  resolveMyEventSubmittedPrice,
+  seatingLayoutIsFree,
+  validateMyEventPricing,
+} from "@/lib/events/pricing";
 import { resolveTicketingType } from "@/lib/events/types";
 import { getMyEventSession } from "@/lib/my-event/session";
 import {
@@ -13,8 +19,10 @@ import {
 
 import {
   getVenueTemplateById,
+  saveEventSeatingPlan,
   syncEventSeatingFromVenueTemplate,
 } from "@/lib/seating/store";
+import type { SeatingLayout } from "@/lib/seating/types";
 
 async function resolveEventPlaceAddress(
   venueTemplateId: number | null | undefined,
@@ -78,9 +86,12 @@ export async function POST(request: Request) {
     image?: string;
     days?: { date: string; sessions: { time: string; purchaseUrl?: string }[] }[];
     hasAssignedSeating?: boolean;
+    pricingMode?: "free" | "fixed" | "per_seat" | null;
+    fixedPriceAmount?: string;
     listOnBilitmall?: boolean;
     publicEventSlug?: string;
     venueTemplateId?: number | null;
+    seatingLayout?: SeatingLayout | null;
     published?: boolean;
   };
 
@@ -88,18 +99,53 @@ export async function POST(request: Request) {
   const city = body.city?.trim() ?? "تهران";
   const category = body.category?.trim() ?? "ایونت";
   const place = body.place?.trim() ?? "";
-  const price = body.price?.trim() ?? "";
   const image = body.image?.trim() ?? "";
 
   if (!isValidMyEventCategory(category)) {
     return NextResponse.json({ error: "دسته‌بندی را انتخاب کنید." }, { status: 400 });
   }
 
-  if (!title || !place || !price) {
+  if (!title || !place) {
     return NextResponse.json(
-      { error: "عنوان، مکان و قیمت الزامی است." },
+      { error: "عنوان و مکان الزامی است." },
       { status: 400 }
     );
+  }
+
+  const venueTemplateId = body.venueTemplateId ?? null;
+  if (!venueTemplateId && !(body.placeAddress ?? "").trim()) {
+    return NextResponse.json(
+      { error: "برای محل اجرای سفارشی، آدرس دقیق الزامی است." },
+      { status: 400 }
+    );
+  }
+
+  const pricingError = validateMyEventPricing({
+    hasAssignedSeating: body.hasAssignedSeating ?? null,
+    pricingMode: body.pricingMode ?? null,
+    fixedPriceAmount: body.fixedPriceAmount,
+  });
+  if (pricingError) {
+    return NextResponse.json({ error: pricingError }, { status: 400 });
+  }
+
+  let price = resolveMyEventSubmittedPrice({
+    hasAssignedSeating: body.hasAssignedSeating,
+    pricingMode: body.pricingMode,
+    fixedPriceAmount: body.fixedPriceAmount,
+  });
+
+  const customSeatingLayout =
+    body.hasAssignedSeating === true &&
+    !body.venueTemplateId &&
+    body.seatingLayout
+      ? body.seatingLayout
+      : null;
+
+  if (customSeatingLayout) {
+    price = seatingLayoutIsFree(customSeatingLayout)
+      ? "رایگان"
+      : EVENT_PRICE_PER_SEAT_LABEL;
   }
 
   const days = normalizeEventDays(body.days ?? []);
@@ -131,7 +177,6 @@ export async function POST(request: Request) {
     { requestedSlug: body.publicEventSlug }
   );
 
-  const venueTemplateId = body.venueTemplateId ?? null;
   const placeAddress = await resolveEventPlaceAddress(venueTemplateId, body.placeAddress);
 
   const event = await prisma.event.create({
@@ -161,6 +206,14 @@ export async function POST(request: Request) {
 
   if (event.hasAssignedSeating && venueTemplateId) {
     await syncEventSeatingFromVenueTemplate(event.id, venueTemplateId);
+  } else if (customSeatingLayout) {
+    const venueName = place || customSeatingLayout.name;
+    await saveEventSeatingPlan(
+      event.id,
+      { ...customSeatingLayout, name: venueName },
+      venueName,
+      { approvalStatus: "pending" }
+    );
   }
 
   return NextResponse.json(

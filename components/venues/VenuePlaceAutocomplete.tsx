@@ -22,6 +22,7 @@ type VenuePlaceAutocompleteProps = {
   variant?: "my-event" | "admin";
   showLinkedAddress?: boolean;
   searchPath?: string;
+  active?: boolean;
 };
 
 const themes = {
@@ -59,6 +60,7 @@ export default function VenuePlaceAutocomplete({
   variant = "my-event",
   showLinkedAddress = true,
   searchPath,
+  active = true,
 }: VenuePlaceAutocompleteProps) {
   const theme = themes[variant];
   const apiPath = searchPath ?? (variant === "admin" ? "/api/admin/venues" : "/api/my-event/venues");
@@ -67,40 +69,75 @@ export default function VenuePlaceAutocomplete({
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const mountedRef = useRef(true);
+  const requestIdRef = useRef(0);
 
   useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+    };
   }, []);
 
   useEffect(() => {
-    const cityName = city.trim();
-    if (!cityName) {
-      const clearTimer = setTimeout(() => setSuggestions([]), 0);
-      return () => clearTimeout(clearTimer);
+    if (!active) {
+      setOpen(false);
+      setSuggestions([]);
+      setLoading(false);
+    }
+  }, [active]);
+
+  useEffect(() => {
+    if (!open) return;
+
+    function handlePointerDown(e: PointerEvent) {
+      if (containerRef.current?.contains(e.target as Node)) return;
+      setOpen(false);
     }
 
-    const timer = setTimeout(async () => {
-      setLoading(true);
-      try {
-        const params = new URLSearchParams({ city: cityName, q: value.trim() });
-        const res = await fetch(`${apiPath}?${params.toString()}`);
-        if (res.ok) {
+    document.addEventListener("pointerdown", handlePointerDown);
+    return () => document.removeEventListener("pointerdown", handlePointerDown);
+  }, [open]);
+
+  useEffect(() => {
+    if (!active) return;
+
+    const cityName = city.trim();
+    if (!cityName) {
+      setSuggestions([]);
+      return;
+    }
+
+    const requestId = ++requestIdRef.current;
+    const controller = new AbortController();
+    const timer = setTimeout(() => {
+      void (async () => {
+        setLoading(true);
+        try {
+          const params = new URLSearchParams({ city: cityName, q: value.trim() });
+          const res = await fetch(`${apiPath}?${params.toString()}`, {
+            signal: controller.signal,
+          });
+          if (!res.ok || !mountedRef.current || requestId !== requestIdRef.current) return;
           const data = (await res.json()) as VenueSuggestion[];
-          setSuggestions(data);
+          if (mountedRef.current && requestId === requestIdRef.current) {
+            setSuggestions(data);
+          }
+        } catch (error) {
+          if (error instanceof DOMException && error.name === "AbortError") return;
+        } finally {
+          if (mountedRef.current && requestId === requestIdRef.current) {
+            setLoading(false);
+          }
         }
-      } finally {
-        setLoading(false);
-      }
+      })();
     }, 200);
 
-    return () => clearTimeout(timer);
-  }, [value, city, apiPath]);
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
+  }, [value, city, apiPath, active]);
 
   function handleInputChange(next: string) {
     const matched = suggestions.find((s) => s.name === next);
@@ -114,7 +151,7 @@ export default function VenuePlaceAutocomplete({
   }
 
   const citySelected = Boolean(city.trim());
-  const showList = open && citySelected && suggestions.length > 0;
+  const showList = active && open && citySelected && suggestions.length > 0;
 
   return (
     <div ref={containerRef} className="relative">
@@ -126,7 +163,10 @@ export default function VenuePlaceAutocomplete({
         disabled={!citySelected}
         onChange={(e) => handleInputChange(e.target.value)}
         onFocus={() => {
-          if (citySelected) setOpen(true);
+          if (citySelected && active) setOpen(true);
+        }}
+        onKeyDown={(e) => {
+          if (e.key === "Escape") setOpen(false);
         }}
         className={`${className} disabled:cursor-not-allowed disabled:opacity-60`}
         autoComplete="off"
@@ -144,19 +184,28 @@ export default function VenuePlaceAutocomplete({
             <p className={`text-xs ${theme.address}`}>آدرس اجرا: {placeAddress}</p>
           ) : null}
         </div>
+      ) : value.trim() ? (
+        <p className={`mt-1 text-xs ${theme.hint}`}>
+          این محل در فهرست سالن‌های بلیت‌مال نیست — آدرس دقیق را جداگانه وارد کنید.
+        </p>
       ) : (
         <p className={`mt-1 text-xs ${theme.hint}`}>
           نام سالن را تایپ کنید (مثلاً «میلاد») — فقط سالن‌های شهر {city} پیشنهاد می‌شود.
         </p>
       )}
+      {loading ? (
+        <p className={`absolute left-3 top-3 text-xs ${theme.loading}`}>...</p>
+      ) : null}
+
       {showList ? (
         <ul
-          className={`absolute z-20 mt-1 max-h-56 w-full overflow-auto rounded-xl border py-1 ${theme.list}`}
+          className={`absolute top-full z-50 mt-1 max-h-56 w-full overflow-auto rounded-xl border py-1 ${theme.list}`}
         >
           {suggestions.map((venue) => (
             <li key={venue.id}>
               <button
                 type="button"
+                onMouseDown={(e) => e.preventDefault()}
                 onClick={() => selectVenue(venue)}
                 className={`w-full px-4 py-2.5 text-right text-sm ${theme.item} ${
                   venueTemplateId === venue.id ? theme.itemActive : ""
@@ -170,9 +219,6 @@ export default function VenuePlaceAutocomplete({
             </li>
           ))}
         </ul>
-      ) : null}
-      {loading ? (
-        <p className={`absolute left-3 top-3 text-xs ${theme.loading}`}>...</p>
       ) : null}
     </div>
   );

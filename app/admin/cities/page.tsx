@@ -1,8 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useCities } from "@/components/CitiesProvider";
+import AdminBackLink from "@/components/admin/AdminBackLink";
 import { adminTableClasses } from "@/components/admin/admin-table-classes";
 import type { CityWithUsage } from "@/lib/cities/types";
 
@@ -109,9 +109,7 @@ export default function AdminCitiesPage() {
       dir="rtl"
     >
       <div className="mx-auto max-w-4xl">
-        <Link href="/admin" className="mb-4 inline-block text-sm font-bold text-blue-600 dark:text-blue-400">
-          ← پنل ادمین
-        </Link>
+        <AdminBackLink />
         <h1 className="text-3xl font-black text-slate-800 dark:text-slate-100">مدیریت شهرها</h1>
         <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
           شهرهای فعال در ثبت رویداد، سالن و فرم‌های سیستم نمایش داده می‌شوند. در سایت عمومی،

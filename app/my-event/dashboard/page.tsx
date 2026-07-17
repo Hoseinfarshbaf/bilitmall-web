@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import MyEventShell from "@/components/my-event/MyEventShell";
 import { buildPublicEventSlug } from "@/lib/my-event/public-slugs";
 import { getMyEventPublicUrl } from "@/lib/my-event/auth";
-import { MY_EVENT_EVENT_STATUS_LABELS, BILITMALL_LISTING_LABELS, MY_EVENT_SEATING_AFTER_APPROVAL_HINT, MY_EVENT_LINKED_VENUE_SEATING_HINT, isMyEventEventApproved, eventUsesLinkedVenueSeating } from "@/lib/my-event/constants";
+import { MY_EVENT_EVENT_STATUS_LABELS, BILITMALL_LISTING_LABELS, MY_EVENT_PENDING_CHANGE_LABELS, MY_EVENT_LINKED_VENUE_SEATING_HINT, MY_EVENT_DESIGN_SEATING_CTA, MY_EVENT_VIEW_LINKED_VENUE_CTA, isMyEventEventApproved, eventUsesLinkedVenueSeating } from "@/lib/my-event/constants";
 import type { MyEventDashboardEvent, MyEventOrganizerProfile } from "@/lib/my-event/store";
 
 export default function MyEventDashboardPage() {
@@ -138,7 +138,10 @@ export default function MyEventDashboardPage() {
           events.map((event) => {
             const isApproved = isMyEventEventApproved(event);
             const usesLinkedVenue = eventUsesLinkedVenueSeating(event);
-            const canDesignSeating = isApproved && event.hasAssignedSeating && !usesLinkedVenue;
+            const canDesignSeating = event.hasAssignedSeating && !usesLinkedVenue;
+            const isFreeEvent = !event.price.trim() || event.price.trim() === "رایگان";
+            const canViewLinkedVenue =
+              event.hasAssignedSeating && usesLinkedVenue;
             return (
               <div
                 key={event.id}
@@ -155,9 +158,8 @@ export default function MyEventDashboardPage() {
                       <span className="text-emerald-600 dark:text-emerald-400"> · صحنه از سالن تأییدشده</span>
                     ) : event.hasAssignedSeating && event.hasSeatingPlan ? (
                       <span className="text-emerald-600 dark:text-emerald-400"> · صحنه تعریف شده</span>
-                    ) : null}
-                    {event.hasAssignedSeating && !isApproved && !usesLinkedVenue ? (
-                      <span className="text-violet-600 dark:text-violet-400"> · طراحی صحنه پس از تأیید</span>
+                    ) : event.hasAssignedSeating ? (
+                      <span className="text-violet-600 dark:text-violet-400"> · طراحی صحنه لازم است</span>
                     ) : null}
                     {" · "}
                     {event.listOnBilitmallRequested
@@ -166,25 +168,51 @@ export default function MyEventDashboardPage() {
                         : BILITMALL_LISTING_LABELS.pending
                       : BILITMALL_LISTING_LABELS.notRequested}
                   </p>
-                  <span
-                    className={`mt-2 inline-block rounded-full px-2 py-0.5 text-xs font-bold ${
-                      event.status === "active"
-                        ? "bg-green-500/20 text-green-700 dark:text-green-300"
-                        : event.status === "pending"
-                          ? "bg-amber-500/20 text-amber-700 dark:text-amber-300"
-                          : "bg-red-500/20 text-red-700 dark:text-red-300"
-                    }`}
-                  >
-                    {MY_EVENT_EVENT_STATUS_LABELS[event.status] ?? event.status}
-                  </span>
+                  <div className="mt-2 flex flex-col items-start gap-1">
+                    <span
+                      className={`inline-block rounded-full px-2 py-0.5 text-xs font-bold ${
+                        event.status === "active"
+                          ? "bg-green-500/20 text-green-700 dark:text-green-300"
+                          : event.status === "pending"
+                            ? "bg-amber-500/20 text-amber-700 dark:text-amber-300"
+                            : "bg-red-500/20 text-red-700 dark:text-red-300"
+                      }`}
+                    >
+                      {MY_EVENT_EVENT_STATUS_LABELS[event.status] ?? event.status}
+                    </span>
+                    {event.status === "pending" && event.pendingEventChanges ? (
+                      <span className="text-[11px] font-bold text-orange-700 dark:text-orange-300">
+                        {MY_EVENT_PENDING_CHANGE_LABELS.event}
+                      </span>
+                    ) : null}
+                    {event.status === "pending" && event.pendingVenueChanges ? (
+                      <span className="text-[11px] font-bold text-orange-700 dark:text-orange-300">
+                        {MY_EVENT_PENDING_CHANGE_LABELS.venue}
+                      </span>
+                    ) : null}
+                  </div>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
+                  {canViewLinkedVenue ? (
+                    <Link
+                      href={`/my-event/events/${event.id}/seating`}
+                      className="rounded-xl bg-violet-600 px-4 py-2 text-sm font-bold text-white hover:bg-violet-500"
+                    >
+                      {MY_EVENT_VIEW_LINKED_VENUE_CTA(event.place)}
+                    </Link>
+                  ) : null}
                   {canDesignSeating ? (
                     <Link
                       href={`/my-event/events/${event.id}/seating`}
                       className="rounded-xl bg-violet-600 px-4 py-2 text-sm font-bold text-white hover:bg-violet-500"
                     >
-                      {event.hasSeatingPlan ? "ویرایش صحنه" : "ساخت صحنه"}
+                      {event.hasSeatingPlan
+                        ? isFreeEvent
+                          ? "ویرایش صحنه"
+                          : "ویرایش صحنه و قیمت‌گذاری"
+                        : isFreeEvent
+                          ? "ورود به استودیو طراحی محل اجرا"
+                          : MY_EVENT_DESIGN_SEATING_CTA}
                     </Link>
                   ) : null}
                   {isApproved ? (
@@ -203,9 +231,7 @@ export default function MyEventDashboardPage() {
                     <span className="max-w-xs rounded-xl bg-neutral-100 px-4 py-2 text-xs leading-6 text-neutral-500 dark:bg-white/5 dark:text-slate-500">
                       {event.hasAssignedSeating && usesLinkedVenue
                         ? MY_EVENT_LINKED_VENUE_SEATING_HINT
-                        : event.hasAssignedSeating
-                          ? MY_EVENT_SEATING_AFTER_APPROVAL_HINT
-                          : "لینک پس از تأیید ادمین فعال می‌شود."}
+                        : "لینک پس از تأیید ادمین فعال می‌شود."}
                     </span>
                   )}
                   <Link

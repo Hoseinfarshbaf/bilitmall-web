@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
+import AdminBackLink from "@/components/admin/AdminBackLink";
 import { adminTableClasses } from "@/components/admin/admin-table-classes";
 import { ORDER_STATUS_LABELS } from "@/lib/bilitmall/store";
 
@@ -34,9 +34,7 @@ export default function AdminOrdersPage() {
       dir="rtl"
     >
       <div className="mx-auto max-w-6xl">
-        <Link href="/admin" className="mb-4 inline-block text-sm font-bold text-blue-600 dark:text-blue-400">
-          ← بازگشت به پنل
-        </Link>
+        <AdminBackLink />
         <h1 className="text-3xl font-black text-slate-800 dark:text-slate-100">سفارش‌ها و پرداخت‌ها</h1>
         <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">تمام تراکنش‌های کاربران بلیت‌مال</p>
 
