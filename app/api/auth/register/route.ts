@@ -4,6 +4,8 @@ import { hashPassword } from "@/lib/auth/password";
 import { isValidIranMobile, normalizePhone } from "@/lib/auth/phone";
 import { createBilitmallSessionToken } from "@/lib/bilitmall/auth";
 import { setBilitmallSessionCookie } from "@/lib/bilitmall/session";
+import { getRoleIdBySlug } from "@/lib/admin/directory";
+import { SYSTEM_ROLE_SLUGS } from "@/lib/bilitmall/roles";
 
 export async function POST(request: Request) {
   try {
@@ -48,12 +50,15 @@ export async function POST(request: Request) {
       );
     }
 
+    const roleId = await getRoleIdBySlug(SYSTEM_ROLE_SLUGS.user);
+
     const user = await prisma.bilitmallUser.create({
       data: {
         phone,
         name,
         email,
         passwordHash: hashPassword(password),
+        roleId,
       },
     });
 

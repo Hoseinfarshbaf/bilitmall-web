@@ -244,7 +244,7 @@ const WIZARD_STEPS = [
     title: "کانال‌های انتشار",
     shortTitle: "انتشار",
     description:
-      "می‌توانید هر دو را با هم انتخاب کنید. (با انتخاب «انتشار در سایت بلیت‌مال»، پس از تأیید ادمین در بلیت‌مال نمایش داده می‌شود.)",
+      "می‌توانید هر دو را با هم انتخاب کنید.",
     icon: Megaphone,
     accent: "amber" as const,
   },
@@ -252,7 +252,7 @@ const WIZARD_STEPS = [
     id: 7,
     title: "توضیحات",
     shortTitle: "توضیحات",
-    description: "توضیحات رویداد را بنویسید، سپس ثبت را بزنید تا برای تأیید ادمین ارسال شود.",
+    description: "در صورت تمایل توضیحات رویداد را بنویسید، سپس ثبت را بزنید تا برای تأیید ادمین ارسال شود.",
     icon: FileText,
     accent: "sky" as const,
   },
@@ -747,15 +747,6 @@ export default function MyEventEventForm({
         return {
           field: "publishChannels",
           message: "حداقل یکی از کانال‌های انتشار را انتخاب کنید.",
-        };
-      }
-    }
-
-    if (step === 7) {
-      if (!formData.description.trim()) {
-        return {
-          field: "description",
-          message: "لطفاً توضیحات رویداد را بنویسید، سپس ثبت را بزنید.",
         };
       }
     }
@@ -1648,7 +1639,7 @@ export default function MyEventEventForm({
       <FormSection
         step={6}
         title="کانال‌های انتشار"
-        description="می‌توانید هر دو را با هم انتخاب کنید. (با انتخاب «انتشار در سایت بلیت‌مال»، پس از تأیید ادمین در بلیت‌مال نمایش داده می‌شود.)"
+        description="می‌توانید هر دو را با هم انتخاب کنید."
         icon={<Megaphone className="h-4 w-4" />}
         accent="amber"
       >
@@ -1684,12 +1675,12 @@ export default function MyEventEventForm({
       <FormSection
         step={7}
         title="توضیحات"
-        description="توضیحات رویداد را بنویسید، سپس دکمه ثبت را بزنید تا برای تأیید ادمین ارسال شود."
+        description="در صورت تمایل توضیحات رویداد را بنویسید، سپس دکمه ثبت را بزنید تا برای تأیید ادمین ارسال شود."
         icon={<FileText className="h-4 w-4" />}
         accent="sky"
       >
         <div ref={setFieldRef("description")}>
-          <label className={labelClass}>توضیحات رویداد</label>
+          <label className={labelClass}>توضیحات رویداد (اختیاری)</label>
           <textarea
             value={formData.description}
             onChange={(e) => {

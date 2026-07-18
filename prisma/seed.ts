@@ -4,11 +4,15 @@ import { hashPassword } from "../lib/auth/password";
 import { ensureCitiesSeeded } from "../lib/cities/store";
 import { seedEvents } from "../lib/events/seed-events";
 import { resolveTicketingType } from "../lib/events/types";
+import { ensureSystemRoles, getRoleIdBySlug } from "../lib/admin/directory";
+import { SYSTEM_ROLE_SLUGS } from "../lib/bilitmall/roles";
 
 const prisma = new PrismaClient();
 
 async function main() {
   await ensureCitiesSeeded();
+  await ensureSystemRoles();
+  const userRoleId = await getRoleIdBySlug(SYSTEM_ROLE_SLUGS.user);
 
   for (const seed of seedEvents) {    const days =
       seed.days ??
@@ -51,6 +55,7 @@ async function main() {
       name: "کاربر نمونه",
       email: "demo@bilitmall.com",
       passwordHash: hashPassword("demo12345"),
+      roleId: userRoleId,
     },
     update: {},
   });

@@ -115,27 +115,47 @@ export default function MyEventNewEventPage() {
       {submitted ? (
         <div className="max-w-xl space-y-4 rounded-3xl border border-amber-500/30 bg-amber-500/10 p-6">
           <h2 className="text-xl font-black text-amber-700 dark:text-amber-200">رویداد ثبت شد</h2>
-          <p className="text-sm text-neutral-600 dark:text-slate-300">{MY_EVENT_EVENT_SUBMIT_SUCCESS_MESSAGE}</p>
+          <p className="text-sm text-neutral-600 dark:text-slate-300">
+            {MY_EVENT_EVENT_SUBMIT_SUCCESS_MESSAGE}
+          </p>
           {hadSeating && hadLinkedVenue ? (
             <p className="text-sm leading-7 text-emerald-700 dark:text-emerald-200">
               {MY_EVENT_LINKED_VENUE_SEATING_HINT}
             </p>
-          ) : hadSeating && createdEventId ? (
+          ) : null}
+          {createdEventId ? (
+            <div className="flex flex-col gap-3 pt-1">
+              <button
+                type="button"
+                onClick={() => router.push(`/my-event/events/${createdEventId}/seating`)}
+                className="rounded-xl bg-violet-600 px-4 py-3 text-sm font-bold text-white hover:bg-violet-500"
+              >
+                ویرایش صحنه و قیمت‌گذاری
+              </button>
+              <button
+                type="button"
+                onClick={() => router.push(`/my-event/events/${createdEventId}/edit`)}
+                className="rounded-xl bg-blue-600 px-4 py-3 text-sm font-bold text-white hover:bg-blue-500"
+              >
+                ویرایش جزئیات رویداد
+              </button>
+              <button
+                type="button"
+                onClick={() => router.push("/my-event/dashboard")}
+                className="rounded-xl border border-emerald-600/40 bg-transparent px-4 py-3 text-sm font-bold text-emerald-700 hover:bg-emerald-500/10 dark:text-emerald-300"
+              >
+                بازگشت به داشبورد
+              </button>
+            </div>
+          ) : (
             <button
               type="button"
-              onClick={() => router.push(`/my-event/events/${createdEventId}/seating`)}
-              className="rounded-xl bg-violet-600 px-4 py-2 text-sm font-bold text-white hover:bg-violet-500"
+              onClick={() => router.push("/my-event/dashboard")}
+              className="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-bold text-white"
             >
-              ویرایش صحنه و قیمت‌گذاری
+              بازگشت به داشبورد
             </button>
-          ) : null}
-          <button
-            type="button"
-            onClick={() => router.push("/my-event/dashboard")}
-            className="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-bold text-white"
-          >
-            بازگشت به داشبورد
-          </button>
+          )}
         </div>
       ) : (
         <MyEventEventForm

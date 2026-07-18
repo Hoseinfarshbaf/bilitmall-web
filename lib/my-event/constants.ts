@@ -1,5 +1,7 @@
 export const MY_EVENT_BRAND = "My Event";
 export const MY_EVENT_STUDIO = "My Event Studio";
+/** عنوان تب مرورگر برای مسیرهای /my-event */
+export const MY_EVENT_STUDIO_TAB_TITLE = "استودیو مای‌ایونت";
 export const MY_EVENT_EVENT_SOURCE = "my_event";
 
 /** نمونه لینک عمومی: cofferoze.myevent.ae/summer-workshop */

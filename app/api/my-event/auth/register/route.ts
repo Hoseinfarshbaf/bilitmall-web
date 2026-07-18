@@ -8,6 +8,8 @@ import {
 import { isValidIranMobile, normalizePhone } from "@/lib/auth/phone";
 import { MY_EVENT_REGISTRATION_SUCCESS_MESSAGE } from "@/lib/my-event/constants";
 import { isMyEventSlugTaken } from "@/lib/my-event/store";
+import { getRoleIdBySlug } from "@/lib/admin/directory";
+import { SYSTEM_ROLE_SLUGS } from "@/lib/bilitmall/roles";
 
 export async function POST(request: Request) {
   try {
@@ -68,6 +70,8 @@ export async function POST(request: Request) {
       );
     }
 
+    const roleId = await getRoleIdBySlug(SYSTEM_ROLE_SLUGS.organizer);
+
     await prisma.myEventOrganizer.create({
       data: {
         slug,
@@ -79,7 +83,7 @@ export async function POST(request: Request) {
             phone,
             name,
             passwordHash: hashPassword(password),
-            role: "owner",
+            roleId,
           },
         },
       },

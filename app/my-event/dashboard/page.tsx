@@ -215,6 +215,12 @@ export default function MyEventDashboardPage() {
                           : MY_EVENT_DESIGN_SEATING_CTA}
                     </Link>
                   ) : null}
+                  <Link
+                    href={`/my-event/events/${event.id}/edit`}
+                    className="rounded-xl border border-neutral-200 px-4 py-2 text-sm font-bold hover:bg-neutral-100 dark:border-white/15 dark:hover:bg-white/5"
+                  >
+                    ویرایش جزئیات رویداد
+                  </Link>
                   {isApproved ? (
                     <a
                       href={getMyEventPublicUrl(
@@ -234,12 +240,6 @@ export default function MyEventDashboardPage() {
                         : "لینک پس از تأیید ادمین فعال می‌شود."}
                     </span>
                   )}
-                  <Link
-                    href={`/my-event/events/${event.id}/edit`}
-                    className="rounded-xl border border-neutral-200 px-4 py-2 text-sm font-bold hover:bg-neutral-100 dark:border-white/15 dark:hover:bg-white/5"
-                  >
-                    ویرایش
-                  </Link>
                   <button
                     type="button"
                     onClick={() => handleDelete(event.id, event.title)}

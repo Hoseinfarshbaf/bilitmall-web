@@ -1,8 +1,15 @@
+import type { Metadata } from "next";
 import {
   AdminThemeProvider,
   AdminThemeToggle,
 } from "@/components/admin/AdminThemeProvider";
 import { ADMIN_THEME_NO_FLASH_SCRIPT } from "@/lib/theme-no-flash";
+
+export const metadata: Metadata = {
+  title: {
+    absolute: "پنل ادمین",
+  },
+};
 
 export default function AdminLayout({
   children,

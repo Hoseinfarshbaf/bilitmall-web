@@ -36,13 +36,15 @@ export default function AdminPage() {
           </div>
 
           <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-            <h2 className="mb-2 text-xl font-bold">کاربران بلیت‌مال</h2>
-            <p className="mb-4 text-slate-600 dark:text-slate-400">خریداران ثبت‌نام‌شده در سایت</p>
+            <h2 className="mb-2 text-xl font-bold">کاربران و نقش‌ها</h2>
+            <p className="mb-4 text-slate-600 dark:text-slate-400">
+              فهرست خریداران و برگزارکنندگان، نمایش و تغییر نقش
+            </p>
             <a
               href="/admin/users"
               className="inline-block rounded-xl bg-blue-600 px-4 py-3 text-white"
             >
-              لیست کاربران
+              مدیریت کاربران
             </a>
           </div>
 

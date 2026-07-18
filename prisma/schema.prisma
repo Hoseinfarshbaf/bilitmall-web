@@ -7,6 +7,21 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+/// نقش‌های کاربران (سیستمی + سفارشی ساخته‌شده در ادمین)
+model Role {
+  id          Int            @id @default(autoincrement())
+  slug        String         @unique
+  name        String
+  description String?
+  isSystem    Boolean        @default(false)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  bilitmallUsers BilitmallUser[]
+  myEventUsers   MyEventUser[]
+
+  @@map("Role")
+}
+
 /// کاربران خریدار بلیت‌مال (جدا از MyEventUser — شماره موبایل می‌تواند تکراری باشد)
 model BilitmallUser {
   id           Int           @id @default(autoincrement())
@@ -14,11 +29,14 @@ model BilitmallUser {
   passwordHash String
   name         String
   email        String?
+  roleId       Int
+  role         Role          @relation(fields: [roleId], references: [id])
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
   orders       TicketOrder[]
   favorites    FavoriteEvent[]
 
+  @@index([roleId])
   @@map("BilitmallUser")
 }
 
@@ -75,11 +93,13 @@ model MyEventUser {
   phone              String           @unique
   passwordHash       String
   name               String
-  role               String           @default("owner")
+  roleId             Int
+  role               Role             @relation(fields: [roleId], references: [id])
   createdAt          DateTime         @default(now())
   myEventOrganizer   MyEventOrganizer @relation(fields: [myEventOrganizerId], references: [id], onDelete: Cascade)
 
   @@index([myEventOrganizerId])
+  @@index([roleId])
   @@map("MyEventUser")
 }
 

@@ -71,7 +71,10 @@ export async function getUserOrders(userId: number): Promise<UserTicketOrder[]> 
 export async function listBilitmallUsersForAdmin() {
   const users = await prisma.bilitmallUser.findMany({
     orderBy: { createdAt: "desc" },
-    include: { _count: { select: { orders: true } } },
+    include: {
+      role: true,
+      _count: { select: { orders: true } },
+    },
   });
 
   return users.map((user) => ({
@@ -79,6 +82,13 @@ export async function listBilitmallUsersForAdmin() {
     phone: user.phone,
     name: user.name,
     email: user.email,
+    role: {
+      id: user.role.id,
+      slug: user.role.slug,
+      name: user.role.name,
+      description: user.role.description,
+      isSystem: user.role.isSystem,
+    },
     orderCount: user._count.orders,
     createdAt: user.createdAt.toISOString(),
   }));

@@ -1,7 +1,12 @@
 import { NextResponse } from "next/server";
-import { listBilitmallUsersForAdmin } from "@/lib/bilitmall/store";
+import { listDirectoryAccounts } from "@/lib/admin/directory";
 
 export async function GET() {
-  const users = await listBilitmallUsersForAdmin();
-  return NextResponse.json(users);
+  try {
+    const users = await listDirectoryAccounts();
+    return NextResponse.json(users);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "خطا";
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
 }
