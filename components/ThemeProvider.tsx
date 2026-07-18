@@ -9,6 +9,9 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { usePathname } from "next/navigation";
+import { isMyEventPublicHost } from "@/lib/my-event/domains";
+import { shouldSkipMarketplaceDocumentTheme } from "@/lib/theme-surfaces";
 
 export type Theme = "light" | "dark";
 
@@ -39,13 +42,38 @@ function applyThemeClass(theme: Theme) {
   document.documentElement.style.colorScheme = theme === "dark" ? "dark" : "light";
 }
 
+function clearDocumentTheme() {
+  document.documentElement.classList.remove("dark");
+  document.documentElement.style.colorScheme = "light";
+}
+
+function getBrowserHost(): string {
+  if (typeof window === "undefined") return "";
+  return window.location.host.split(":")[0]?.toLowerCase() ?? "";
+}
+
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>(readStoredTheme);
+  const pathname = usePathname() ?? "";
+  const [host, setHost] = useState("");
+  const [theme, setThemeState] = useState<Theme>("light");
 
   useEffect(() => {
-    applyThemeClass(theme);
+    setHost(getBrowserHost());
+    setThemeState(readStoredTheme());
+  }, []);
+
+  const onOrganizerPublicHost = host !== "" && isMyEventPublicHost(host);
+  const skipDocumentTheme =
+    shouldSkipMarketplaceDocumentTheme(pathname) || onOrganizerPublicHost;
+
+  useEffect(() => {
     window.localStorage.setItem(STORAGE_KEY, theme);
-  }, [theme]);
+    if (skipDocumentTheme) {
+      clearDocumentTheme();
+      return;
+    }
+    applyThemeClass(theme);
+  }, [theme, skipDocumentTheme]);
 
   const setTheme = useCallback((next: Theme) => {
     setThemeState(next);

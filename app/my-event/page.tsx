@@ -28,11 +28,11 @@ export default function MyEventLandingPage() {
         </div>
 
         <h1 className="max-w-3xl text-4xl font-black leading-tight sm:text-5xl">
-          صفحه اختصاصی رویداد خودت را بساز و لینکش را برای خریداران بفرست
+          صفحه فروش اختصاصی خودت را روی بلیت‌مال بساز
         </h1>
         <p className="mt-6 max-w-2xl text-lg leading-8 text-neutral-600 dark:text-slate-300">
-          {MY_EVENT_BRAND} پلتفرم جدا از بلیت‌مال برای برگزارکنندگان است — با
-          ساب‌دامین اختصاصی، کاور برند و صفحه یک‌صفحه‌ای.
+          {MY_EVENT_BRAND} برای برگزارکنندگان است — با ساب‌دامین اختصاصی روی
+          بلیت‌مال، کاور برند و مدیریت رویدادها.
         </p>
 
         <div className="mt-10 flex flex-wrap gap-4">
@@ -64,7 +64,7 @@ export default function MyEventLandingPage() {
         <div className="mt-16 grid gap-4 sm:grid-cols-3">
           <div className="rounded-3xl border border-emerald-500/20 bg-emerald-500/5 p-6 dark:border-emerald-500/10">
             <Globe className="mb-3 h-6 w-6 text-emerald-600 dark:text-emerald-300" />
-            <h2 className="font-black">ساب‌دامین اختصاصی</h2>
+            <h2 className="font-black">ساب‌دامین روی بلیت‌مال</h2>
             <p className="mt-2 text-sm text-neutral-500 dark:text-slate-400">
               مثلاً <span dir="ltr">https://{MY_EVENT_URL_EXAMPLE}</span>
             </p>

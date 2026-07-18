@@ -8,6 +8,8 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { isMyEventPublicHost } from "@/lib/my-event/domains";
+import { shouldSkipMarketplaceDocumentTheme } from "@/lib/theme-surfaces";
 
 type Theme = "light" | "dark";
 
@@ -18,29 +20,41 @@ type MyEventThemeContextType = {
 };
 
 const STORAGE_KEY = "myevent-theme";
-const SITE_STORAGE_KEY = "bilitmall-theme";
+const ROOT_ID = "my-event-theme-root";
 
 const MyEventThemeContext = createContext<MyEventThemeContextType | undefined>(
   undefined
 );
 
-function readStoredTheme(): Theme {
-  if (typeof window === "undefined") return "light";
-  const stored = window.localStorage.getItem(STORAGE_KEY);
-  return stored === "dark" || stored === "light" ? stored : "light";
+function clearMarketplaceDocumentTheme() {
+  document.documentElement.classList.remove("dark");
+  document.documentElement.style.colorScheme = "light";
 }
 
-function readSiteTheme(): Theme {
-  if (typeof window === "undefined") return "light";
-  const stored = window.localStorage.getItem(SITE_STORAGE_KEY);
-  if (stored === "dark" || stored === "light") return stored;
-  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+function restoreMarketplaceDocumentTheme() {
+  if (typeof window === "undefined") return;
+  const path = window.location.pathname || "";
+  const host = window.location.host.split(":")[0]?.toLowerCase() ?? "";
+  if (
+    shouldSkipMarketplaceDocumentTheme(path) ||
+    isMyEventPublicHost(host)
+  ) {
+    clearMarketplaceDocumentTheme();
+    return;
+  }
+  const stored = window.localStorage.getItem("bilitmall-theme");
+  const dark =
+    stored === "dark" ||
+    (!stored && window.matchMedia("(prefers-color-scheme: dark)").matches);
+  document.documentElement.classList.toggle("dark", dark);
+  document.documentElement.style.colorScheme = dark ? "dark" : "light";
 }
 
-/** تم استودیو باید روی html اعمال شود؛ در غیر این صورت dark سراسری همیشه برنده است. */
-function applyDocumentTheme(theme: Theme) {
-  document.documentElement.classList.toggle("dark", theme === "dark");
-  document.documentElement.style.colorScheme = theme === "dark" ? "dark" : "light";
+/** تم استودیو فقط روی ریشهٔ My Event — بدون آلوده کردن html مارکت‌پلیس. */
+function applyThemeClass(theme: Theme) {
+  const root = document.getElementById(ROOT_ID);
+  if (!root) return;
+  root.classList.toggle("dark", theme === "dark");
 }
 
 export default function MyEventThemeProvider({
@@ -48,41 +62,47 @@ export default function MyEventThemeProvider({
 }: {
   children: ReactNode;
 }) {
-  const [theme, setThemeState] = useState<Theme>(readStoredTheme);
+  const [theme, setThemeState] = useState<Theme>("light");
 
   useEffect(() => {
-    applyDocumentTheme(theme);
-    window.localStorage.setItem(STORAGE_KEY, theme);
+    const stored = window.localStorage.getItem(STORAGE_KEY);
+    const next: Theme = stored === "dark" ? "dark" : "light";
+    setThemeState(next);
+  }, []);
 
+  useEffect(() => {
+    clearMarketplaceDocumentTheme();
     return () => {
-      applyDocumentTheme(readSiteTheme());
+      restoreMarketplaceDocumentTheme();
     };
+  }, []);
+
+  useEffect(() => {
+    clearMarketplaceDocumentTheme();
+    applyThemeClass(theme);
+    window.localStorage.setItem(STORAGE_KEY, theme);
   }, [theme]);
 
   const setTheme = useCallback((next: Theme) => {
     setThemeState(next);
     window.localStorage.setItem(STORAGE_KEY, next);
-    applyDocumentTheme(next);
+    clearMarketplaceDocumentTheme();
+    applyThemeClass(next);
   }, []);
 
   const toggleTheme = useCallback(() => {
     setThemeState((current) => {
       const next = current === "dark" ? "light" : "dark";
       window.localStorage.setItem(STORAGE_KEY, next);
-      applyDocumentTheme(next);
+      clearMarketplaceDocumentTheme();
+      applyThemeClass(next);
       return next;
     });
   }, []);
 
   return (
     <MyEventThemeContext.Provider value={{ theme, toggleTheme, setTheme }}>
-      <div
-        id="my-event-theme-root"
-        className={theme === "dark" ? "dark" : undefined}
-        suppressHydrationWarning
-      >
-        {children}
-      </div>
+      {children}
     </MyEventThemeContext.Provider>
   );
 }

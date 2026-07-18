@@ -5,10 +5,15 @@ import { CalendarDays, MapPin } from "lucide-react";
 import type { EventItem } from "@/lib/events/types";
 import EventBookingFlow from "@/components/events/EventBookingFlow";
 import EventCoverLayout from "@/components/events/EventCoverLayout";
+import MyEventOrganizerHome from "@/components/my-event/MyEventOrganizerHome";
+import type { OrganizerEventCardData } from "@/components/my-event/MyEventOrganizerEventCard";
 import { formatEventDateDisplay, getEventSchedule } from "@/lib/events/date-utils";
 import { isEventUnavailable } from "@/lib/events/status";
 import { MY_EVENT_BRAND } from "@/lib/my-event/constants";
-import { getMyEventEventHref, getMyEventOrganizerHomeHref } from "@/lib/my-event/domains";
+import {
+  getMyEventEventHref,
+  getMyEventOrganizerHomeHref,
+} from "@/lib/my-event/domains";
 import { useEventPageTheme } from "@/lib/events/event-page-theme";
 import { cn } from "@/lib/utils";
 
@@ -22,7 +27,7 @@ type MyEventPublicPageProps = {
   };
   event: EventItem | null;
   description?: string | null;
-  allEvents: { publicEventSlug: string; title: string }[];
+  allEvents: OrganizerEventCardData[];
   currentPublicEventSlug?: string;
   onSubdomain?: boolean;
 };
@@ -45,29 +50,23 @@ export default function MyEventPublicPage({
     chipActiveOrganizer,
     chipIdleOrganizer,
     footerMuted,
-    booking,
   } = useEventPageTheme("organizer");
 
-  const coverImage = event?.image || organizer.coverImage;
-  const schedule = event ? getEventSchedule(event) : [];
-  const unavailable = event ? isEventUnavailable(event) : true;
+  const homeHref = getMyEventOrganizerHomeHref(organizer.slug, { onSubdomain });
 
   if (!event) {
     return (
-      <EventCoverLayout
-        coverImage={coverImage}
-        title={organizer.displayName}
-        subtitle={organizer.bio ?? MY_EVENT_BRAND}
-        variant="organizer"
-      >
-        <div className={cn(booking.unavailablePanel, "p-8 text-center")}>
-          <p className={mutedText}>رویداد فعالی برای نمایش وجود ندارد.</p>
-        </div>
-      </EventCoverLayout>
+      <MyEventOrganizerHome
+        organizer={organizer}
+        allEvents={allEvents}
+        onSubdomain={onSubdomain}
+      />
     );
   }
 
-  const homeHref = getMyEventOrganizerHomeHref(organizer.slug, { onSubdomain });
+  const coverImage = event.image || organizer.coverImage;
+  const schedule = getEventSchedule(event);
+  const unavailable = isEventUnavailable(event);
 
   return (
     <EventCoverLayout
@@ -77,7 +76,7 @@ export default function MyEventPublicPage({
       place={event.place}
       placeAddress={event.placeAddress}
       dateDisplay={formatEventDateDisplay(event)}
-      backHref={allEvents.length > 1 ? homeHref : undefined}
+      backHref={homeHref}
       backLabel="همه رویدادها"
       variant="organizer"
     >
@@ -105,13 +104,17 @@ export default function MyEventPublicPage({
       <div className={cn("mb-6 p-4", surfaceCard)}>
         <div className="flex items-start gap-4">
           {organizer.logoImage ? (
-            <div
-              className="h-14 w-14 shrink-0 rounded-xl border border-emerald-500/30 bg-cover bg-center"
+            <Link
+              href={homeHref}
+              className="h-14 w-14 shrink-0 rounded-xl border border-emerald-500/30 bg-cover bg-center transition hover:ring-2 hover:ring-emerald-400/50"
               style={{ backgroundImage: `url(${organizer.logoImage})` }}
+              aria-label={`بازگشت به صفحه ${organizer.displayName}`}
             />
           ) : null}
           <div className={cn("min-w-0 flex-1 space-y-2 text-sm", mutedText)}>
-            <p className={cn("font-black", accentText)}>{organizer.displayName}</p>
+            <Link href={homeHref} className={cn("font-black hover:underline", accentText)}>
+              {organizer.displayName}
+            </Link>
             <p className="flex items-center gap-2">
               <CalendarDays className={cn("h-4 w-4 shrink-0", accentIcon)} />
               {formatEventDateDisplay(event)}

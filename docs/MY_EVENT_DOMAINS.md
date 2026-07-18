@@ -1,44 +1,53 @@
-# راه‌اندازی دامنه‌ها: bilitmall.com + My Event
+# راه‌اندازی دامنه‌ها: bilitmall.com + صفحه برگزارکننده
 
 ## معماری URL
 
 | آدرس | نقش |
 |--------|-----|
-| `bilitmall.com` | سایت اصلی، ادمین، استودیو برگزارکننده (`/my-event`) |
-| `www.myevent.{slug}` | صفحه عمومی برگزارکننده |
-| `www.myevent.{slug}/{eventEn}/{cityEn}` | صفحه رویداد (مثلاً `/arminzarei/tehran`) |
-| `/sites/{slug}/{eventEn}/{cityEn}` | همان صفحه در حالت توسعه محلی |
+| `bilitmall.com` | مارکت‌پلیس بلیت‌مال |
+| `bilitmall.com/my-event` | استودیو برگزارکننده (My Event Studio) |
+| `{slug}.bilitmall.com` | صفحه فروش اختصاصی برگزارکننده |
+| `{slug}.bilitmall.com/{event}` | صفحه رویداد (مثلاً `afra.bilitmall.com/dorehami`) |
+| `/sites/{slug}/{event}` | همان صفحه در حالت توسعه محلی |
 
-مثال: `https://www.myevent.cofe-roz/arminzarei/tehran`
-
-لینک‌های قدیمی `/sites/cofe-roz/کنسرت-...` به‌صورت خودکار به URL جدید ریدایرکت می‌شوند.
-
-از بلیت‌مال، کارت رویدادهای My Event مستقیماً به همین صفحه اختصاصی می‌روند.
+از بلیت‌مال، کارت رویدادهای My Event به همین صفحه اختصاصی می‌روند.
 
 ---
 
-## متغیرهای محیطی
+## متغیرهای محیطی (production)
+
+```
+NEXT_PUBLIC_APP_URL=https://bilitmall.com
+MY_EVENT_PAGES_DOMAIN=bilitmall.com
+NEXT_PUBLIC_MY_EVENT_PAGES_DOMAIN=bilitmall.com
+NEXT_PUBLIC_MY_EVENT_USE_LOCAL_PATHS=false
+```
+
+## توسعه محلی
 
 ```
 NEXT_PUBLIC_APP_URL=http://localhost:3000
-NEXT_PUBLIC_MY_EVENT_HOST_SUFFIX=.localhost
-NEXT_PUBLIC_MY_EVENT_USE_WWW_HOST=true
+# بدون USE_LOCAL_PATHS=false → لینک‌ها /sites/{slug}/... هستند
 ```
 
-در production می‌توانید `NEXT_PUBLIC_MY_EVENT_HOST_SUFFIX` را خالی بگذارید اگر DNS دقیقاً `www.myevent.cofe-roz` است.
+- `http://localhost:3000` → مارکت‌پلیس
+- `http://localhost:3000/sites/afra/dorehami` → صفحه رویداد
+- برای تست ساب‌دامین محلی: host مثل `afra.localhost:3000` با `MY_EVENT_PAGES_DOMAIN=localhost`
 
 ---
 
-## تست محلی
+## DNS / TLS (خارج از اپ)
 
-مرورگرهای مدرن `*.localhost` را به `127.0.0.1` resolve می‌کنند:
-
-- `http://localhost:3000` → بلیت‌مال
-- `http://www.myevent.cofe-roz.localhost:3000/arminzarei/tehran` → صفحه رویداد
-- `http://localhost:3000/sites/cofe-roz/arminzarei/tehran` → همان صفحه (مسیر داخلی)
+- رکورد wildcard: `*.bilitmall.com` → همان اپلیکیشن
+- گواهی TLS برای wildcard
 
 ---
 
-## Legacy: `{slug}.myevent.ae`
+## سازگاری موقت (legacy)
 
-هنوز از middleware پشتیبانی می‌شود و به `/sites/{slug}/...` rewrite می‌شود.
+این hostها هنوز در middleware به `/sites/{slug}/...` rewrite می‌شوند:
+
+- `{slug}.myevent.ae`
+- `myevent.{slug}.ae`
+
+لینک‌های ساخته‌شده در UI فقط شکل `{slug}.bilitmall.com` هستند.

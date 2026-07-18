@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import "./globals.css";
 import FooterWrapper from "@/components/FooterWrapper";
 import NavbarWrapper from "@/components/NavbarWrapper";
@@ -17,11 +18,14 @@ export const metadata: Metadata = {
   description: "خرید بلیت رویدادها",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const headerList = await headers();
+  const organizerPublic = headerList.get("x-organizer-public") === "1";
+
   return (
     <html lang="fa" dir="rtl" suppressHydrationWarning>
       <head>
@@ -36,9 +40,9 @@ export default function RootLayout({
                 <CitiesProvider>
                   <CityProvider>
                     <CitySelectionSync />
-                    <NavbarWrapper />
+                    <NavbarWrapper organizerPublic={organizerPublic} />
                     {children}
-                    <FooterWrapper />
+                    <FooterWrapper organizerPublic={organizerPublic} />
                   </CityProvider>
                 </CitiesProvider>
               </FavoritesProvider>

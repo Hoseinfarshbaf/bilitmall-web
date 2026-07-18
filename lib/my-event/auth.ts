@@ -1,4 +1,5 @@
 import { createHmac } from "crypto";
+import { isReservedBilitmallSubdomain } from "./domains";
 
 export { hashPassword, verifyPassword } from "@/lib/auth/password";
 
@@ -7,10 +8,12 @@ export {
   getMyEventEventHref,
   getMyEventOrganizerHomeHref,
   getMyEventPagesDomain,
+  getBilitmallPagesDomain,
   isMyEventSubdomainHost,
   isMyEventPublicHost,
   extractOrganizerSlugFromHost,
   formatMyEventEventLinkPreview,
+  isReservedBilitmallSubdomain,
 } from "./domains";
 
 export { resolveEventPublicUrl, assignUniquePublicSlugs } from "./store";
@@ -83,5 +86,7 @@ export function normalizeMyEventSlug(value: string): string {
 }
 
 export function isValidMyEventSlug(slug: string): boolean {
-  return /^[a-z0-9](?:[a-z0-9-]{1,38}[a-z0-9])?$/.test(slug);
+  if (!/^[a-z0-9](?:[a-z0-9-]{1,38}[a-z0-9])?$/.test(slug)) return false;
+  if (isReservedBilitmallSubdomain(slug)) return false;
+  return true;
 }

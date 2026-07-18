@@ -178,7 +178,8 @@ const bookingThemes: Record<"light" | "dark", Record<EventPageVariant, BookingFl
 
 export function useEventPageTheme(variant: EventPageVariant = "bilitmall") {
   const { theme } = useTheme();
-  const isDark = theme === "dark";
+  // Organizer public pages stay light and ignore marketplace preference.
+  const isDark = variant === "organizer" ? false : theme === "dark";
   const mode = isDark ? "dark" : "light";
   return {
     isDark,

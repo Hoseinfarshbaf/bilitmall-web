@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Upload, X } from "lucide-react";
 import MyEventShell from "@/components/my-event/MyEventShell";
 import { getMyEventPublicUrl, normalizeMyEventSlug } from "@/lib/my-event/auth";
+import { getMyEventOrganizerHostname } from "@/lib/my-event/domains";
 import { hasUploadedImage } from "@/lib/events/helpers";
 import { getEventImageStyle } from "@/lib/events/helpers";
 import type { MyEventOrganizerProfile } from "@/lib/my-event/store";
@@ -48,6 +49,7 @@ export default function MyEventProfilePage() {
 
   const slug = normalizeMyEventSlug(slugInput);
   const previewUrl = slug ? getMyEventPublicUrl(slug) : "";
+  const previewHost = slug ? getMyEventOrganizerHostname(slug) : "";
 
   useEffect(() => {
     let cancelled = false;
@@ -277,12 +279,19 @@ export default function MyEventProfilePage() {
             {slugStatus === "invalid" && slugInput.trim() ? (
               <p className="mt-2 text-xs text-red-500 dark:text-red-400">فرمت آدرس معتبر نیست.</p>
             ) : null}
-            {previewUrl ? (
+            {previewHost ? (
               <div className="mt-3 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3">
-                <p className="text-xs font-bold text-emerald-700 dark:text-emerald-300">پیش‌نمایش لینک صفحه</p>
-                <p className="mt-1 font-mono text-sm text-neutral-900 dark:text-white" dir="ltr">
-                  {previewUrl}
+                <p className="text-xs font-bold text-emerald-700 dark:text-emerald-300">
+                  پیش‌نمایش ساب‌دامین بلیت‌مال
                 </p>
+                <p className="mt-1 font-mono text-sm text-neutral-900 dark:text-white" dir="ltr">
+                  https://{previewHost}
+                </p>
+                {previewUrl ? (
+                  <p className="mt-1 text-[11px] text-neutral-400" dir="ltr">
+                    لوکال: {previewUrl}
+                  </p>
+                ) : null}
               </div>
             ) : null}
           </div>

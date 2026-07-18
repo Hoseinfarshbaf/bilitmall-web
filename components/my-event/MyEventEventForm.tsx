@@ -1147,7 +1147,7 @@ export default function MyEventEventForm({
           ) : null}
           <div className="mt-3 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3">
             <p className="text-xs font-bold text-emerald-700 dark:text-emerald-300">
-              پیش‌نمایش لینک صفحه اختصاصی
+              پیش‌نمایش لینک فروش (ساب‌دامین بلیت‌مال)
             </p>
             <p className="mt-1 font-mono text-sm text-neutral-900 dark:text-white" dir="ltr">
               {linkPreview}

@@ -83,7 +83,9 @@ export default function MyEventDashboardPage() {
 
       {isOrganizerLive ? (
         <div className="mb-8 rounded-3xl border border-emerald-500/30 bg-emerald-500/10 p-6">
-          <p className="text-sm font-bold text-emerald-700 dark:text-emerald-200">لینک صفحه شما</p>
+          <p className="text-sm font-bold text-emerald-700 dark:text-emerald-200">
+            لینک صفحه برند شما
+          </p>
           <a
             href={publicUrl}
             target="_blank"
@@ -93,6 +95,9 @@ export default function MyEventDashboardPage() {
           >
             {publicUrl}
           </a>
+          <p className="mt-2 text-xs text-neutral-500 dark:text-slate-400">
+            لوگو، نام برند و کارت رویدادهای فعال شما اینجا نمایش داده می‌شود.
+          </p>
         </div>
       ) : (
         <div className="mb-8 rounded-3xl border border-neutral-200 bg-white p-5 text-sm text-neutral-500 dark:border-white/10 dark:bg-white/5 dark:text-slate-400">
@@ -231,7 +236,7 @@ export default function MyEventDashboardPage() {
                       rel="noreferrer"
                       className="rounded-xl bg-neutral-100 px-4 py-2 text-sm font-bold hover:bg-neutral-200 dark:bg-white/10 dark:hover:bg-white/15"
                     >
-                      مشاهده صفحه
+                      مشاهده صفحه فروش
                     </a>
                   ) : (
                     <span className="max-w-xs rounded-xl bg-neutral-100 px-4 py-2 text-xs leading-6 text-neutral-500 dark:bg-white/5 dark:text-slate-500">

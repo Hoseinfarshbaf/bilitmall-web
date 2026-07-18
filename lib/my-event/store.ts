@@ -621,6 +621,7 @@ export async function getPublicMyEventPage(
 
   let event: (typeof organizer.events)[number] | undefined;
 
+  // Home (`{slug}.bilitmall.com`) is the brand page — no auto-selected event.
   if (eventPathSlug) {
     const normalized = eventPathSlug.toLowerCase();
     event = organizer.events.find(
@@ -629,8 +630,6 @@ export async function getPublicMyEventPage(
         (item.publicEventSlug ?? buildPublicEventSlug(item.title)) === normalized ||
         item.slug === eventPathSlug
     );
-  } else {
-    event = organizer.events[0];
   }
 
   return { organizer, event, events: organizer.events };

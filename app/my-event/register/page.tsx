@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import MyEventShell from "@/components/my-event/MyEventShell";
 import { getMyEventPublicUrl, normalizeMyEventSlug } from "@/lib/my-event/auth";
+import { getMyEventOrganizerHostname } from "@/lib/my-event/domains";
 import { MY_EVENT_REGISTRATION_SUCCESS_MESSAGE } from "@/lib/my-event/constants";
 
 export default function MyEventRegisterPage() {
@@ -24,6 +25,7 @@ export default function MyEventRegisterPage() {
   );
 
   const previewUrl = slug ? getMyEventPublicUrl(slug) : "";
+  const previewHost = slug ? getMyEventOrganizerHostname(slug) : "";
   const slugStatus = !slug ? ("invalid" as const) : remoteSlugStatus;
 
   useEffect(() => {
@@ -166,9 +168,14 @@ export default function MyEventRegisterPage() {
             placeholder="cafe-niloufar"
             dir="ltr"
           />
-          {previewUrl ? (
+          {previewHost ? (
             <p className="mt-2 text-xs text-emerald-600 dark:text-emerald-300" dir="ltr">
-              {previewUrl}/نام-رویداد
+              https://{previewHost}/نام-رویداد
+            </p>
+          ) : null}
+          {previewUrl && process.env.NODE_ENV === "development" ? (
+            <p className="mt-1 text-[11px] text-neutral-400" dir="ltr">
+              لوکال: {previewUrl}
             </p>
           ) : null}
           {slugStatus === "checking" ? (

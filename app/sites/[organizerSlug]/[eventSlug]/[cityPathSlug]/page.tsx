@@ -5,7 +5,7 @@ type PageProps = {
   params: Promise<{ organizerSlug: string; eventSlug: string; cityPathSlug: string }>;
 };
 
-/** Old two-segment URLs → myevent.{brand}/{eventEn} */
+/** Old two-segment URLs → {brand}.bilitmall.com/{eventEn} */
 export default async function LegacyCityPathRedirect({ params }: PageProps) {
   const { organizerSlug, eventSlug } = await params;
   const page = await getPublicMyEventPage(organizerSlug, eventSlug);

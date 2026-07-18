@@ -4,8 +4,11 @@ import MyEventPublicPage from "@/components/my-event";
 import { isMyEventPublicHost } from "@/lib/my-event/domains";
 import { buildPublicEventSlug } from "@/lib/my-event/public-slugs";
 import { getPublicMyEventPage } from "@/lib/my-event/store";
-import { managedToEventItem } from "@/lib/events/date-utils";
-import { parseDaysFromRecord } from "@/lib/events/date-utils";
+import {
+  formatEventDateDisplay,
+  managedToEventItem,
+  parseDaysFromRecord,
+} from "@/lib/events/date-utils";
 
 type PageProps = {
   params: Promise<{ organizerSlug: string }>;
@@ -22,29 +25,39 @@ export default async function OrganizerSiteHomePage({ params }: PageProps) {
 
   if (!page) return notFound();
 
-  const eventItem = page.event
-    ? managedToEventItem({
-        id: page.event.id,
-        slug: page.event.slug,
-        title: page.event.title,
-        city: page.event.city,
-        category: page.event.category,
-        place: page.event.place,
-        price: page.event.price,
-        image: page.event.image,
-        bannerImage: "",
-        badge: page.event.badge ?? undefined,
-        days: parseDaysFromRecord(page.event.days),
-        published: page.event.published,
-        popular: page.event.popular,
-        featured: page.event.featured,
-        ticketingType: page.event.ticketingType as "INTERNAL" | "EXTERNAL_LINK",
-        hasAssignedSeating: page.event.hasAssignedSeating,
-        status: page.event.status as "active",
-        createdAt: page.event.createdAt.toISOString(),
-        updatedAt: page.event.updatedAt.toISOString(),
-      })
-    : null;
+  const allEvents = page.events.map((e) => {
+    const item = managedToEventItem({
+      id: e.id,
+      slug: e.slug,
+      title: e.title,
+      city: e.city,
+      category: e.category,
+      place: e.place,
+      placeAddress: e.placeAddress ?? undefined,
+      price: e.price,
+      image: e.image,
+      bannerImage: "",
+      badge: e.badge ?? undefined,
+      days: parseDaysFromRecord(e.days),
+      published: e.published,
+      popular: e.popular,
+      featured: e.featured,
+      ticketingType: e.ticketingType as "INTERNAL" | "EXTERNAL_LINK",
+      hasAssignedSeating: e.hasAssignedSeating,
+      status: e.status as "active",
+      createdAt: e.createdAt.toISOString(),
+      updatedAt: e.updatedAt.toISOString(),
+    });
+
+    return {
+      publicEventSlug: e.publicEventSlug ?? buildPublicEventSlug(e.title),
+      title: e.title,
+      image: e.image,
+      city: e.city,
+      place: e.place,
+      dateDisplay: formatEventDateDisplay(item),
+    };
+  });
 
   return (
     <MyEventPublicPage
@@ -55,12 +68,8 @@ export default async function OrganizerSiteHomePage({ params }: PageProps) {
         coverImage: page.organizer.coverImage,
         logoImage: page.organizer.logoImage,
       }}
-      event={eventItem}
-      description={page.event?.description}
-      allEvents={page.events.map((e) => ({
-        publicEventSlug: e.publicEventSlug ?? buildPublicEventSlug(e.title),
-        title: e.title,
-      }))}
+      event={null}
+      allEvents={allEvents}
       onSubdomain={await isOnSubdomain()}
     />
   );

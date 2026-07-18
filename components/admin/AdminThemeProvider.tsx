@@ -8,6 +8,8 @@ import {
   useState,
 } from "react";
 import { Moon, Sun } from "lucide-react";
+import { isMyEventPublicHost } from "@/lib/my-event/domains";
+import { shouldSkipMarketplaceDocumentTheme } from "@/lib/theme-surfaces";
 
 type Theme = "light" | "dark";
 
@@ -24,7 +26,31 @@ const AdminThemeContext = createContext<AdminThemeContextType | undefined>(
   undefined
 );
 
-/** کلاس dark را مستقیم روی ریشهٔ پنل ادمین اعمال می‌کند (بدون درگیر کردن state رندر). */
+function clearMarketplaceDocumentTheme() {
+  document.documentElement.classList.remove("dark");
+  document.documentElement.style.colorScheme = "light";
+}
+
+function restoreMarketplaceDocumentTheme() {
+  if (typeof window === "undefined") return;
+  const path = window.location.pathname || "";
+  const host = window.location.host.split(":")[0]?.toLowerCase() ?? "";
+  if (
+    shouldSkipMarketplaceDocumentTheme(path) ||
+    isMyEventPublicHost(host)
+  ) {
+    clearMarketplaceDocumentTheme();
+    return;
+  }
+  const stored = window.localStorage.getItem("bilitmall-theme");
+  const dark =
+    stored === "dark" ||
+    (!stored && window.matchMedia("(prefers-color-scheme: dark)").matches);
+  document.documentElement.classList.toggle("dark", dark);
+  document.documentElement.style.colorScheme = dark ? "dark" : "light";
+}
+
+/** کلاس dark فقط روی ریشهٔ پنل ادمین — html مارکت‌پلیس را خالی نگه می‌داریم. */
 function applyThemeClass(theme: Theme) {
   const root = document.getElementById(ROOT_ID);
   if (!root) return;
@@ -36,19 +62,29 @@ export function AdminThemeProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const [theme, setThemeState] = useState<Theme>(() => {
-    if (typeof window === "undefined") return "light";
-    const stored = window.localStorage.getItem(STORAGE_KEY);
-    return stored === "dark" ? "dark" : "light";
-  });
+  const [theme, setThemeState] = useState<Theme>("light");
 
   useEffect(() => {
+    const stored = window.localStorage.getItem(STORAGE_KEY);
+    setThemeState(stored === "dark" ? "dark" : "light");
+  }, []);
+
+  useEffect(() => {
+    clearMarketplaceDocumentTheme();
+    return () => {
+      restoreMarketplaceDocumentTheme();
+    };
+  }, []);
+
+  useEffect(() => {
+    clearMarketplaceDocumentTheme();
     applyThemeClass(theme);
   }, [theme]);
 
   const setTheme = useCallback((next: Theme) => {
     setThemeState(next);
     window.localStorage.setItem(STORAGE_KEY, next);
+    clearMarketplaceDocumentTheme();
     applyThemeClass(next);
   }, []);
 
@@ -56,6 +92,7 @@ export function AdminThemeProvider({
     setThemeState((current) => {
       const next = current === "dark" ? "light" : "dark";
       window.localStorage.setItem(STORAGE_KEY, next);
+      clearMarketplaceDocumentTheme();
       applyThemeClass(next);
       return next;
     });

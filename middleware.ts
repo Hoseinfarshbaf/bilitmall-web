@@ -2,11 +2,26 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import {
   extractOrganizerSlugFromHost,
-  getMyEventPagesDomain,
-  parseOrganizerSlugFromV2Host,
+  getBilitmallPagesDomain,
 } from "@/lib/my-event/domains";
 
-const PAGES_DOMAIN = process.env.MY_EVENT_PAGES_DOMAIN ?? getMyEventPagesDomain();
+const PAGES_DOMAIN =
+  process.env.MY_EVENT_PAGES_DOMAIN ?? getBilitmallPagesDomain();
+
+function withPathHeaders(
+  request: NextRequest,
+  extras?: Record<string, string>
+): Headers {
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("x-pathname", request.nextUrl.pathname);
+  requestHeaders.set("x-organizer-public", "0");
+  if (extras) {
+    for (const [key, value] of Object.entries(extras)) {
+      requestHeaders.set(key, value);
+    }
+  }
+  return requestHeaders;
+}
 
 export function middleware(request: NextRequest) {
   const host = request.headers.get("host")?.split(":")[0]?.toLowerCase() ?? "";
@@ -20,35 +35,32 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const organizerFromV2 = parseOrganizerSlugFromV2Host(host);
-  const organizerFromLegacy =
-    PAGES_DOMAIN && host.endsWith(`.${PAGES_DOMAIN}`) && host !== PAGES_DOMAIN
-      ? extractOrganizerSlugFromHost(host, PAGES_DOMAIN)
-      : null;
+  // Apex / www stay on the marketplace — never rewrite to /my-event
+  if (host === PAGES_DOMAIN || host === `www.${PAGES_DOMAIN}`) {
+    return NextResponse.next({
+      request: { headers: withPathHeaders(request) },
+    });
+  }
 
-  const organizerSlug = organizerFromV2 ?? organizerFromLegacy;
+  const organizerSlug = extractOrganizerSlugFromHost(host, PAGES_DOMAIN);
 
   if (organizerSlug) {
     const suffix = pathname === "/" ? "" : pathname;
     const rewriteUrl = request.nextUrl.clone();
     rewriteUrl.pathname = `/sites/${organizerSlug}${suffix}`;
-    return NextResponse.rewrite(rewriteUrl);
+    return NextResponse.rewrite(rewriteUrl, {
+      request: {
+        headers: withPathHeaders(request, {
+          "x-organizer-public": "1",
+          "x-organizer-slug": organizerSlug,
+        }),
+      },
+    });
   }
 
-  if (!PAGES_DOMAIN) {
-    return NextResponse.next();
-  }
-
-  if (host === PAGES_DOMAIN) {
-    if (pathname === "/" || pathname === "") {
-      const rewriteUrl = request.nextUrl.clone();
-      rewriteUrl.pathname = "/my-event";
-      return NextResponse.rewrite(rewriteUrl);
-    }
-    return NextResponse.next();
-  }
-
-  return NextResponse.next();
+  return NextResponse.next({
+    request: { headers: withPathHeaders(request) },
+  });
 }
 
 export const config = {

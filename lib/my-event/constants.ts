@@ -4,8 +4,8 @@ export const MY_EVENT_STUDIO = "My Event Studio";
 export const MY_EVENT_STUDIO_TAB_TITLE = "استودیو مای‌ایونت";
 export const MY_EVENT_EVENT_SOURCE = "my_event";
 
-/** نمونه لینک عمومی: cofferoze.myevent.ae/summer-workshop */
-export const MY_EVENT_URL_EXAMPLE = "cofferoze.myevent.ae/summer-workshop";
+/** نمونه لینک عمومی: afra.bilitmall.com/dorehami */
+export const MY_EVENT_URL_EXAMPLE = "afra.bilitmall.com/dorehami";
 
 export const MY_EVENT_STATUS_LABELS: Record<string, string> = {
   pending: "در انتظار تأیید",

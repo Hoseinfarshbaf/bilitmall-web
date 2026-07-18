@@ -24,6 +24,6 @@ npm run dev
 - `/` — مارکت‌پلیس رویدادها
 - `/admin` — پنل مدیریت بلیت‌مال
 - `/my-event` — استودیو برگزارکننده (My Event)
-- `/sites/{slug}` — صفحه عمومی برگزارکننده (یا `{slug}.myevent.ae` در production)
+- `/sites/{slug}` — صفحه عمومی برگزارکننده (در production: `{slug}.bilitmall.com`)
 
-راه‌اندازی دامنه `myevent.ae`: [docs/MY_EVENT_DOMAINS.md](docs/MY_EVENT_DOMAINS.md)
+راه‌اندازی ساب‌دامین برگزارکننده: [docs/MY_EVENT_DOMAINS.md](docs/MY_EVENT_DOMAINS.md)

@@ -1,28 +1,53 @@
 /**
- * Production: myevent.{organizerBrand}.ae/{eventSlugEn}
- * e.g. myevent.coferoz.ae/asrhajar
- * Local host: myevent.coferoz.localhost:3000/asrhajar
- * Local path (bilitmall dev): /sites/coferoz/asrhajar
+ * Production organizer shop: {organizer}.bilitmall.com/{eventSlug}
+ * e.g. afra.bilitmall.com/dorehami
+ * Local path (dev default): /sites/afra/dorehami
+ *
+ * Legacy hosts still rewrite via middleware:
+ * - {organizer}.myevent.ae
+ * - myevent.{organizer}.ae
  */
 
 import { buildMyEventPublicPath } from "./public-slugs";
 
-const PRODUCT_LABEL = "myevent";
+export const DEFAULT_BILITMALL_PAGES_DOMAIN = "bilitmall.com";
 
-export function getMyEventRootTld(): string {
-  return (
-    process.env.NEXT_PUBLIC_MY_EVENT_ROOT_TLD ??
-    (process.env.NODE_ENV === "development" ? "localhost" : "ae")
+/** Subdomains that must never be treated as organizer shops */
+export const RESERVED_BILITMALL_SUBDOMAINS = [
+  "www",
+  "api",
+  "admin",
+  "cdn",
+  "static",
+  "mail",
+  "app",
+  "staging",
+  "my-event",
+  "myevent",
+] as const;
+
+export function isReservedBilitmallSubdomain(slug: string): boolean {
+  return (RESERVED_BILITMALL_SUBDOMAINS as readonly string[]).includes(
+    slug.trim().toLowerCase()
   );
 }
 
-/** TLD shown in link preview (future production domain) */
-export function getMyEventPreviewTld(): string {
-  return process.env.NEXT_PUBLIC_MY_EVENT_PREVIEW_TLD ?? "ae";
+/** Apex domain for organizer subdomains (e.g. bilitmall.com) */
+export function getBilitmallPagesDomain(): string {
+  return (
+    process.env.NEXT_PUBLIC_MY_EVENT_PAGES_DOMAIN ??
+    process.env.MY_EVENT_PAGES_DOMAIN ??
+    DEFAULT_BILITMALL_PAGES_DOMAIN
+  );
+}
+
+/** @deprecated use getBilitmallPagesDomain */
+export function getMyEventPagesDomain(): string {
+  return getBilitmallPagesDomain();
 }
 
 export function getMyEventOrganizerHostname(organizerSlug: string): string {
-  return `${PRODUCT_LABEL}.${organizerSlug}.${getMyEventRootTld()}`;
+  return `${organizerSlug}.${getBilitmallPagesDomain()}`;
 }
 
 export function formatMyEventEventLinkPreview(
@@ -30,9 +55,10 @@ export function formatMyEventEventLinkPreview(
   publicEventSlug: string
 ): string {
   const slug = publicEventSlug.trim() || "eventname";
-  return `${PRODUCT_LABEL}.${organizerSlug}.${getMyEventPreviewTld()}/${slug}`;
+  return `${organizerSlug}.${getBilitmallPagesDomain()}/${slug}`;
 }
 
+/** Legacy: myevent.{organizer}.ae | myevent.{organizer}.localhost */
 export function parseOrganizerSlugFromV2Host(host: string): string | null {
   const normalized = host.split(":")[0].toLowerCase();
   const match = normalized.match(
@@ -41,43 +67,49 @@ export function parseOrganizerSlugFromV2Host(host: string): string | null {
   return match ? match[1] : null;
 }
 
-export function getMyEventPagesDomain(): string {
-  return (
-    process.env.NEXT_PUBLIC_MY_EVENT_PAGES_DOMAIN ??
-    process.env.MY_EVENT_PAGES_DOMAIN ??
-    ""
-  );
+/** Legacy pages apex: myevent.ae (optional env override only for legacy rewrite) */
+function getLegacyMyEventAeDomain(): string {
+  return process.env.MY_EVENT_LEGACY_PAGES_DOMAIN ?? "myevent.ae";
 }
 
 export function isMyEventSubdomainHost(host: string, pagesDomain?: string): boolean {
-  const domain = pagesDomain ?? getMyEventPagesDomain();
+  const domain = pagesDomain ?? getBilitmallPagesDomain();
   if (!domain) return false;
   const normalized = host.split(":")[0].toLowerCase();
-  return (
-    normalized !== domain &&
-    normalized.endsWith(`.${domain}`) &&
-    !normalized.slice(0, -(domain.length + 1)).includes(".")
-  );
+  if (normalized === domain || !normalized.endsWith(`.${domain}`)) return false;
+  const label = normalized.slice(0, -(domain.length + 1));
+  if (!label || label.includes(".")) return false;
+  if (isReservedBilitmallSubdomain(label)) return false;
+  return true;
 }
 
-export function extractOrganizerSlugFromHost(host: string, pagesDomain?: string): string | null {
-  const v2 = parseOrganizerSlugFromV2Host(host);
-  if (v2) return v2;
+export function extractOrganizerSlugFromHost(
+  host: string,
+  pagesDomain?: string
+): string | null {
+  const domain = pagesDomain ?? getBilitmallPagesDomain();
+  if (isMyEventSubdomainHost(host, domain)) {
+    const normalized = host.split(":")[0].toLowerCase();
+    return normalized.slice(0, -(domain.length + 1));
+  }
 
-  const domain = pagesDomain ?? getMyEventPagesDomain();
-  if (!isMyEventSubdomainHost(host, domain)) return null;
-  const normalized = host.split(":")[0].toLowerCase();
-  return normalized.slice(0, -(domain.length + 1));
+  const v2 = parseOrganizerSlugFromV2Host(host);
+  if (v2 && !isReservedBilitmallSubdomain(v2)) return v2;
+
+  const legacyAe = getLegacyMyEventAeDomain();
+  if (legacyAe !== domain && isMyEventSubdomainHost(host, legacyAe)) {
+    const normalized = host.split(":")[0].toLowerCase();
+    return normalized.slice(0, -(legacyAe.length + 1));
+  }
+
+  return null;
 }
 
 export function isMyEventPublicHost(host: string): boolean {
-  return (
-    parseOrganizerSlugFromV2Host(host) !== null ||
-    isMyEventSubdomainHost(host)
-  );
+  return extractOrganizerSlugFromHost(host) !== null;
 }
 
-/** Working URL — local uses /sites path on same Next app */
+/** Working URL — local uses /sites path on same Next app by default */
 export function getMyEventPublicUrl(
   organizerSlug: string,
   publicEventSlug?: string
