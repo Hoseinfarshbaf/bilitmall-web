@@ -94,14 +94,14 @@ export default function SpecialOffers() {
                   </h3>
                   <div className="mt-2.5 flex flex-col items-start gap-2 text-xs font-semibold text-white/90 md:mt-3 md:flex-row md:flex-wrap md:items-center md:gap-2.5 md:text-[13px] lg:text-sm">
                     <span className="inline-flex min-h-9 max-w-full items-center gap-1.5 rounded-full bg-white/10 px-3 py-1.5 ring-1 ring-white/10 backdrop-blur-sm">
-                      <CalendarDays className="h-4 w-4 shrink-0 text-red-300" />
+                      <CalendarDays className="h-4 w-4 shrink-0 text-brand-300" />
                       <span className="truncate">{formatEventDateDisplay(event)}</span>
                     </span>
                     <span className="inline-flex min-h-9 max-w-full items-center gap-1.5 rounded-full bg-white/10 px-3 py-1.5 ring-1 ring-white/10 backdrop-blur-sm">
-                      <MapPin className="h-4 w-4 shrink-0 text-red-300" />
+                      <MapPin className="h-4 w-4 shrink-0 text-brand-300" />
                       <span className="truncate">{event.place}</span>
                     </span>
-                    <span className="inline-flex min-h-9 items-center gap-1 text-red-300 opacity-100 transition-all duration-300 md:opacity-0 md:group-hover:translate-x-0 md:group-hover:opacity-100">
+                    <span className="inline-flex min-h-9 items-center gap-1 text-brand-300 opacity-100 transition-all duration-300 md:opacity-0 md:group-hover:translate-x-0 md:group-hover:opacity-100">
                       <span className="font-black">مشاهده و خرید</span>
                       <ArrowLeft className="h-4 w-4" />
                     </span>

@@ -154,11 +154,11 @@ export default function EventCoverLayout({
                           "mr-auto rounded-full px-2 py-0.5 text-xs font-bold",
                           variant === "bilitmall"
                             ? isDark
-                              ? "bg-red-500/30 text-red-200"
-                              : "bg-red-100 text-red-700"
+                              ? "bg-brand-500/30 text-brand-200"
+                              : "bg-brand-100 text-brand-700"
                             : isDark
-                              ? "bg-emerald-500/30 text-emerald-200"
-                              : "bg-emerald-100 text-emerald-800"
+                              ? "bg-brand-500/30 text-brand-200"
+                              : "bg-brand-100 text-brand-800"
                         )}
                       >
                         {badge}

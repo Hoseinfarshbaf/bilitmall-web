@@ -87,7 +87,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
               <Link
                 href={toast.action.href}
                 onClick={() => dismissToast(toast.id)}
-                className="shrink-0 rounded-full bg-red-600 px-3 py-1.5 text-xs font-bold text-white transition hover:bg-red-700"
+                className="shrink-0 rounded-full bg-brand-500 px-3 py-1.5 text-xs font-bold text-white transition hover:bg-brand-600"
               >
                 {toast.action.label}
               </Link>

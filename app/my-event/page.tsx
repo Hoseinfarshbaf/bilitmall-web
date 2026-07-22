@@ -22,7 +22,7 @@ export default function MyEventLandingPage() {
     >
       <MyEventHeader />
       <div className="mx-auto max-w-5xl px-4 py-16">
-        <div className="mb-10 flex items-center gap-2 text-emerald-600 dark:text-emerald-400">
+        <div className="mb-10 flex items-center gap-2 text-brand-600 dark:text-brand-400">
           <Sparkles className="h-8 w-8" />
           <span className="text-2xl font-black">{MY_EVENT_STUDIO}</span>
         </div>
@@ -39,7 +39,7 @@ export default function MyEventLandingPage() {
           {loggedIn === null ? null : loggedIn ? (
             <Link
               href="/my-event/dashboard"
-              className="rounded-2xl bg-emerald-600 px-6 py-4 text-sm font-black text-white hover:bg-emerald-500"
+              className="rounded-2xl bg-brand-600 px-6 py-4 text-sm font-black text-white hover:bg-brand-500"
             >
               رفتن به داشبورد
             </Link>
@@ -47,13 +47,13 @@ export default function MyEventLandingPage() {
             <>
               <Link
                 href="/my-event/register"
-                className="rounded-2xl bg-emerald-600 px-6 py-4 text-sm font-black text-white hover:bg-emerald-500"
+                className="rounded-2xl bg-brand-600 px-6 py-4 text-sm font-black text-white hover:bg-brand-500"
               >
                 ساخت حساب برگزارکننده
               </Link>
               <Link
                 href="/my-event/login"
-                className="rounded-2xl border border-emerald-500/40 px-6 py-4 text-sm font-black text-emerald-700 hover:bg-emerald-500/10 dark:border-emerald-500/30 dark:text-white"
+                className="rounded-2xl border border-brand-500/40 px-6 py-4 text-sm font-black text-brand-700 hover:bg-brand-500/10 dark:border-brand-500/30 dark:text-white"
               >
                 ورود
               </Link>
@@ -62,22 +62,22 @@ export default function MyEventLandingPage() {
         </div>
 
         <div className="mt-16 grid gap-4 sm:grid-cols-3">
-          <div className="rounded-3xl border border-emerald-500/20 bg-emerald-500/5 p-6 dark:border-emerald-500/10">
-            <Globe className="mb-3 h-6 w-6 text-emerald-600 dark:text-emerald-300" />
+          <div className="rounded-3xl border border-brand-500/20 bg-brand-500/5 p-6 dark:border-brand-500/10">
+            <Globe className="mb-3 h-6 w-6 text-brand-600 dark:text-brand-300" />
             <h2 className="font-black">ساب‌دامین روی بلیت‌مال</h2>
             <p className="mt-2 text-sm text-neutral-500 dark:text-slate-400">
               مثلاً <span dir="ltr">https://{MY_EVENT_URL_EXAMPLE}</span>
             </p>
           </div>
-          <div className="rounded-3xl border border-emerald-500/20 bg-emerald-500/5 p-6 dark:border-emerald-500/10">
-            <Layers className="mb-3 h-6 w-6 text-emerald-600 dark:text-emerald-300" />
+          <div className="rounded-3xl border border-brand-500/20 bg-brand-500/5 p-6 dark:border-brand-500/10">
+            <Layers className="mb-3 h-6 w-6 text-brand-600 dark:text-brand-300" />
             <h2 className="font-black">صفحه یک‌صفحه‌ای</h2>
             <p className="mt-2 text-sm text-neutral-500 dark:text-slate-400">
               فقط رویداد و برند شما — بدون شلوغی بلیت‌مال
             </p>
           </div>
-          <div className="rounded-3xl border border-emerald-500/20 bg-emerald-500/5 p-6 dark:border-emerald-500/10">
-            <Sparkles className="mb-3 h-6 w-6 text-emerald-600 dark:text-emerald-300" />
+          <div className="rounded-3xl border border-brand-500/20 bg-brand-500/5 p-6 dark:border-brand-500/10">
+            <Sparkles className="mb-3 h-6 w-6 text-brand-600 dark:text-brand-300" />
             <h2 className="font-black">انتشار در بلیت‌مال</h2>
             <p className="mt-2 text-sm text-neutral-500 dark:text-slate-400">
               در صورت تمایل، رویدادتان پس از تأیید ادمین در مارکت‌پلیس هم دیده می‌شود

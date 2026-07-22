@@ -14,9 +14,9 @@ const SESSION_STEP_LABELS = ["۱", "۲", "۳", "۴", "۵", "۶", "۷", "۸", "۹
 
 const SESSION_TONES = [
   {
-    card: "border-emerald-200 bg-emerald-50/70 dark:border-emerald-500/25 dark:bg-emerald-500/10",
-    badge: "bg-emerald-600 text-white",
-    bar: "bg-emerald-500",
+    card: "border-brand-200 bg-brand-50/70 dark:border-brand-500/25 dark:bg-brand-500/10",
+    badge: "bg-brand-600 text-white",
+    bar: "bg-brand-500",
   },
   {
     card: "border-sky-200 bg-sky-50/70 dark:border-sky-500/25 dark:bg-sky-500/10",
@@ -102,7 +102,7 @@ export default function EventSessionScheduleEditor({
 
   return (
     <div className="space-y-4">
-      <div className="inline-flex items-center gap-2 rounded-full bg-emerald-500/10 px-3 py-1.5 text-xs font-bold text-emerald-700 dark:text-emerald-300">
+      <div className="inline-flex items-center gap-2 rounded-full bg-brand-500/10 px-3 py-1.5 text-xs font-bold text-brand-700 dark:text-brand-300">
         <CalendarRange className="h-3.5 w-3.5" />
         {days.length.toLocaleString("fa-IR")} روز · {totalSessions.toLocaleString("fa-IR")} سانس
       </div>
@@ -120,25 +120,25 @@ export default function EventSessionScheduleEditor({
               className={cn(
                 "flex min-w-18 flex-col items-center rounded-2xl border px-3 py-2.5 transition active:scale-[0.98]",
                 active
-                  ? "border-emerald-500 bg-emerald-600 text-white shadow-md shadow-emerald-600/20"
-                  : "border-neutral-200 bg-white text-neutral-700 hover:border-emerald-300 dark:border-white/10 dark:bg-slate-900 dark:text-slate-200"
+                  ? "border-brand-500 bg-brand-600 text-white shadow-md shadow-brand-600/20"
+                  : "border-neutral-200 bg-white text-neutral-700 hover:border-brand-300 dark:border-white/10 dark:bg-slate-900 dark:text-slate-200"
               )}
             >
-              <span className={cn("text-[10px] font-bold", active ? "text-emerald-100" : "text-neutral-400")}>
+              <span className={cn("text-[10px] font-bold", active ? "text-brand-100" : "text-neutral-400")}>
                 {meta.weekday}
               </span>
               <span className="text-lg font-black leading-none">{meta.dayNumber}</span>
-              <span className={cn("mt-0.5 text-[10px] font-medium", active ? "text-emerald-100" : "text-neutral-400")}>
+              <span className={cn("mt-0.5 text-[10px] font-medium", active ? "text-brand-100" : "text-neutral-400")}>
                 {meta.month}
               </span>
-              <span className={cn("text-[10px]", active ? "text-emerald-100/80" : "text-neutral-400")}>
+              <span className={cn("text-[10px]", active ? "text-brand-100/80" : "text-neutral-400")}>
                 {meta.year}
               </span>
               {day.sessions.length > 1 ? (
                 <span
                   className={cn(
                     "mt-1.5 rounded-full px-2 py-0.5 text-[10px] font-black leading-none",
-                    active ? "bg-white/20 text-white" : "bg-emerald-50 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300"
+                    active ? "bg-white/20 text-white" : "bg-brand-50 text-brand-700 dark:bg-brand-500/15 dark:text-brand-300"
                   )}
                 >
                   {day.sessions.length.toLocaleString("fa-IR")} سانس
@@ -156,7 +156,7 @@ export default function EventSessionScheduleEditor({
               <p className="text-lg font-black text-neutral-900 dark:text-white">
                 {selectedMeta.fullLabel}
               </p>
-              <span className="text-sm font-bold text-emerald-700 dark:text-emerald-300">
+              <span className="text-sm font-bold text-brand-700 dark:text-brand-300">
                 {selectedMeta.weekday}
               </span>
             </div>
@@ -171,7 +171,7 @@ export default function EventSessionScheduleEditor({
               onRemoveDay(safeIndex);
               setSelectedIndex((current) => Math.max(0, current - 1));
             }}
-            className="inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-xl border border-red-200 bg-white px-3 py-2 text-xs font-bold text-red-600 transition hover:bg-red-50 dark:border-red-500/30 dark:bg-slate-900 dark:text-red-400 dark:hover:bg-red-500/10"
+            className="inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-xl border border-brand-200 bg-white px-3 py-2 text-xs font-bold text-brand-600 transition hover:bg-brand-50 dark:border-brand-500/30 dark:bg-slate-900 dark:text-brand-400 dark:hover:bg-brand-500/10"
           >
             <Trash2 className="h-3.5 w-3.5" />
             حذف این روز
@@ -183,16 +183,16 @@ export default function EventSessionScheduleEditor({
             <button
               type="button"
               onClick={() => onApplySessionsToAllDays(safeIndex)}
-              className="group flex w-full items-center gap-3 rounded-2xl border border-emerald-500/25 bg-linear-to-l from-emerald-500/10 to-transparent px-4 py-3 text-right transition hover:border-emerald-500/50 hover:from-emerald-500/15 dark:border-emerald-400/20 dark:from-emerald-500/10"
+              className="group flex w-full items-center gap-3 rounded-2xl border border-brand-500/25 bg-linear-to-l from-brand-500/10 to-transparent px-4 py-3 text-right transition hover:border-brand-500/50 hover:from-brand-500/15 dark:border-brand-400/20 dark:from-brand-500/10"
             >
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-600 text-white shadow-sm shadow-emerald-600/25 transition group-hover:scale-105">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-600 text-white shadow-sm shadow-brand-600/25 transition group-hover:scale-105">
                 <Copy className="h-4 w-4" />
               </span>
               <span className="min-w-0 flex-1">
-                <span className="block text-sm font-black text-emerald-800 dark:text-emerald-200">
+                <span className="block text-sm font-black text-brand-800 dark:text-brand-200">
                   اعمال سانس‌های این روز به همه
                 </span>
-                <span className="mt-0.5 block text-[11px] font-medium text-emerald-700/70 dark:text-emerald-300/70">
+                <span className="mt-0.5 block text-[11px] font-medium text-brand-700/70 dark:text-brand-300/70">
                   همین ساعت‌ها برای بقیه روزها هم کپی می‌شود
                 </span>
               </span>
@@ -258,7 +258,7 @@ export default function EventSessionScheduleEditor({
                           <button
                             type="button"
                             onClick={() => onRemoveSession(safeIndex, sessionIndex)}
-                            className="inline-flex items-center gap-1 rounded-lg px-2 py-1.5 text-xs font-bold text-red-500 transition hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10"
+                            className="inline-flex items-center gap-1 rounded-lg px-2 py-1.5 text-xs font-bold text-red-500 transition hover:bg-brand-50 dark:text-brand-400 dark:hover:bg-brand-500/10"
                           >
                             <Trash2 className="h-3.5 w-3.5" />
                             حذف
@@ -284,7 +284,7 @@ export default function EventSessionScheduleEditor({
           <button
             type="button"
             onClick={() => onAddSession(safeIndex)}
-            className="flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl border border-dashed border-emerald-400/50 bg-emerald-500/5 text-sm font-bold text-emerald-700 transition hover:bg-emerald-500/10 dark:text-emerald-300"
+            className="flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl border border-dashed border-brand-400/50 bg-brand-500/5 text-sm font-bold text-brand-700 transition hover:bg-brand-500/10 dark:text-brand-300"
           >
             <Plus className="h-4 w-4" />
             افزودن سانس جدید

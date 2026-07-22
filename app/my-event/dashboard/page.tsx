@@ -82,8 +82,8 @@ export default function MyEventDashboardPage() {
       ) : null}
 
       {isOrganizerLive ? (
-        <div className="mb-8 rounded-3xl border border-emerald-500/30 bg-emerald-500/10 p-6">
-          <p className="text-sm font-bold text-emerald-700 dark:text-emerald-200">
+        <div className="mb-8 rounded-3xl border border-brand-500/30 bg-brand-500/10 p-6">
+          <p className="text-sm font-bold text-brand-700 dark:text-brand-200">
             لینک صفحه برند شما
           </p>
           <a
@@ -109,7 +109,7 @@ export default function MyEventDashboardPage() {
         {canCreateEvents ? (
           <Link
             href="/my-event/events/new"
-            className="rounded-xl bg-emerald-600 px-5 py-3 text-sm font-black text-white hover:bg-emerald-500"
+            className="rounded-xl bg-brand-600 px-5 py-3 text-sm font-black text-white hover:bg-brand-500"
           >
             + رویداد جدید
           </Link>
@@ -160,9 +160,9 @@ export default function MyEventDashboardPage() {
                   <p className="mt-1 text-xs text-neutral-400 dark:text-slate-500">
                     {event.hasAssignedSeating ? "صندلی مشخص" : "بدون صندلی ثابت"}
                     {event.hasAssignedSeating && usesLinkedVenue ? (
-                      <span className="text-emerald-600 dark:text-emerald-400"> · صحنه از سالن تأییدشده</span>
+                      <span className="text-brand-600 dark:text-brand-400"> · صحنه از سالن تأییدشده</span>
                     ) : event.hasAssignedSeating && event.hasSeatingPlan ? (
-                      <span className="text-emerald-600 dark:text-emerald-400"> · صحنه تعریف شده</span>
+                      <span className="text-brand-600 dark:text-brand-400"> · صحنه تعریف شده</span>
                     ) : event.hasAssignedSeating ? (
                       <span className="text-violet-600 dark:text-violet-400"> · طراحی صحنه لازم است</span>
                     ) : null}

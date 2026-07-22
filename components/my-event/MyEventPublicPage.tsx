@@ -106,7 +106,7 @@ export default function MyEventPublicPage({
           {organizer.logoImage ? (
             <Link
               href={homeHref}
-              className="h-14 w-14 shrink-0 rounded-xl border border-emerald-500/30 bg-cover bg-center transition hover:ring-2 hover:ring-emerald-400/50"
+              className="h-14 w-14 shrink-0 rounded-xl border border-brand-500/30 bg-cover bg-center transition hover:ring-2 hover:ring-brand-400/50"
               style={{ backgroundImage: `url(${organizer.logoImage})` }}
               aria-label={`بازگشت به صفحه ${organizer.displayName}`}
             />

@@ -34,9 +34,9 @@ export default function ThemeToggle({
       className={cn(
         "relative inline-flex shrink-0 items-center rounded-full border font-bold transition-all duration-200",
         "border-neutral-200 bg-white text-neutral-700 shadow-sm",
-        "hover:border-red-200 hover:bg-red-50 hover:text-red-600",
+        "hover:border-brand-200 hover:bg-brand-50 hover:text-brand-600",
         "dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-200",
-        "dark:hover:border-red-500/40 dark:hover:bg-neutral-800 dark:hover:text-red-400",
+        "dark:hover:border-brand-500/40 dark:hover:bg-neutral-800 dark:hover:text-brand-400",
         sizeClass,
         className
       )}

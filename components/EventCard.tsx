@@ -55,7 +55,7 @@ export default function EventCard({ event }: { event: EventItem }) {
         className={cn(
           "absolute left-3 top-3 z-10 flex h-11 w-11 cursor-pointer items-center justify-center rounded-full backdrop-blur-sm transition sm:left-4 sm:top-4 sm:h-9 sm:w-9",
           favorited
-            ? "bg-red-600 text-white hover:bg-red-700"
+            ? "bg-brand-500 text-white hover:bg-brand-600"
             : "bg-black/20 text-white hover:bg-black/40"
         )}
         aria-label={favorited ? "حذف از علاقه‌مندی‌ها" : "افزودن به علاقه‌مندی‌ها"}
@@ -69,7 +69,7 @@ export default function EventCard({ event }: { event: EventItem }) {
           {statusLabel}
         </span>
       ) : event.badge ? (
-        <span className="absolute right-3 top-3 z-10 rounded-full bg-red-600 px-3 py-1 text-xs font-bold text-white sm:right-4 sm:top-4">
+        <span className="absolute right-3 top-3 z-10 rounded-full bg-brand-500 px-3 py-1 text-xs font-bold text-white sm:right-4 sm:top-4">
           {event.badge}
         </span>
       ) : null}

@@ -28,12 +28,12 @@ type VenuePlaceAutocompleteProps = {
 const themes = {
   "my-event": {
     warning: "text-amber-600 dark:text-amber-400",
-    selected: "text-emerald-600 dark:text-emerald-400",
+    selected: "text-brand-600 dark:text-brand-400",
     hint: "text-neutral-400 dark:text-slate-500",
     address: "text-neutral-500 dark:text-slate-400",
     list: "border-neutral-200 bg-white shadow-lg dark:border-white/10 dark:bg-slate-900",
     item: "text-neutral-800 hover:bg-neutral-100 dark:text-white dark:hover:bg-white/10",
-    itemActive: "bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300",
+    itemActive: "bg-brand-50 text-brand-700 dark:bg-brand-500/10 dark:text-brand-300",
     loading: "text-neutral-400 dark:text-slate-500",
   },
   admin: {

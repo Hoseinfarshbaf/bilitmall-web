@@ -58,7 +58,7 @@ const BILITMALL_FILTER_OPTIONS: { value: BilitmallFilter; label: string }[] = [
 ];
 
 const inputClass =
-  "w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 outline-none focus:border-emerald-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100";
+  "w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 outline-none focus:border-brand-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100";
 
 function parseBilitmallFilter(value: string | null): BilitmallFilter {
   if (value === "not_requested" || value === "pending" || value === "approved") {
@@ -417,8 +417,8 @@ function AdminMyEventEventsPageContent() {
             className={cn(
               "rounded-full px-3 py-1.5 text-xs font-bold transition",
               statusFilter === "rejected"
-                ? "bg-red-600 text-white"
-                : "bg-red-50 text-red-700 dark:bg-red-500/15 dark:text-red-300"
+                ? "bg-brand-500 text-white"
+                : "bg-brand-50 text-brand-700 dark:bg-brand-500/15 dark:text-brand-300"
             )}
           >
             رد شده ({rejectedCount})
@@ -548,7 +548,7 @@ function AdminMyEventEventsPageContent() {
                             needsBilitmallReview(event)
                               ? "font-bold text-amber-700 dark:text-amber-400"
                               : event.listOnBilitmallApproved
-                                ? "text-emerald-700 dark:text-emerald-400"
+                                ? "text-brand-700 dark:text-brand-400"
                                 : "text-slate-400 dark:text-slate-500"
                           }
                         >
@@ -568,7 +568,7 @@ function AdminMyEventEventsPageContent() {
                                 ? "bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-300"
                                 : event.status === "pending"
                                   ? "bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300"
-                                  : "bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-300"
+                                  : "bg-brand-100 text-brand-700 dark:bg-brand-500/20 dark:text-brand-300"
                             }`}
                           >
                             {MY_EVENT_EVENT_STATUS_LABELS[event.status] ?? event.status}
@@ -599,7 +599,7 @@ function AdminMyEventEventsPageContent() {
                               <button
                                 type="button"
                                 onClick={() => handleReject(event.id)}
-                                className="rounded-lg bg-red-50 px-3 py-1 text-xs font-bold text-red-700 dark:bg-red-500/15 dark:text-red-300"
+                                className="rounded-lg bg-brand-50 px-3 py-1 text-xs font-bold text-brand-700 dark:bg-brand-500/15 dark:text-brand-300"
                               >
                                 رد
                               </button>
@@ -611,7 +611,7 @@ function AdminMyEventEventsPageContent() {
                               <button
                                 type="button"
                                 onClick={() => approveBilitmallOnly(event.id)}
-                                className="rounded-lg bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300"
+                                className="rounded-lg bg-brand-50 px-3 py-1 text-xs font-bold text-brand-700 dark:bg-brand-500/15 dark:text-brand-300"
                               >
                                 تأیید بلیت‌مال
                               </button>
@@ -665,7 +665,7 @@ function AdminMyEventEventsPageContent() {
                             <button
                               type="button"
                               onClick={() => deleteEvent(event.id)}
-                              className="rounded-lg bg-red-50 px-3 py-1 text-xs font-bold text-red-700 dark:bg-red-500/15 dark:text-red-300"
+                              className="rounded-lg bg-brand-50 px-3 py-1 text-xs font-bold text-brand-700 dark:bg-brand-500/15 dark:text-brand-300"
                             >
                               {event.status === "rejected"
                                 ? "حذف کامل از لیست"
@@ -723,7 +723,7 @@ function AdminMyEventEventsPageContent() {
               <button
                 type="submit"
                 disabled={saving || (!approvePage && !approveBilitmall)}
-                className="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-bold text-white disabled:opacity-50"
+                className="rounded-xl bg-brand-600 px-4 py-2 text-sm font-bold text-white disabled:opacity-50"
               >
                 {saving ? "..." : "تأیید"}
               </button>

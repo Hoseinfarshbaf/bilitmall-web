@@ -91,7 +91,7 @@ export default function DiscoveryPage() {
             <Link
               href="/"
               title="بازگشت به صفحه اصلی"
-              className="flex shrink-0 items-center gap-2 rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-2 text-sm font-bold text-neutral-600 transition-all hover:border-red-200 hover:bg-red-50 hover:text-red-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300 dark:hover:border-red-500/40 dark:hover:bg-red-500/10 dark:hover:text-red-400"
+              className="flex shrink-0 items-center gap-2 rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-2 text-sm font-bold text-neutral-600 transition-all hover:border-brand-200 hover:bg-brand-50 hover:text-brand-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300 dark:hover:border-brand-500/40 dark:hover:bg-brand-400/10 dark:hover:text-brand-400"
             >
               <Home className="w-4 h-4" />
               <span className="hidden sm:inline">صفحه اصلی</span>
@@ -101,10 +101,10 @@ export default function DiscoveryPage() {
               <h1 className="truncate text-lg font-black leading-none text-neutral-900 dark:text-neutral-100">
                 {pageTitle}
               </h1>
-              <span className="hidden shrink-0 items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700 sm:inline-flex dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-300">
+              <span className="hidden shrink-0 items-center gap-1.5 rounded-full border border-brand-200 bg-brand-50 px-2.5 py-1 text-xs font-bold text-brand-700 sm:inline-flex dark:border-brand-500/30 dark:bg-brand-500/10 dark:text-brand-300">
                 <span className="relative flex h-2 w-2">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-                  <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-400 opacity-75" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-brand-500" />
                 </span>
                 {filteredEvents.length} رویداد فعال
               </span>
@@ -114,9 +114,9 @@ export default function DiscoveryPage() {
               <ThemeToggle size="sm" showLabel={false} />
               <button
                 onClick={() => setIsCityOpen((open) => !open)}
-                className="flex items-center gap-1.5 rounded-xl border border-neutral-200 px-3 py-2 text-sm font-bold text-neutral-700 transition-all hover:border-red-600 hover:text-red-600 dark:border-neutral-700 dark:text-neutral-200 dark:hover:border-red-500 dark:hover:text-red-400"
+                className="flex items-center gap-1.5 rounded-xl border border-neutral-200 px-3 py-2 text-sm font-bold text-neutral-700 transition-all hover:border-red-600 hover:text-brand-600 dark:border-neutral-700 dark:text-neutral-200 dark:hover:border-brand-500 dark:hover:text-brand-400"
               >
-                <MapPin className="w-4 h-4 text-red-600" />
+                <MapPin className="w-4 h-4 text-brand-600" />
                 <span>{cityParam}</span>
                 <ChevronDown className={`h-4 w-4 text-neutral-400 transition-transform dark:text-neutral-500 ${isCityOpen ? "rotate-180" : ""}`} />
               </button>
@@ -146,7 +146,7 @@ export default function DiscoveryPage() {
                 placeholder="نام رویداد یا هنرمند..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full rounded-xl border border-neutral-100 bg-neutral-50 py-2.5 pr-10 pl-4 text-sm font-bold outline-none transition-all focus:border-red-600 focus:bg-white focus:ring-2 focus:ring-red-600/10 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:focus:border-red-500 dark:focus:bg-neutral-900 dark:focus:ring-red-500/20"
+                className="w-full rounded-xl border border-neutral-100 bg-neutral-50 py-2.5 pr-10 pl-4 text-sm font-bold outline-none transition-all focus:border-red-600 focus:bg-white focus:ring-2 focus:ring-brand-600/10 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:focus:border-brand-500 dark:focus:bg-neutral-900 dark:focus:ring-brand-500/20"
               />
             </div>
             <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide">
@@ -156,8 +156,8 @@ export default function DiscoveryPage() {
                   onClick={() => router.push(buildDiscoveryPageUrl(cityParam, cat.value))}
                   className={`shrink-0 rounded-xl px-4 py-2.5 text-sm font-bold transition-all ${
                     categoryParam.trim() === cat.value.trim()
-                      ? "bg-red-600 text-white shadow-sm shadow-red-100 dark:shadow-red-900/30"
-                      : "border border-neutral-200 bg-white text-neutral-500 hover:border-red-600 hover:text-red-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-400 dark:hover:border-red-500 dark:hover:text-red-400"
+                      ? "bg-brand-500 text-white shadow-sm shadow-brand-100 dark:shadow-brand-900/30"
+                      : "border border-neutral-200 bg-white text-neutral-500 hover:border-red-600 hover:text-brand-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-400 dark:hover:border-brand-500 dark:hover:text-brand-400"
                   }`}
                 >
                   {cat.label}
@@ -181,8 +181,8 @@ export default function DiscoveryPage() {
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center rounded-[3rem] border-2 border-dashed border-neutral-100 bg-white py-40 dark:border-neutral-800 dark:bg-neutral-900">
-            <div className="mb-6 rounded-full bg-red-50 p-8 dark:bg-red-500/10">
-              <Search className="h-12 w-12 text-red-300 dark:text-red-400" />
+            <div className="mb-6 rounded-full bg-brand-50 p-8 dark:bg-brand-500/10">
+              <Search className="h-12 w-12 text-brand-300 dark:text-brand-400" />
             </div>
             {searchQuery.trim() ? (
               <>
@@ -202,7 +202,7 @@ export default function DiscoveryPage() {
                   setSearchQuery("");
                   router.push(buildDiscoveryPageUrl(cityParam, "همه"));
                 }}
-                className="mt-6 border-b-2 border-red-600 font-bold text-red-600 transition-colors hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
+                className="mt-6 border-b-2 border-red-600 font-bold text-brand-600 transition-colors hover:text-red-800 dark:text-brand-400 dark:hover:text-brand-300"
               >
                 مشاهده همه رویدادهای {cityParam}
               </button>

@@ -65,7 +65,7 @@ function LoginPageContent() {
           حساب کاربری ندارید؟{" "}
           <Link
             href="/auth/register"
-            className="font-bold text-red-600 hover:underline"
+            className="font-bold text-brand-600 hover:underline"
           >
             ثبت‌نام کنید
           </Link>
@@ -83,7 +83,7 @@ function LoginPageContent() {
             inputMode="numeric"
             placeholder="۰۹۱۲۳۴۵۶۷۸۹"
             dir="ltr"
-            className="h-11 rounded-xl border-neutral-200 bg-white px-4 text-left placeholder:text-right focus-visible:border-red-500 focus-visible:ring-red-100"
+            className="h-11 rounded-xl border-neutral-200 bg-white px-4 text-left placeholder:text-right focus-visible:border-brand-500 focus-visible:ring-brand-100"
             value={mobile}
             onChange={(e) => setMobile(e.target.value)}
             required
@@ -99,7 +99,7 @@ function LoginPageContent() {
             type="password"
             placeholder="رمز عبور خود را وارد کنید"
             dir="ltr"
-            className="h-11 rounded-xl border-neutral-200 bg-white px-4 text-left placeholder:text-right focus-visible:border-red-500 focus-visible:ring-red-100"
+            className="h-11 rounded-xl border-neutral-200 bg-white px-4 text-left placeholder:text-right focus-visible:border-brand-500 focus-visible:ring-brand-100"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required

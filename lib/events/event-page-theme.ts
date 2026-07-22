@@ -35,18 +35,18 @@ const bookingThemes: Record<"light" | "dark", Record<EventPageVariant, BookingFl
   light: {
     bilitmall: {
       chipActive:
-        "border-red-500 bg-red-50 text-red-700 shadow-md shadow-red-500/10",
+        "border-brand-500 bg-brand-50 text-brand-700 shadow-md shadow-brand-500/10",
       chipIdle:
-        "border-neutral-200 bg-neutral-50 text-neutral-700 hover:border-red-300 hover:bg-red-50/60",
-      btn: "bg-red-600 hover:bg-red-500",
-      stepActive: "bg-red-600 text-white",
-      stepDone: "bg-red-100 text-red-700",
+        "border-neutral-200 bg-neutral-50 text-neutral-700 hover:border-brand-300 hover:bg-brand-50/60",
+      btn: "bg-brand-500 hover:bg-brand-400",
+      stepActive: "bg-brand-500 text-white",
+      stepDone: "bg-brand-100 text-brand-700",
       stepIdle: "bg-neutral-100 text-neutral-400",
-      line: "bg-red-200",
+      line: "bg-brand-200",
       panel:
         "overflow-hidden rounded-3xl border border-neutral-200 bg-white/95 shadow-xl backdrop-blur-md",
       panelHeader: "border-b border-neutral-200 bg-neutral-50/90",
-      sectionIcon: "text-red-500",
+      sectionIcon: "text-brand-500",
       sectionTitle: "text-neutral-800",
       summaryCard: "rounded-2xl border border-neutral-200 bg-neutral-50 p-4",
       summaryLabel: "text-neutral-500",
@@ -64,24 +64,24 @@ const bookingThemes: Record<"light" | "dark", Record<EventPageVariant, BookingFl
         "rounded-3xl border border-neutral-200 bg-white/95 p-6 shadow-xl backdrop-blur-md",
       unavailableBox:
         "rounded-2xl bg-neutral-100 py-8 text-center text-base font-black text-neutral-600",
-      successIcon: "text-red-500",
+      successIcon: "text-brand-500",
       successSubtitle: "text-neutral-600",
       successFootnote: "text-neutral-500",
     },
     organizer: {
       chipActive:
-        "border-emerald-500 bg-emerald-50 text-emerald-800 shadow-md shadow-emerald-500/10",
+        "border-brand-500 bg-brand-50 text-brand-800 shadow-md shadow-brand-500/10",
       chipIdle:
-        "border-neutral-200 bg-neutral-50 text-neutral-700 hover:border-emerald-300 hover:bg-emerald-50/60",
-      btn: "bg-emerald-600 hover:bg-emerald-500",
-      stepActive: "bg-emerald-600 text-white",
-      stepDone: "bg-emerald-100 text-emerald-800",
+        "border-neutral-200 bg-neutral-50 text-neutral-700 hover:border-brand-300 hover:bg-brand-50/60",
+      btn: "bg-brand-600 hover:bg-brand-500",
+      stepActive: "bg-brand-600 text-white",
+      stepDone: "bg-brand-100 text-brand-800",
       stepIdle: "bg-neutral-100 text-neutral-400",
-      line: "bg-emerald-200",
+      line: "bg-brand-200",
       panel:
         "overflow-hidden rounded-3xl border border-neutral-200 bg-white/95 shadow-xl backdrop-blur-md",
       panelHeader: "border-b border-neutral-200 bg-neutral-50/90",
-      sectionIcon: "text-emerald-600",
+      sectionIcon: "text-brand-600",
       sectionTitle: "text-neutral-800",
       summaryCard: "rounded-2xl border border-neutral-200 bg-neutral-50 p-4",
       summaryLabel: "text-neutral-500",
@@ -99,7 +99,7 @@ const bookingThemes: Record<"light" | "dark", Record<EventPageVariant, BookingFl
         "rounded-3xl border border-neutral-200 bg-white/95 p-6 shadow-xl backdrop-blur-md",
       unavailableBox:
         "rounded-2xl bg-neutral-100 py-8 text-center text-base font-black text-neutral-600",
-      successIcon: "text-emerald-500",
+      successIcon: "text-brand-500",
       successSubtitle: "text-neutral-600",
       successFootnote: "text-neutral-500",
     },
@@ -107,13 +107,13 @@ const bookingThemes: Record<"light" | "dark", Record<EventPageVariant, BookingFl
   dark: {
     bilitmall: {
       chipActive:
-        "border-red-400 bg-red-500/25 text-white shadow-lg shadow-red-500/20",
-      chipIdle: "border-white/15 bg-white/10 text-white/85 hover:border-red-400/40",
-      btn: "bg-red-600 hover:bg-red-500",
-      stepActive: "bg-red-500 text-white",
-      stepDone: "bg-red-500/30 text-red-200",
+        "border-brand-400 bg-brand-500/25 text-white shadow-lg shadow-brand-500/20",
+      chipIdle: "border-white/15 bg-white/10 text-white/85 hover:border-brand-400/40",
+      btn: "bg-brand-500 hover:bg-brand-400",
+      stepActive: "bg-brand-500 text-white",
+      stepDone: "bg-brand-500/30 text-brand-200",
       stepIdle: "bg-white/10 text-white/50",
-      line: "bg-red-500/40",
+      line: "bg-brand-500/40",
       panel:
         "overflow-hidden rounded-3xl border border-white/10 bg-black/45 shadow-2xl backdrop-blur-md",
       panelHeader: "border-b border-white/10 bg-black/30",
@@ -135,19 +135,19 @@ const bookingThemes: Record<"light" | "dark", Record<EventPageVariant, BookingFl
         "rounded-3xl border border-white/10 bg-black/40 p-6 backdrop-blur-md",
       unavailableBox:
         "rounded-2xl bg-white/10 py-8 text-center text-base font-black text-white/70",
-      successIcon: "text-red-400",
+      successIcon: "text-brand-400",
       successSubtitle: "text-white/70",
       successFootnote: "text-white/45",
     },
     organizer: {
       chipActive:
-        "border-emerald-400 bg-emerald-500/25 text-white shadow-lg shadow-emerald-500/20",
-      chipIdle: "border-white/15 bg-white/10 text-white/85 hover:border-emerald-400/40",
-      btn: "bg-emerald-600 hover:bg-emerald-500",
-      stepActive: "bg-emerald-500 text-white",
-      stepDone: "bg-emerald-500/30 text-emerald-200",
+        "border-brand-400 bg-brand-500/25 text-white shadow-lg shadow-brand-500/20",
+      chipIdle: "border-white/15 bg-white/10 text-white/85 hover:border-brand-400/40",
+      btn: "bg-brand-600 hover:bg-brand-500",
+      stepActive: "bg-brand-500 text-white",
+      stepDone: "bg-brand-500/30 text-brand-200",
       stepIdle: "bg-white/10 text-white/50",
-      line: "bg-emerald-500/40",
+      line: "bg-brand-500/40",
       panel:
         "overflow-hidden rounded-3xl border border-white/10 bg-black/45 shadow-2xl backdrop-blur-md",
       panelHeader: "border-b border-white/10 bg-black/30",
@@ -166,10 +166,10 @@ const bookingThemes: Record<"light" | "dark", Record<EventPageVariant, BookingFl
       stepLabelActive: "text-white",
       stepLabelIdle: "text-white/45",
       unavailablePanel:
-        "rounded-3xl border border-emerald-500/20 bg-black/40 p-6 backdrop-blur-md",
+        "rounded-3xl border border-brand-500/20 bg-black/40 p-6 backdrop-blur-md",
       unavailableBox:
         "rounded-2xl bg-white/10 py-8 text-center text-base font-black text-white/70",
-      successIcon: "text-emerald-400",
+      successIcon: "text-brand-400",
       successSubtitle: "text-white/70",
       successFootnote: "text-white/45",
     },
@@ -189,19 +189,19 @@ export function useEventPageTheme(variant: EventPageVariant = "bilitmall") {
     accentText:
       variant === "bilitmall"
         ? isDark
-          ? "text-red-400"
-          : "text-red-600"
+          ? "text-brand-400"
+          : "text-brand-600"
         : isDark
-          ? "text-emerald-400"
-          : "text-emerald-600",
+          ? "text-brand-400"
+          : "text-brand-600",
     accentIcon:
       variant === "bilitmall"
         ? isDark
-          ? "text-red-400"
-          : "text-red-500"
+          ? "text-brand-400"
+          : "text-brand-500"
         : isDark
-          ? "text-emerald-400"
-          : "text-emerald-500",
+          ? "text-brand-400"
+          : "text-brand-500",
     heroCard: isDark
       ? "border-white/10 bg-black/45"
       : "border-neutral-200/80 bg-white/90",
@@ -215,11 +215,11 @@ export function useEventPageTheme(variant: EventPageVariant = "bilitmall") {
     subtleText: isDark ? "text-white/55" : "text-neutral-500",
     titleText: isDark ? "text-white" : "text-neutral-900",
     chipActiveOrganizer: isDark
-      ? "bg-emerald-600 text-white"
-      : "bg-emerald-600 text-white",
+      ? "bg-brand-600 text-white"
+      : "bg-brand-600 text-white",
     chipIdleOrganizer: isDark
       ? "border border-white/15 bg-black/30 text-white/80 hover:bg-black/50"
-      : "border border-neutral-200 bg-white text-neutral-700 hover:border-emerald-300 hover:bg-emerald-50",
+      : "border border-neutral-200 bg-white text-neutral-700 hover:border-brand-300 hover:bg-brand-50",
     footerMuted: isDark ? "text-white/30" : "text-neutral-400",
   };
 }

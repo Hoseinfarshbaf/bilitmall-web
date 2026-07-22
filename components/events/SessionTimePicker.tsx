@@ -78,7 +78,7 @@ export default function SessionTimePicker({ value, onChange, className }: Sessio
   return (
     <div className={cn("space-y-3", className)}>
       <div className="flex items-center gap-2 text-xs font-bold text-neutral-500 dark:text-slate-400">
-        <Clock className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+        <Clock className="h-3.5 w-3.5 text-brand-600 dark:text-brand-400" />
         <span>
           ساعت انتخابی:{" "}
           <span className="font-black tabular-nums text-neutral-800 dark:text-white" dir="ltr">
@@ -109,7 +109,7 @@ export default function SessionTimePicker({ value, onChange, className }: Sessio
                   commit(hourText, minuteText);
                 }
               }}
-              className="w-full rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-3 text-center text-lg font-black tabular-nums text-neutral-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 dark:border-white/10 dark:bg-slate-800 dark:text-white"
+              className="w-full rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-3 text-center text-lg font-black tabular-nums text-neutral-900 outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 dark:border-white/10 dark:bg-slate-800 dark:text-white"
             />
           </div>
 
@@ -135,13 +135,13 @@ export default function SessionTimePicker({ value, onChange, className }: Sessio
                   commit(hourText, minuteText);
                 }
               }}
-              className="w-full rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-3 text-center text-lg font-black tabular-nums text-neutral-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 dark:border-white/10 dark:bg-slate-800 dark:text-white"
+              className="w-full rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-3 text-center text-lg font-black tabular-nums text-neutral-900 outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 dark:border-white/10 dark:bg-slate-800 dark:text-white"
             />
           </div>
         </div>
 
         <p className="mt-3 text-center text-[11px] font-bold leading-5 text-neutral-500 dark:text-slate-400">
-          ساعت را به‌صورت <span className="text-emerald-600 dark:text-emerald-400">۲۴ ساعته</span> وارد
+          ساعت را به‌صورت <span className="text-brand-600 dark:text-brand-400">۲۴ ساعته</span> وارد
           کنید؛ مثلاً برای ۶ عصر بنویسید{" "}
           <span className="font-black tabular-nums text-neutral-800 dark:text-white" dir="ltr">
             18
@@ -165,7 +165,7 @@ export default function SessionTimePicker({ value, onChange, className }: Sessio
                 className={cn(
                   "rounded-md px-2 py-1 text-[10px] font-bold tabular-nums transition active:scale-[0.98]",
                   active
-                    ? "bg-emerald-600 text-white"
+                    ? "bg-brand-600 text-white"
                     : "bg-white text-neutral-600 hover:bg-neutral-100 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-700"
                 )}
               >

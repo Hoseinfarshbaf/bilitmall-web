@@ -463,7 +463,7 @@ function AdminEventsPageContent() {
             ) : null}
 
             {selectedCount > 0 ? (
-              <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 dark:border-red-500/30 dark:bg-red-500/10">
+              <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-brand-200 bg-brand-50 px-4 py-3 dark:border-brand-500/30 dark:bg-brand-500/10">
                 <p className="text-sm font-bold text-red-800 dark:text-red-200">
                   {selectedCount.toLocaleString("fa-IR")} رویداد انتخاب شده
                 </p>
@@ -472,7 +472,7 @@ function AdminEventsPageContent() {
                     type="button"
                     onClick={clearSelection}
                     disabled={bulkDeleting}
-                    className="rounded-lg border border-red-200 bg-white px-3 py-1.5 text-xs font-bold text-red-700 transition hover:bg-red-100 disabled:opacity-50 dark:border-red-500/30 dark:bg-slate-900 dark:text-red-300 dark:hover:bg-red-500/15"
+                    className="rounded-lg border border-brand-200 bg-white px-3 py-1.5 text-xs font-bold text-brand-700 transition hover:bg-brand-100 disabled:opacity-50 dark:border-brand-500/30 dark:bg-slate-900 dark:text-brand-300 dark:hover:bg-brand-500/15"
                   >
                     لغو انتخاب
                   </button>
@@ -480,7 +480,7 @@ function AdminEventsPageContent() {
                     type="button"
                     onClick={handleBulkDelete}
                     disabled={bulkDeleting}
-                    className="inline-flex items-center gap-2 rounded-lg bg-red-600 px-3 py-1.5 text-xs font-bold text-white transition hover:bg-red-700 disabled:opacity-50"
+                    className="inline-flex items-center gap-2 rounded-lg bg-brand-500 px-3 py-1.5 text-xs font-bold text-white transition hover:bg-brand-600 disabled:opacity-50"
                   >
                     {bulkDeleting ? (
                       <>
@@ -587,7 +587,7 @@ function AdminEventsPageContent() {
                             </td>
                             <td className={adminTableClasses.td}>
                               {event.featured ? (
-                                <span className="rounded-full bg-red-100 px-3 py-1 text-xs font-bold text-red-700 dark:bg-red-500/20 dark:text-red-300">
+                                <span className="rounded-full bg-brand-100 px-3 py-1 text-xs font-bold text-brand-700 dark:bg-brand-500/20 dark:text-brand-300">
                                   ویژه
                                 </span>
                               ) : (
@@ -615,7 +615,7 @@ function AdminEventsPageContent() {
                                 <button
                                   type="button"
                                   onClick={() => handleDelete(event)}
-                                  className="rounded-lg bg-red-50 px-3 py-1.5 text-xs font-bold text-red-600 hover:bg-red-100 dark:bg-red-500/15 dark:text-red-300 dark:hover:bg-red-500/25"
+                                  className="rounded-lg bg-brand-50 px-3 py-1.5 text-xs font-bold text-brand-600 hover:bg-brand-100 dark:bg-brand-500/15 dark:text-brand-300 dark:hover:bg-brand-500/25"
                                 >
                                   حذف کامل
                                 </button>

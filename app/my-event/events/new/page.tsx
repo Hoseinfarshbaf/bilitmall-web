@@ -119,7 +119,7 @@ export default function MyEventNewEventPage() {
             {MY_EVENT_EVENT_SUBMIT_SUCCESS_MESSAGE}
           </p>
           {hadSeating && hadLinkedVenue ? (
-            <p className="text-sm leading-7 text-emerald-700 dark:text-emerald-200">
+            <p className="text-sm leading-7 text-brand-700 dark:text-brand-200">
               {MY_EVENT_LINKED_VENUE_SEATING_HINT}
             </p>
           ) : null}
@@ -142,7 +142,7 @@ export default function MyEventNewEventPage() {
               <button
                 type="button"
                 onClick={() => router.push("/my-event/dashboard")}
-                className="rounded-xl border border-emerald-600/40 bg-transparent px-4 py-3 text-sm font-bold text-emerald-700 hover:bg-emerald-500/10 dark:text-emerald-300"
+                className="rounded-xl border border-brand-600/40 bg-transparent px-4 py-3 text-sm font-bold text-brand-700 hover:bg-brand-500/10 dark:text-brand-300"
               >
                 بازگشت به داشبورد
               </button>
@@ -151,7 +151,7 @@ export default function MyEventNewEventPage() {
             <button
               type="button"
               onClick={() => router.push("/my-event/dashboard")}
-              className="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-bold text-white"
+              className="rounded-xl bg-brand-600 px-4 py-2 text-sm font-bold text-white"
             >
               بازگشت به داشبورد
             </button>

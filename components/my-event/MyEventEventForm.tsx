@@ -110,7 +110,7 @@ export const emptyMyEventFormValues: MyEventEventFormValues = {
 };
 
 const inputClass =
-  "w-full rounded-xl border border-neutral-300 bg-white px-4 py-3 text-neutral-900 outline-none focus:border-emerald-500 dark:border-white/10 dark:bg-slate-900 dark:text-white";
+  "w-full rounded-xl border border-neutral-300 bg-white px-4 py-3 text-neutral-900 outline-none focus:border-brand-500 dark:border-white/10 dark:bg-slate-900 dark:text-white";
 const inputErrorClass =
   "border-red-400 focus:border-red-500 dark:border-red-500/60 dark:focus:border-red-400";
 const labelClass = "mb-2 block text-sm font-bold text-neutral-700 dark:text-slate-300";
@@ -262,8 +262,8 @@ const TOTAL_STEPS = WIZARD_STEPS.length;
 
 const SECTION_ACCENTS = {
   emerald: {
-    header: "from-emerald-500/10 to-transparent",
-    icon: "text-emerald-600 dark:text-emerald-400",
+    header: "from-brand-500/10 to-transparent",
+    icon: "text-brand-600 dark:text-brand-400",
   },
   sky: {
     header: "from-sky-500/10 to-transparent",
@@ -346,7 +346,7 @@ function WizardProgress({
     >
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <p className="text-xs font-bold text-emerald-600 dark:text-emerald-400">
+          <p className="text-xs font-bold text-brand-600 dark:text-brand-400">
             <span>مرحله </span>
             <span>{SECTION_STEP_LABELS[currentStep - 1]}</span>
             <span> از </span>
@@ -370,7 +370,7 @@ function WizardProgress({
 
       <div className="h-2 overflow-hidden rounded-full bg-neutral-100 dark:bg-white/10">
         <div
-          className="h-full rounded-full bg-emerald-500 transition-all duration-300"
+          className="h-full rounded-full bg-brand-500 transition-all duration-300"
           style={{ width: `${percent}%` }}
         />
       </div>
@@ -391,14 +391,14 @@ function WizardProgress({
                 className={cn(
                   "flex w-full flex-col items-center gap-1.5 rounded-xl px-1 py-2 transition",
                   reachable ? "cursor-pointer" : "cursor-default opacity-50",
-                  active && "bg-emerald-500/10",
+                  active && "bg-brand-500/10",
                   done && "hover:bg-neutral-50 dark:hover:bg-white/5"
                 )}
               >
                 <span
                   className={cn(
                     "flex h-8 w-8 items-center justify-center rounded-full text-xs font-black transition",
-                    done && "bg-emerald-600 text-white",
+                    done && "bg-brand-600 text-white",
                     active && "bg-neutral-900 text-white dark:bg-white dark:text-neutral-900",
                     !done &&
                       !active &&
@@ -415,7 +415,7 @@ function WizardProgress({
                   className={cn(
                     "hidden truncate text-[10px] font-bold sm:block",
                     active
-                      ? "text-emerald-700 dark:text-emerald-300"
+                      ? "text-brand-700 dark:text-brand-300"
                       : "text-neutral-400 dark:text-slate-500"
                   )}
                 >
@@ -919,9 +919,9 @@ export default function MyEventEventForm({
                   setFormError(null);
                   setFormData({ ...emptyMyEventFormValues, category: cat });
                 }}
-                className="rounded-2xl border border-neutral-200 bg-neutral-50 p-5 text-right transition hover:border-emerald-500/50 hover:bg-emerald-500/5 dark:border-white/10 dark:bg-slate-900"
+                className="rounded-2xl border border-neutral-200 bg-neutral-50 p-5 text-right transition hover:border-brand-500/50 hover:bg-brand-500/5 dark:border-white/10 dark:bg-slate-900"
               >
-                <p className="text-lg font-black text-emerald-600 dark:text-emerald-400">{cat}</p>
+                <p className="text-lg font-black text-brand-600 dark:text-brand-400">{cat}</p>
                 {ex ? (
                   <p className="mt-2 text-xs leading-6 text-neutral-400 dark:text-slate-500">
                     مثال: {ex.title}
@@ -1055,9 +1055,9 @@ export default function MyEventEventForm({
           </div>
         ) : null}
 
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-3">
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-brand-500/20 bg-brand-500/10 px-4 py-3">
           <div>
-            <p className="text-xs text-emerald-700 dark:text-emerald-300">
+            <p className="text-xs text-brand-700 dark:text-brand-300">
               <span>دسته انتخاب‌شده</span>
             </p>
             <p className="font-black text-neutral-900 dark:text-white">
@@ -1145,8 +1145,8 @@ export default function MyEventEventForm({
           {fieldHasError("publicEventSlug") ? (
             <FieldHint>{activeFieldMessage}</FieldHint>
           ) : null}
-          <div className="mt-3 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3">
-            <p className="text-xs font-bold text-emerald-700 dark:text-emerald-300">
+          <div className="mt-3 rounded-xl border border-brand-500/30 bg-brand-500/10 px-4 py-3">
+            <p className="text-xs font-bold text-brand-700 dark:text-brand-300">
               پیش‌نمایش لینک فروش (ساب‌دامین بلیت‌مال)
             </p>
             <p className="mt-1 font-mono text-sm text-neutral-900 dark:text-white" dir="ltr">
@@ -1182,7 +1182,7 @@ export default function MyEventEventForm({
               active={currentStep === 2}
               value={formData.city}
               className={cn(
-                "w-full rounded-xl border border-neutral-300 bg-white py-3 pr-10 pl-9 text-neutral-900 outline-none focus:border-emerald-500 dark:border-white/10 dark:bg-slate-900 dark:text-white",
+                "w-full rounded-xl border border-neutral-300 bg-white py-3 pr-10 pl-9 text-neutral-900 outline-none focus:border-brand-500 dark:border-white/10 dark:bg-slate-900 dark:text-white",
                 fieldHasError("city") && inputErrorClass
               )}
               onChange={(city) => {
@@ -1282,7 +1282,7 @@ export default function MyEventEventForm({
               type="button"
               onClick={() => fileInputRef.current?.click()}
               disabled={imageProcessing}
-              className="inline-flex items-center gap-2 rounded-xl border border-dashed border-neutral-300 bg-neutral-50 px-4 py-3 text-sm font-bold text-neutral-700 transition hover:border-emerald-500/50 disabled:opacity-60 dark:border-white/20 dark:bg-slate-900 dark:text-slate-200"
+              className="inline-flex items-center gap-2 rounded-xl border border-dashed border-neutral-300 bg-neutral-50 px-4 py-3 text-sm font-bold text-neutral-700 transition hover:border-brand-500/50 disabled:opacity-60 dark:border-white/20 dark:bg-slate-900 dark:text-slate-200"
             >
               <Upload className="h-4 w-4" />
               {imageProcessing ? "در حال پردازش تصویر..." : "آپلود از کامپیوتر"}
@@ -1582,7 +1582,7 @@ export default function MyEventEventForm({
 
         {formData.hasAssignedSeating === true && usesLinkedVenue ? (
           <div className="space-y-3 rounded-xl border border-violet-500/30 bg-violet-500/10 p-4">
-            <p className="text-sm leading-7 text-emerald-700 dark:text-emerald-200">
+            <p className="text-sm leading-7 text-brand-700 dark:text-brand-200">
               {MY_EVENT_LINKED_VENUE_SEATING_HINT}
             </p>
             <button
@@ -1601,7 +1601,7 @@ export default function MyEventEventForm({
         {formData.hasAssignedSeating === true && !usesLinkedVenue ? (
           <div className="space-y-3 rounded-xl border border-violet-500/30 bg-violet-500/10 p-4">
             {showSeatingDesigned ? (
-              <p className="text-sm font-bold text-emerald-700 dark:text-emerald-300">
+              <p className="text-sm font-bold text-brand-700 dark:text-brand-300">
                 ✓ صحنه و نقشه صندلی‌ها تعریف شده است.
               </p>
             ) : (
@@ -1644,12 +1644,12 @@ export default function MyEventEventForm({
         accent="amber"
       >
         <div ref={setFieldRef("publishChannels")} className="space-y-2">
-          <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3.5 hover:border-emerald-400/60 dark:border-white/10 dark:bg-slate-900 dark:hover:border-emerald-500/40">
+          <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3.5 hover:border-brand-400/60 dark:border-white/10 dark:bg-slate-900 dark:hover:border-brand-500/40">
             <input
               type="checkbox"
               checked={formData.publishOnMyEvent !== false}
               onChange={(e) => setPublishOnMyEvent(e.target.checked)}
-              className="h-4 w-4 accent-emerald-500"
+              className="h-4 w-4 accent-brand-500"
             />
             <span className="text-sm font-bold text-neutral-700 dark:text-slate-200">
               صفحه اختصاصی My Event
@@ -1660,7 +1660,7 @@ export default function MyEventEventForm({
               type="checkbox"
               checked={formData.listOnBilitmall}
               onChange={(e) => setListOnBilitmall(e.target.checked)}
-              className="h-4 w-4 accent-emerald-500"
+              className="h-4 w-4 accent-brand-500"
             />
             <span className="text-sm font-bold text-neutral-700 dark:text-slate-200">
               انتشار در سایت بلیت‌مال
@@ -1723,7 +1723,7 @@ export default function MyEventEventForm({
           <button
             type="button"
             onClick={goNext}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-emerald-600 py-3.5 font-black text-white shadow-lg shadow-emerald-600/25 hover:bg-emerald-500 sm:flex-1"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-brand-600 py-3.5 font-black text-white shadow-lg shadow-brand-600/25 hover:bg-brand-500 sm:flex-1"
           >
             <span>مرحله بعد</span>
             <ArrowLeft className="h-4 w-4" aria-hidden />
@@ -1733,7 +1733,7 @@ export default function MyEventEventForm({
             type="button"
             onClick={submitForm}
             disabled={loading || !canSubmit}
-            className="inline-flex w-full items-center justify-center rounded-2xl bg-emerald-600 py-3.5 font-black text-white shadow-lg shadow-emerald-600/25 hover:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-60 sm:flex-1"
+            className="inline-flex w-full items-center justify-center rounded-2xl bg-brand-600 py-3.5 font-black text-white shadow-lg shadow-brand-600/25 hover:bg-brand-500 disabled:cursor-not-allowed disabled:opacity-60 sm:flex-1"
           >
             <span>{loading ? "در حال ذخیره..." : finalSubmitLabel}</span>
           </button>

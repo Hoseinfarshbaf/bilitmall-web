@@ -59,7 +59,7 @@ export default function RegisterPage() {
           قبلاً ثبت‌نام کرده‌اید؟{" "}
           <Link
             href="/auth/login"
-            className="font-bold text-red-600 hover:underline"
+            className="font-bold text-brand-600 hover:underline"
           >
             وارد شوید
           </Link>
@@ -75,7 +75,7 @@ export default function RegisterPage() {
             id="name"
             type="text"
             placeholder="نام و نام خانوادگی"
-            className="h-11 rounded-xl border-neutral-200 bg-white px-4 focus-visible:border-red-500 focus-visible:ring-red-100"
+            className="h-11 rounded-xl border-neutral-200 bg-white px-4 focus-visible:border-brand-500 focus-visible:ring-brand-100"
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
@@ -92,7 +92,7 @@ export default function RegisterPage() {
             inputMode="numeric"
             placeholder="۰۹۱۲۳۴۵۶۷۸۹"
             dir="ltr"
-            className="h-11 rounded-xl border-neutral-200 bg-white px-4 text-left placeholder:text-right focus-visible:border-red-500 focus-visible:ring-red-100"
+            className="h-11 rounded-xl border-neutral-200 bg-white px-4 text-left placeholder:text-right focus-visible:border-brand-500 focus-visible:ring-brand-100"
             value={mobile}
             onChange={(e) => setMobile(e.target.value)}
             required
@@ -108,7 +108,7 @@ export default function RegisterPage() {
             type="password"
             placeholder="حداقل ۸ کاراکتر"
             dir="ltr"
-            className="h-11 rounded-xl border-neutral-200 bg-white px-4 text-left placeholder:text-right focus-visible:border-red-500 focus-visible:ring-red-100"
+            className="h-11 rounded-xl border-neutral-200 bg-white px-4 text-left placeholder:text-right focus-visible:border-brand-500 focus-visible:ring-brand-100"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             minLength={8}
@@ -125,7 +125,7 @@ export default function RegisterPage() {
             type="password"
             placeholder="رمز عبور را دوباره وارد کنید"
             dir="ltr"
-            className="h-11 rounded-xl border-neutral-200 bg-white px-4 text-left placeholder:text-right focus-visible:border-red-500 focus-visible:ring-red-100"
+            className="h-11 rounded-xl border-neutral-200 bg-white px-4 text-left placeholder:text-right focus-visible:border-brand-500 focus-visible:ring-brand-100"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             minLength={8}

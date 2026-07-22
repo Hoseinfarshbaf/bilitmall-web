@@ -87,7 +87,7 @@ export default function AccountTicketsPage() {
           <p className="text-neutral-500">هنوز بلیتی خریداری نکرده‌اید.</p>
           <Link
             href="/"
-            className="mt-4 inline-block rounded-full bg-red-600 px-5 py-2 text-sm font-bold text-white"
+            className="mt-4 inline-block rounded-full bg-brand-500 px-5 py-2 text-sm font-bold text-white"
           >
             مشاهده رویدادها
           </Link>

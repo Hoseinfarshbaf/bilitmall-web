@@ -52,7 +52,7 @@ export default function SeatingPlanEditor({
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
-              <LayoutGrid className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+              <LayoutGrid className="h-5 w-5 text-brand-600 dark:text-brand-400" />
               <p className="text-base font-black text-slate-900 dark:text-white">
                 {readOnly ? "مشاهده سالن و صندلی‌ها" : "طراحی سالن و صندلی‌گذاری"}
               </p>
@@ -63,7 +63,7 @@ export default function SeatingPlanEditor({
                 : "صحنه یکپارچه، بالکن‌ها، جایگاه‌ها و چیدمان آزاد صندلی‌ها را در استودیوی طراحی تنظیم کنید. قیمت را برای همه، هر ردیف یا هر صندلی جداگانه تعیین کنید."}
             </p>
             <div className="mt-3 flex flex-wrap gap-2 text-xs">
-              <span className="rounded-full bg-emerald-100 px-3 py-1 font-bold text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300">
+              <span className="rounded-full bg-brand-100 px-3 py-1 font-bold text-brand-700 dark:bg-brand-500/20 dark:text-brand-300">
                 {bookableCount.toLocaleString("fa-IR")} صندلی
               </span>
               <span className="rounded-full bg-violet-100 px-3 py-1 font-bold text-violet-700 dark:bg-violet-500/20 dark:text-violet-300">
@@ -81,7 +81,7 @@ export default function SeatingPlanEditor({
           <button
             type="button"
             onClick={() => setStudioOpen(true)}
-            className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-emerald-600 px-5 py-3 text-sm font-black text-white shadow-lg shadow-emerald-900/30 hover:bg-emerald-500"
+            className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-brand-600 px-5 py-3 text-sm font-black text-white shadow-lg shadow-brand-900/30 hover:bg-brand-500"
           >
             <Maximize2 className="h-4 w-4" />
             {enterLabel}
@@ -96,7 +96,7 @@ export default function SeatingPlanEditor({
             <input
               value={layout.name}
               onChange={(e) => setLayout({ ...layout, name: e.target.value })}
-              className="w-full max-w-md rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-emerald-500 dark:border-white/10 dark:bg-slate-900 dark:text-white"
+              className="w-full max-w-md rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-brand-500 dark:border-white/10 dark:bg-slate-900 dark:text-white"
             />
           </div>
         ) : null}
@@ -107,7 +107,7 @@ export default function SeatingPlanEditor({
               بارگذاری از قالب
             </label>
             <select
-              className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-emerald-500 dark:border-white/10 dark:bg-slate-900 dark:text-white"
+              className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-brand-500 dark:border-white/10 dark:bg-slate-900 dark:text-white"
               defaultValue=""
               onChange={(e) => {
                 const tpl = templates.find((t) => t.id === Number(e.target.value));

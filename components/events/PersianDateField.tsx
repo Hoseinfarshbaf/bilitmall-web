@@ -81,11 +81,11 @@ export default function PersianDateField({
         disabled={!enabled}
         onClick={() => setOpen((prev) => !prev)}
         className={cn(
-          "flex w-full items-center justify-between gap-3 rounded-xl border bg-neutral-50 px-3 py-3 text-right text-sm font-bold outline-none transition focus:border-emerald-500 dark:bg-slate-900",
+          "flex w-full items-center justify-between gap-3 rounded-xl border bg-neutral-50 px-3 py-3 text-right text-sm font-bold outline-none transition focus:border-brand-500 dark:bg-slate-900",
           hasError
             ? "border-red-400 dark:border-red-500/60"
             : "border-neutral-200 dark:border-white/10",
-          open && "border-emerald-500 ring-2 ring-emerald-500/20"
+          open && "border-brand-500 ring-2 ring-brand-500/20"
         )}
       >
         <span

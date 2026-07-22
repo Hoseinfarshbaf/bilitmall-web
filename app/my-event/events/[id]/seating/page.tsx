@@ -100,7 +100,7 @@ export default function MyEventSeatingPage({
           <p className="text-sm leading-7 text-violet-700 dark:text-violet-200">{blocked}</p>
           <Link
             href="/my-event/dashboard"
-            className="inline-block rounded-xl bg-emerald-600 px-4 py-2 text-sm font-bold text-white"
+            className="inline-block rounded-xl bg-brand-600 px-4 py-2 text-sm font-bold text-white"
           >
             بازگشت به داشبورد
           </Link>
@@ -125,17 +125,17 @@ export default function MyEventSeatingPage({
   return (
     <MyEventShell title={pageTitle}>
       {readOnly ? (
-        <p className="mb-4 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm leading-7 text-emerald-700 dark:text-emerald-200">
+        <p className="mb-4 rounded-xl border border-brand-500/30 bg-brand-500/10 px-4 py-3 text-sm leading-7 text-brand-700 dark:text-brand-200">
           {MY_EVENT_LINKED_VENUE_SEATING_HINT}
         </p>
       ) : hasSeatingPlan ? (
-        <p className="mb-4 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm font-bold leading-7 text-emerald-700 dark:text-emerald-200">
+        <p className="mb-4 rounded-xl border border-brand-500/30 bg-brand-500/10 px-4 py-3 text-sm font-bold leading-7 text-brand-700 dark:text-brand-200">
           ✓ صحنه ذخیره شد و در انتظار تأیید ادمین است. پس از تأیید، این سالن برای شهر شما در فهرست
           مکان‌های پیشنهادی قرار می‌گیرد.
         </p>
       ) : null}
       {message ? (
-        <p className="mb-4 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-700 dark:text-emerald-200">
+        <p className="mb-4 rounded-xl border border-brand-500/30 bg-brand-500/10 px-4 py-3 text-sm text-brand-700 dark:text-brand-200">
           {message}
         </p>
       ) : null}

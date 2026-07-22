@@ -49,7 +49,7 @@ export default function Navbar() {
     <header className="sticky top-0 z-50 border-b border-neutral-200/80 bg-white/85 backdrop-blur-md dark:border-neutral-800 dark:bg-neutral-950/85">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
         <div className="flex items-center gap-8">
-          <Link href="/" className="flex items-center gap-2 text-xl font-black text-red-600">
+          <Link href="/" className="flex items-center gap-2 text-xl font-black text-brand-600">
             <Ticket className="h-8 w-8" />
             <span>بلیت‌مال</span>
           </Link>
@@ -58,19 +58,19 @@ export default function Navbar() {
             {/* لینک‌های داینامیک با در نظر گرفتن شهر انتخاب شده */}
             <Link
               href={buildDiscoveryPageUrl(selectedCity, "کنسرت")}
-              className="text-sm font-bold text-neutral-600 transition hover:text-red-600 dark:text-neutral-300 dark:hover:text-red-400"
+              className="text-sm font-bold text-neutral-600 transition hover:text-brand-600 dark:text-neutral-300 dark:hover:text-brand-400"
             >
               کنسرت
             </Link>
             <Link
               href={buildDiscoveryPageUrl(selectedCity, "تئاتر")}
-              className="text-sm font-bold text-neutral-600 transition hover:text-red-600 dark:text-neutral-300 dark:hover:text-red-400"
+              className="text-sm font-bold text-neutral-600 transition hover:text-brand-600 dark:text-neutral-300 dark:hover:text-brand-400"
             >
               تئاتر
             </Link>
             <Link
               href={buildDiscoveryPageUrl(selectedCity, "ایونت")}
-              className="text-sm font-bold text-neutral-600 transition hover:text-red-600 dark:text-neutral-300 dark:hover:text-red-400"
+              className="text-sm font-bold text-neutral-600 transition hover:text-brand-600 dark:text-neutral-300 dark:hover:text-brand-400"
             >
               ایونت
             </Link>
@@ -84,10 +84,10 @@ export default function Navbar() {
             href="/contact"
             aria-label="تماس و پشتیبانی"
             title="نیاز به کمک دارید؟ پشتیبانی"
-            className="group flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-2 py-2 font-bold text-emerald-700 shadow-sm transition hover:border-emerald-300 hover:bg-emerald-100 hover:shadow md:px-4 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-300 dark:hover:border-emerald-500/50 dark:hover:bg-emerald-500/15"
+            className="group flex items-center gap-2 rounded-full border border-brand-200 bg-brand-50 px-2 py-2 font-bold text-brand-700 shadow-sm transition hover:border-brand-300 hover:bg-brand-100 hover:shadow md:px-4 dark:border-brand-500/30 dark:bg-brand-500/10 dark:text-brand-300 dark:hover:border-brand-500/50 dark:hover:bg-brand-500/15"
           >
             <span className="relative flex h-6 w-6 items-center justify-center">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400/40 opacity-75 group-hover:opacity-100" />
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-400/40 opacity-75 group-hover:opacity-100" />
               <Headset className="relative h-5 w-5" />
             </span>
             <span className="hidden text-sm md:inline">پشتیبانی</span>
@@ -99,7 +99,7 @@ export default function Navbar() {
               onClick={() => setIsOpen((prev) => !prev)}
               className="flex items-center gap-2 rounded-full border border-neutral-200 bg-white px-4 py-2 text-sm font-semibold text-neutral-700 shadow-sm transition hover:bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-200 dark:hover:bg-neutral-800"
             >
-              <MapPin className="h-4 w-4 text-red-600" />
+              <MapPin className="h-4 w-4 text-brand-600" />
               <span>{selectedCity}</span>
               <ChevronDown className={`h-4 w-4 transition-transform ${isOpen ? "rotate-180" : ""}`} />
             </button>
@@ -125,9 +125,9 @@ export default function Navbar() {
               <button
                 type="button"
                 onClick={() => setIsUserOpen((prev) => !prev)}
-                className="flex items-center gap-2 rounded-full border border-neutral-200 bg-white px-2 py-1.5 pl-3 text-sm font-bold text-neutral-700 shadow-sm transition hover:border-red-200 hover:text-red-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-200 dark:hover:border-red-500/40 dark:hover:text-red-400"
+                className="flex items-center gap-2 rounded-full border border-neutral-200 bg-white px-2 py-1.5 pl-3 text-sm font-bold text-neutral-700 shadow-sm transition hover:border-brand-200 hover:text-brand-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-200 dark:hover:border-brand-500/40 dark:hover:text-brand-400"
               >
-                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-red-600 text-xs font-black text-white">
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-500 text-xs font-black text-white">
                   {authUser.name.trim().charAt(0) || "؟"}
                 </span>
                 <span className="hidden max-w-[120px] truncate sm:inline">{authUser.name}</span>
@@ -138,7 +138,7 @@ export default function Navbar() {
 
               {isUserOpen && (
                 <div className="absolute left-0 z-50 mt-2 w-60 overflow-hidden rounded-2xl border border-neutral-200/80 bg-white/95 shadow-[0_8px_32px_rgba(0,0,0,0.12)] backdrop-blur-xl animate-in fade-in zoom-in duration-150 dark:border-neutral-700 dark:bg-neutral-900/95 dark:shadow-[0_8px_32px_rgba(0,0,0,0.45)]">
-                  <div className="border-b border-neutral-200/60 bg-linear-to-l from-red-50 to-white px-4 py-3 dark:border-neutral-700 dark:from-red-500/10 dark:to-neutral-900">
+                  <div className="border-b border-neutral-200/60 bg-linear-to-l from-brand-50 to-white px-4 py-3 dark:border-neutral-700 dark:from-brand-500/10 dark:to-neutral-900">
                     <p className="text-xs text-neutral-500 dark:text-neutral-400">وارد شده با نام</p>
                     <p className="truncate text-sm font-black text-neutral-900 dark:text-neutral-100">{authUser.name}</p>
                   </div>
@@ -147,7 +147,7 @@ export default function Navbar() {
                     <Link
                       href="/account"
                       onClick={() => setIsUserOpen(false)}
-                      className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold text-neutral-700 transition hover:bg-red-50 hover:text-red-600 dark:text-neutral-200 dark:hover:bg-red-500/10 dark:hover:text-red-400"
+                      className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold text-neutral-700 transition hover:bg-brand-50 hover:text-brand-600 dark:text-neutral-200 dark:hover:bg-brand-400/10 dark:hover:text-brand-400"
                     >
                       <Ticket className="h-4 w-4" />
                       بلیت‌های من
@@ -155,7 +155,7 @@ export default function Navbar() {
                     <Link
                       href="/account/favorites"
                       onClick={() => setIsUserOpen(false)}
-                      className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold text-neutral-700 transition hover:bg-red-50 hover:text-red-600 dark:text-neutral-200 dark:hover:bg-red-500/10 dark:hover:text-red-400"
+                      className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold text-neutral-700 transition hover:bg-brand-50 hover:text-brand-600 dark:text-neutral-200 dark:hover:bg-brand-400/10 dark:hover:text-brand-400"
                     >
                       <Heart className="h-4 w-4" />
                       علاقه‌مندی‌ها
@@ -163,7 +163,7 @@ export default function Navbar() {
                     <Link
                       href="/account/payments"
                       onClick={() => setIsUserOpen(false)}
-                      className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold text-neutral-700 transition hover:bg-red-50 hover:text-red-600 dark:text-neutral-200 dark:hover:bg-red-500/10 dark:hover:text-red-400"
+                      className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold text-neutral-700 transition hover:bg-brand-50 hover:text-brand-600 dark:text-neutral-200 dark:hover:bg-brand-400/10 dark:hover:text-brand-400"
                     >
                       <CreditCard className="h-4 w-4" />
                       پرداخت‌ها
@@ -171,7 +171,7 @@ export default function Navbar() {
                     <Link
                       href="/account/profile"
                       onClick={() => setIsUserOpen(false)}
-                      className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold text-neutral-700 transition hover:bg-red-50 hover:text-red-600 dark:text-neutral-200 dark:hover:bg-red-500/10 dark:hover:text-red-400"
+                      className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold text-neutral-700 transition hover:bg-brand-50 hover:text-brand-600 dark:text-neutral-200 dark:hover:bg-brand-400/10 dark:hover:text-brand-400"
                     >
                       <Settings className="h-4 w-4" />
                       ویرایش حساب
@@ -195,13 +195,13 @@ export default function Navbar() {
             <>
               <Link
                 href="/auth/login"
-                className="hidden px-2 text-sm font-bold text-neutral-700 hover:text-red-600 dark:text-neutral-300 dark:hover:text-red-400 md:block"
+                className="hidden px-2 text-sm font-bold text-neutral-700 hover:text-brand-600 dark:text-neutral-300 dark:hover:text-brand-400 md:block"
               >
                 ورود
               </Link>
               <Link
                 href="/auth/register"
-                className="flex items-center gap-2 rounded-full bg-neutral-900 px-5 py-2.5 text-sm font-bold text-white shadow-md transition hover:bg-black active:scale-95 dark:bg-red-600 dark:hover:bg-red-500"
+                className="flex items-center gap-2 rounded-full bg-neutral-900 px-5 py-2.5 text-sm font-bold text-white shadow-md transition hover:bg-black active:scale-95 dark:bg-brand-500 dark:hover:bg-brand-400"
               >
                 <User className="h-4 w-4" />
                 <span>ثبت‌نام</span>

@@ -365,7 +365,7 @@ export default function AdminVenueTemplatesPage() {
             <button
               type="button"
               onClick={startCreating}
-              className="mt-6 rounded-xl bg-emerald-600 px-5 py-3 text-sm font-black text-white"
+              className="mt-6 rounded-xl bg-brand-600 px-5 py-3 text-sm font-black text-white"
             >
               + سالن جدید (مدیر)
             </button>
@@ -425,7 +425,7 @@ function TabButton({
   const activeClass = {
     blue: "bg-blue-600 text-white",
     violet: "bg-violet-600 text-white",
-    emerald: "bg-emerald-600 text-white",
+    emerald: "bg-brand-600 text-white",
   }[color];
   return (
     <button
@@ -512,7 +512,7 @@ function VenueTable({
             <button
               type="button"
               onClick={() => onDelete(row.id, row.name)}
-              className="rounded-lg bg-red-50 px-3 py-1 text-xs font-bold text-red-700 dark:bg-red-500/15 dark:text-red-300"
+              className="rounded-lg bg-brand-50 px-3 py-1 text-xs font-bold text-brand-700 dark:bg-brand-500/15 dark:text-brand-300"
             >
               حذف
             </button>
@@ -577,14 +577,14 @@ function OrganizerTable({
             <button
               type="button"
               onClick={() => onPromote(plan.id)}
-              className="rounded-lg bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-800 dark:bg-emerald-500/20 dark:text-emerald-300"
+              className="rounded-lg bg-brand-100 px-3 py-1 text-xs font-bold text-brand-800 dark:bg-brand-500/20 dark:text-brand-300"
             >
               تأیید و انتقال به کل سالن‌ها
             </button>
             <button
               type="button"
               onClick={() => onDelete(plan.id, plan.name || plan.eventTitle)}
-              className="rounded-lg bg-red-50 px-3 py-1 text-xs font-bold text-red-700 dark:bg-red-500/15 dark:text-red-300"
+              className="rounded-lg bg-brand-50 px-3 py-1 text-xs font-bold text-brand-700 dark:bg-brand-500/15 dark:text-brand-300"
             >
               حذف
             </button>
@@ -623,7 +623,7 @@ function EditorPanel({
       ? "text-blue-600 dark:text-blue-300"
       : "text-violet-600 dark:text-violet-300";
   const metaInputClass =
-    "w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none focus:border-emerald-500 dark:border-white/10 dark:bg-slate-800 dark:text-white";
+    "w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none focus:border-brand-500 dark:border-white/10 dark:bg-slate-800 dark:text-white";
   return (
     <div className="mt-8 rounded-3xl border border-slate-200 bg-white p-6 text-slate-900 shadow-sm dark:border-transparent dark:bg-slate-900 dark:text-white dark:shadow-none">
       <p className={`mb-1 text-sm font-bold ${accentText}`}>{title}</p>

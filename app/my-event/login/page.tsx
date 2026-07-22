@@ -42,7 +42,7 @@ export default function MyEventLoginPage() {
           <input
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
-            className="w-full rounded-xl border border-neutral-300 bg-white px-4 py-3 text-neutral-900 outline-none focus:border-emerald-500 dark:border-white/10 dark:bg-slate-900 dark:text-white"
+            className="w-full rounded-xl border border-neutral-300 bg-white px-4 py-3 text-neutral-900 outline-none focus:border-brand-500 dark:border-white/10 dark:bg-slate-900 dark:text-white"
             placeholder="09123456789"
             dir="ltr"
           />
@@ -53,19 +53,19 @@ export default function MyEventLoginPage() {
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full rounded-xl border border-neutral-300 bg-white px-4 py-3 text-neutral-900 outline-none focus:border-emerald-500 dark:border-white/10 dark:bg-slate-900 dark:text-white"
+            className="w-full rounded-xl border border-neutral-300 bg-white px-4 py-3 text-neutral-900 outline-none focus:border-brand-500 dark:border-white/10 dark:bg-slate-900 dark:text-white"
           />
         </div>
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-xl bg-emerald-600 py-3 font-black text-white hover:bg-emerald-500 disabled:opacity-60"
+          className="w-full rounded-xl bg-brand-600 py-3 font-black text-white hover:bg-brand-500 disabled:opacity-60"
         >
           {loading ? "در حال ورود..." : "ورود"}
         </button>
         <p className="text-center text-sm text-neutral-500 dark:text-slate-400">
           حساب ندارید؟{" "}
-          <Link href="/my-event/register" className="font-bold text-emerald-600 dark:text-emerald-300">
+          <Link href="/my-event/register" className="font-bold text-brand-600 dark:text-brand-300">
             ثبت‌نام
           </Link>
         </p>

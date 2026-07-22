@@ -262,7 +262,7 @@ export default function CityAutocomplete({
               onMouseDown={(e) => e.preventDefault()}
               onClick={() => void handleCreateCity()}
               disabled={creating}
-              className="mt-3 inline-flex items-center rounded-lg bg-emerald-600 px-3 py-2 text-xs font-black text-white disabled:opacity-60"
+              className="mt-3 inline-flex items-center rounded-lg bg-brand-600 px-3 py-2 text-xs font-black text-white disabled:opacity-60"
             >
               {creating ? "در حال افزودن..." : `${createButtonLabel} «${trimmedQuery}»`}
             </button>

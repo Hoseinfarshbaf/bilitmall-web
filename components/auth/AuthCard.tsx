@@ -26,7 +26,7 @@ export default function AuthCard({
       <CardHeader className="items-center text-center">
         <Link
           href="/"
-          className="mb-2 flex items-center gap-2 text-xl font-black text-red-600"
+          className="mb-2 flex items-center gap-2 text-xl font-black text-brand-600"
         >
           <Ticket className="h-7 w-7" />
           <span>بلیت‌مال</span>

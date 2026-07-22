@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 
 const OWNERSHIP_STYLES: Record<EventOwnershipType, string> = {
   bilitmall:
-    "bg-emerald-100 text-emerald-800 dark:bg-emerald-500/20 dark:text-emerald-300",
+    "bg-brand-100 text-brand-800 dark:bg-brand-500/20 dark:text-brand-300",
   linked: "bg-sky-100 text-sky-800 dark:bg-sky-500/20 dark:text-sky-300",
   organizer:
     "bg-violet-100 text-violet-800 dark:bg-violet-500/20 dark:text-violet-300",

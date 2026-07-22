@@ -30,7 +30,7 @@ const STATUS_FILTER_OPTIONS: { value: StatusFilter; label: string }[] = [
 ];
 
 const inputClass =
-  "w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 outline-none focus:border-emerald-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100";
+  "w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 outline-none focus:border-brand-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100";
 
 export default function AdminMyEventPage() {
   const [organizers, setOrganizers] = useState<MyEventOrganizerRow[]>([]);
@@ -166,7 +166,7 @@ export default function AdminMyEventPage() {
         <div className="mt-4 flex flex-wrap gap-3">
           <Link
             href="/admin/my-event/events"
-            className="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-bold text-white"
+            className="rounded-xl bg-brand-600 px-4 py-2 text-sm font-bold text-white"
           >
             رویدادهای My Event
           </Link>
@@ -254,7 +254,7 @@ export default function AdminMyEventPage() {
                           href={getMyEventPublicUrl(org.slug)}
                           target="_blank"
                           rel="noreferrer"
-                          className="text-xs font-bold text-emerald-600 dark:text-emerald-400"
+                          className="text-xs font-bold text-brand-600 dark:text-brand-400"
                           dir="ltr"
                         >
                           {getMyEventPublicUrl(org.slug)}
@@ -272,7 +272,7 @@ export default function AdminMyEventPage() {
                           org.status === "active"
                             ? "bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-300"
                             : org.status === "suspended"
-                              ? "bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-300"
+                              ? "bg-brand-100 text-brand-700 dark:bg-brand-500/20 dark:text-brand-300"
                               : "bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300"
                         }`}
                       >
@@ -291,7 +291,7 @@ export default function AdminMyEventPage() {
                         <button
                           type="button"
                           onClick={() => handleDelete(org)}
-                          className="rounded-lg bg-red-50 px-3 py-1 text-xs font-bold text-red-700 dark:bg-red-500/15 dark:text-red-300"
+                          className="rounded-lg bg-brand-50 px-3 py-1 text-xs font-bold text-brand-700 dark:bg-brand-500/15 dark:text-brand-300"
                         >
                           حذف
                         </button>
@@ -308,7 +308,7 @@ export default function AdminMyEventPage() {
                           <button
                             type="button"
                             onClick={() => updateStatus(org.id, "suspended")}
-                            className="rounded-lg bg-red-50 px-3 py-1 text-xs font-bold text-red-700 dark:bg-red-500/15 dark:text-red-300"
+                            className="rounded-lg bg-brand-50 px-3 py-1 text-xs font-bold text-brand-700 dark:bg-brand-500/15 dark:text-brand-300"
                           >
                             مسدود
                           </button>
@@ -375,7 +375,7 @@ export default function AdminMyEventPage() {
               <button
                 type="submit"
                 disabled={saving}
-                className="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-bold text-white"
+                className="rounded-xl bg-brand-600 px-4 py-2 text-sm font-bold text-white"
               >
                 {saving ? "..." : "ذخیره"}
               </button>

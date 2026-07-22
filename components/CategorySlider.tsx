@@ -130,7 +130,7 @@ const CategorySlider = ({
           href={listHref}
           className="group/title min-w-0 transition-opacity hover:opacity-90"
         >
-          <h2 className="text-[22px] font-extrabold leading-tight tracking-tight text-neutral-900 group-hover/title:text-red-600 dark:text-neutral-100 dark:group-hover/title:text-red-400 md:text-[26px] lg:text-[28px]">
+          <h2 className="text-[22px] font-extrabold leading-tight tracking-tight text-neutral-900 group-hover/title:text-brand-600 dark:text-neutral-100 dark:group-hover/title:text-brand-400 md:text-[26px] lg:text-[28px]">
             {displayTitle}
           </h2>
           <p className="mt-1 text-[13px] font-normal leading-relaxed tracking-tight text-neutral-400 group-hover/title:text-neutral-500 dark:text-neutral-500 dark:group-hover/title:text-neutral-400 md:text-sm lg:text-[15px]">
@@ -141,7 +141,7 @@ const CategorySlider = ({
         {visibleData.length >= 4 ? (
           <Link
             href={listHref}
-            className="flex min-h-11 w-fit shrink-0 items-center gap-2 self-start rounded-full bg-neutral-100 px-4 py-2.5 text-xs font-bold transition-all duration-300 hover:bg-neutral-900 hover:text-white md:min-h-0 md:py-2 dark:bg-neutral-800 dark:text-neutral-200 dark:hover:bg-red-600 dark:hover:text-white"
+            className="flex min-h-11 w-fit shrink-0 items-center gap-2 self-start rounded-full bg-neutral-100 px-4 py-2.5 text-xs font-bold transition-all duration-300 hover:bg-neutral-900 hover:text-white md:min-h-0 md:py-2 dark:bg-neutral-800 dark:text-neutral-200 dark:hover:bg-brand-500 dark:hover:text-white"
           >
             <span>مشاهده همه</span>
             <ArrowLeft className="h-3 w-3" />

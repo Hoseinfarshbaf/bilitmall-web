@@ -109,7 +109,7 @@ export default function EventImportPanel({ onApply, initialImportUrl }: EventImp
         </h2>
       </div>
       {assetsDownloadNotice ? (
-        <div className="mb-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-200">
+        <div className="mb-4 rounded-xl border border-brand-200 bg-brand-50 px-4 py-3 text-sm text-brand-800 dark:border-brand-500/30 dark:bg-brand-500/10 dark:text-brand-200">
           <p className="font-bold">تصاویر در پوشه دسکتاپ ذخیره شد:</p>
           <p className="mt-1 font-mono text-xs" dir="ltr">
             {assetsDownloadNotice.folderPath}
@@ -271,7 +271,7 @@ export default function EventImportPanel({ onApply, initialImportUrl }: EventImp
             type="button"
             disabled={result.questions.length > 0}
             onClick={() => onApply(result.draft)}
-            className="w-full rounded-xl bg-emerald-600 py-3 text-sm font-black text-white hover:bg-emerald-500 disabled:opacity-50"
+            className="w-full rounded-xl bg-brand-600 py-3 text-sm font-black text-white hover:bg-brand-500 disabled:opacity-50"
           >
             اعمال به فرم ثبت رویداد
           </button>

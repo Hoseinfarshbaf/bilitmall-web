@@ -43,23 +43,23 @@ export default function CityPickerPanel({
   function cityChipClass(isSelected: boolean) {
     if (isSelected) {
       return accent
-        ? "border-red-500 bg-red-600 text-white shadow-sm shadow-red-100 dark:shadow-red-900/30"
-        : "border-red-300 bg-red-50 text-red-600 dark:border-red-500/40 dark:bg-red-500/15 dark:text-red-400";
+        ? "border-brand-500 bg-brand-500 text-white shadow-sm shadow-brand-100 dark:shadow-brand-900/30"
+        : "border-brand-300 bg-brand-50 text-brand-600 dark:border-red-500/40 dark:bg-brand-500/15 dark:text-brand-400";
     }
     return accent
-      ? "border-neutral-200/80 bg-white/80 text-neutral-700 hover:border-red-300 hover:bg-red-50 hover:text-red-600 dark:border-neutral-700 dark:bg-neutral-800/80 dark:text-neutral-200 dark:hover:border-red-500/40 dark:hover:bg-red-500/10 dark:hover:text-red-400"
-      : "border-neutral-200/60 bg-white/70 text-neutral-700 hover:border-red-200 hover:bg-red-50/80 hover:text-red-600 dark:border-neutral-700 dark:bg-neutral-800/70 dark:text-neutral-200 dark:hover:border-red-500/30 dark:hover:bg-red-500/10 dark:hover:text-red-400";
+      ? "border-neutral-200/80 bg-white/80 text-neutral-700 hover:border-brand-300 hover:bg-brand-50 hover:text-brand-600 dark:border-neutral-700 dark:bg-neutral-800/80 dark:text-neutral-200 dark:hover:border-brand-500/40 dark:hover:bg-brand-400/10 dark:hover:text-brand-400"
+      : "border-neutral-200/60 bg-white/70 text-neutral-700 hover:border-brand-200 hover:bg-brand-50/80 hover:text-brand-600 dark:border-neutral-700 dark:bg-neutral-800/70 dark:text-neutral-200 dark:hover:border-brand-500/30 dark:hover:bg-brand-400/10 dark:hover:text-brand-400";
   }
 
   function listItemClass(isSelected: boolean) {
     if (isSelected) {
       return accent
-        ? "bg-red-600 font-bold text-white"
-        : "bg-red-50 font-bold text-red-600 dark:bg-red-500/15 dark:text-red-400";
+        ? "bg-brand-500 font-bold text-white"
+        : "bg-brand-50 font-bold text-brand-600 dark:bg-brand-500/15 dark:text-brand-400";
     }
     return accent
-      ? "font-bold text-neutral-600 hover:bg-red-50 hover:text-red-600 dark:text-neutral-300 dark:hover:bg-red-500/10 dark:hover:text-red-400"
-      : "text-neutral-700 hover:bg-black/5 hover:text-red-600 dark:text-neutral-300 dark:hover:bg-white/5 dark:hover:text-red-400";
+      ? "font-bold text-neutral-600 hover:bg-brand-50 hover:text-brand-600 dark:text-neutral-300 dark:hover:bg-brand-400/10 dark:hover:text-brand-400"
+      : "text-neutral-700 hover:bg-black/5 hover:text-brand-600 dark:text-neutral-300 dark:hover:bg-white/5 dark:hover:text-brand-400";
   }
 
   return (
@@ -154,8 +154,8 @@ export default function CityPickerPanel({
                 onClick={() => setShowAllCities(true)}
                 className={`mt-1.5 flex w-full items-center justify-center gap-1.5 rounded-lg border border-dashed px-2 py-1.5 text-xs font-bold transition ${
                   accent
-                    ? "border-red-200 bg-red-50/50 text-red-600 hover:border-red-300 hover:bg-red-50"
-                    : "border-gray-300/80 bg-white/60 text-gray-700 hover:border-red-200 hover:bg-red-50/60 hover:text-red-600"
+                    ? "border-brand-200 bg-brand-50/50 text-brand-600 hover:border-brand-300 hover:bg-brand-50"
+                    : "border-gray-300/80 bg-white/60 text-gray-700 hover:border-brand-200 hover:bg-brand-50/60 hover:text-brand-600"
                 }`}
               >
                 <LayoutGrid className="h-3.5 w-3.5" />

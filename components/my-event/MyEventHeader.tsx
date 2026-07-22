@@ -23,7 +23,7 @@ function ThemeToggle() {
       {isDark ? (
         <Sun className="h-3.5 w-3.5 text-amber-400" />
       ) : (
-        <Moon className="h-3.5 w-3.5 text-emerald-600" />
+        <Moon className="h-3.5 w-3.5 text-brand-600" />
       )}
       <span className="hidden sm:inline">{isDark ? "روشن" : "تیره"}</span>
     </button>
@@ -40,13 +40,13 @@ export default function MyEventHeader() {
   }, []);
 
   return (
-    <header className="border-b border-neutral-200 bg-white/95 backdrop-blur dark:border-emerald-500/10 dark:bg-[#0a1210]/95">
+    <header className="border-b border-neutral-200 bg-white/95 backdrop-blur dark:border-brand-500/10 dark:bg-[#0a1210]/95">
       <div className="mx-auto flex h-16 max-w-5xl items-center justify-between gap-4 px-4">
         <Link
           href="/my-event"
           className="flex shrink-0 items-center gap-2 font-black text-neutral-900 dark:text-white"
         >
-          <Sparkles className="h-6 w-6 text-emerald-500 dark:text-emerald-400" />
+          <Sparkles className="h-6 w-6 text-brand-500 dark:text-brand-400" />
           <span>{MY_EVENT_STUDIO}</span>
         </Link>
 
@@ -57,13 +57,13 @@ export default function MyEventHeader() {
             <>
               <Link
                 href="/my-event/dashboard"
-                className="text-neutral-600 hover:text-emerald-600 dark:text-slate-300 dark:hover:text-emerald-300"
+                className="text-neutral-600 hover:text-brand-600 dark:text-slate-300 dark:hover:text-brand-300"
               >
                 داشبورد
               </Link>
               <Link
                 href="/my-event/profile"
-                className="text-neutral-600 hover:text-emerald-600 dark:text-slate-300 dark:hover:text-emerald-300"
+                className="text-neutral-600 hover:text-brand-600 dark:text-slate-300 dark:hover:text-brand-300"
               >
                 پروفایل
               </Link>
@@ -72,13 +72,13 @@ export default function MyEventHeader() {
             <>
               <Link
                 href="/my-event/login"
-                className="text-neutral-600 hover:text-emerald-600 dark:text-slate-300 dark:hover:text-emerald-300"
+                className="text-neutral-600 hover:text-brand-600 dark:text-slate-300 dark:hover:text-brand-300"
               >
                 ورود
               </Link>
               <Link
                 href="/my-event/register"
-                className="rounded-full bg-emerald-600 px-3 py-1.5 text-xs text-white hover:bg-emerald-500"
+                className="rounded-full bg-brand-600 px-3 py-1.5 text-xs text-white hover:bg-brand-500"
               >
                 ثبت‌نام
               </Link>
@@ -89,7 +89,7 @@ export default function MyEventHeader() {
 
           <Link
             href="/"
-            className="inline-flex items-center gap-1.5 rounded-full border border-neutral-200 px-3 py-1.5 text-xs text-neutral-600 hover:border-emerald-500/40 hover:text-emerald-600 dark:border-white/10 dark:text-slate-300 dark:hover:border-emerald-500/30 dark:hover:text-emerald-200"
+            className="inline-flex items-center gap-1.5 rounded-full border border-neutral-200 px-3 py-1.5 text-xs text-neutral-600 hover:border-brand-500/40 hover:text-brand-600 dark:border-white/10 dark:text-slate-300 dark:hover:border-brand-500/30 dark:hover:text-brand-200"
           >
             <ExternalLink className="h-3.5 w-3.5" />
             <span className="hidden sm:inline">بازدید از سایت بلیت‌مال</span>

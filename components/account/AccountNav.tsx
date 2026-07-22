@@ -24,7 +24,7 @@ export default function AccountNav() {
             className={`rounded-full px-4 py-2 text-sm font-bold transition ${
               active
                 ? "bg-gray-900 text-white"
-                : "bg-white text-neutral-600 ring-1 ring-neutral-200 hover:text-red-600"
+                : "bg-white text-neutral-600 ring-1 ring-neutral-200 hover:text-brand-600"
             }`}
           >
             {tab.label}

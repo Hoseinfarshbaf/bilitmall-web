@@ -64,7 +64,7 @@ export default function AdminPage() {
             <p className="mb-4 text-slate-600 dark:text-slate-400">تأیید حساب برگزارکنندگان</p>
             <a
               href="/admin/my-event"
-              className="inline-block rounded-xl bg-emerald-600 px-4 py-3 text-white"
+              className="inline-block rounded-xl bg-brand-600 px-4 py-3 text-white"
             >
               مدیریت برگزارکنندگان
             </a>
@@ -77,7 +77,7 @@ export default function AdminPage() {
             </p>
             <a
               href="/admin/my-event/events"
-              className="inline-block rounded-xl bg-emerald-600 px-4 py-3 text-white"
+              className="inline-block rounded-xl bg-brand-600 px-4 py-3 text-white"
             >
               مدیریت رویدادها
             </a>

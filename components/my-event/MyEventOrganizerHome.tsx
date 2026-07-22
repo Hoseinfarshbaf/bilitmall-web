@@ -57,7 +57,7 @@ export default function MyEventOrganizerHome({
         />
         <div
           aria-hidden
-          className="absolute inset-0 bg-[radial-gradient(ellipse_at_25%_15%,rgba(52,211,153,0.2),transparent_55%)]"
+          className="absolute inset-0 bg-[radial-gradient(ellipse_at_25%_15%,rgba(134,71,253,0.22),transparent_55%)]"
         />
 
         <div className="relative mx-auto flex min-h-[min(88vh,720px)] max-w-5xl flex-col justify-end px-5 pb-16 pt-10 sm:px-8 sm:pb-20">
@@ -71,12 +71,12 @@ export default function MyEventOrganizerHome({
                   aria-label={`لوگوی ${organizer.displayName}`}
                 />
               ) : (
-                <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-[1.35rem] bg-emerald-500/20 text-3xl font-black text-emerald-200 ring-2 ring-white/20 sm:h-24 sm:w-24 sm:rounded-[1.5rem] sm:text-4xl">
+                <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-[1.35rem] bg-brand-500/20 text-3xl font-black text-brand-200 ring-2 ring-white/20 sm:h-24 sm:w-24 sm:rounded-[1.5rem] sm:text-4xl">
                   {initial}
                 </div>
               )}
               <div className="min-w-0 pb-1">
-                <p className="mb-2 text-[11px] font-bold tracking-[0.22em] text-emerald-300/90">
+                <p className="mb-2 text-[11px] font-bold tracking-[0.22em] text-brand-300/90">
                   برگزارکننده
                 </p>
                 <h1 className="text-4xl font-black leading-[1.1] tracking-tight text-white sm:text-5xl md:text-6xl">
@@ -94,7 +94,7 @@ export default function MyEventOrganizerHome({
             {eventCount > 0 ? (
               <a
                 href="#events"
-                className="mt-8 inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-black text-neutral-900 transition hover:bg-emerald-50 active:scale-[0.98]"
+                className="mt-8 inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-black text-neutral-900 transition hover:bg-brand-50 active:scale-[0.98]"
               >
                 مشاهده رویدادها
                 <ArrowLeft className="h-4 w-4" />

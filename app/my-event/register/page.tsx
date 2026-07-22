@@ -83,8 +83,8 @@ export default function MyEventRegisterPage() {
   if (submitted) {
     return (
       <MyEventShell title="ثبت‌نام انجام شد">
-        <div className="max-w-xl space-y-4 rounded-3xl border border-emerald-500/30 bg-emerald-500/10 p-6">
-          <h2 className="text-xl font-black text-emerald-700 dark:text-emerald-200">درخواست شما ثبت شد</h2>
+        <div className="max-w-xl space-y-4 rounded-3xl border border-brand-500/30 bg-brand-500/10 p-6">
+          <h2 className="text-xl font-black text-brand-700 dark:text-brand-200">درخواست شما ثبت شد</h2>
           <p className="text-sm leading-7 text-neutral-600 dark:text-slate-300">
             {MY_EVENT_REGISTRATION_SUCCESS_MESSAGE}
           </p>
@@ -93,7 +93,7 @@ export default function MyEventRegisterPage() {
           </p>
           <Link
             href="/my-event/login"
-            className="inline-block rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-bold text-white"
+            className="inline-block rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-bold text-white"
           >
             رفتن به صفحه ورود
           </Link>
@@ -118,7 +118,7 @@ export default function MyEventRegisterPage() {
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full rounded-xl border border-neutral-300 bg-white px-4 py-3 text-neutral-900 outline-none focus:border-emerald-500 dark:border-white/10 dark:bg-slate-900 dark:text-white"
+              className="w-full rounded-xl border border-neutral-300 bg-white px-4 py-3 text-neutral-900 outline-none focus:border-brand-500 dark:border-white/10 dark:bg-slate-900 dark:text-white"
             />
           </div>
           <div>
@@ -127,7 +127,7 @@ export default function MyEventRegisterPage() {
               required
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
-              className="w-full rounded-xl border border-neutral-300 bg-white px-4 py-3 text-neutral-900 outline-none focus:border-emerald-500 dark:border-white/10 dark:bg-slate-900 dark:text-white"
+              className="w-full rounded-xl border border-neutral-300 bg-white px-4 py-3 text-neutral-900 outline-none focus:border-brand-500 dark:border-white/10 dark:bg-slate-900 dark:text-white"
               dir="ltr"
             />
           </div>
@@ -142,7 +142,7 @@ export default function MyEventRegisterPage() {
             onChange={(e) => setPassword(e.target.value)}
             minLength={8}
             placeholder="حداقل ۸ کاراکتر"
-            className="w-full rounded-xl border border-neutral-300 bg-white px-4 py-3 text-neutral-900 outline-none focus:border-emerald-500 dark:border-white/10 dark:bg-slate-900 dark:text-white"
+            className="w-full rounded-xl border border-neutral-300 bg-white px-4 py-3 text-neutral-900 outline-none focus:border-brand-500 dark:border-white/10 dark:bg-slate-900 dark:text-white"
           />
         </div>
 
@@ -152,7 +152,7 @@ export default function MyEventRegisterPage() {
             required
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
-            className="w-full rounded-xl border border-neutral-300 bg-white px-4 py-3 text-neutral-900 outline-none focus:border-emerald-500 dark:border-white/10 dark:bg-slate-900 dark:text-white"
+            className="w-full rounded-xl border border-neutral-300 bg-white px-4 py-3 text-neutral-900 outline-none focus:border-brand-500 dark:border-white/10 dark:bg-slate-900 dark:text-white"
             placeholder="مثلاً کافه نیلوفر"
           />
         </div>
@@ -164,12 +164,12 @@ export default function MyEventRegisterPage() {
           <input
             value={slugInput}
             onChange={(e) => setSlugInput(e.target.value)}
-            className="w-full rounded-xl border border-neutral-300 bg-white px-4 py-3 text-neutral-900 outline-none focus:border-emerald-500 dark:border-white/10 dark:bg-slate-900 dark:text-white"
+            className="w-full rounded-xl border border-neutral-300 bg-white px-4 py-3 text-neutral-900 outline-none focus:border-brand-500 dark:border-white/10 dark:bg-slate-900 dark:text-white"
             placeholder="cafe-niloufar"
             dir="ltr"
           />
           {previewHost ? (
-            <p className="mt-2 text-xs text-emerald-600 dark:text-emerald-300" dir="ltr">
+            <p className="mt-2 text-xs text-brand-600 dark:text-brand-300" dir="ltr">
               https://{previewHost}/نام-رویداد
             </p>
           ) : null}
@@ -182,7 +182,7 @@ export default function MyEventRegisterPage() {
             <p className="mt-2 text-xs text-neutral-400 dark:text-slate-400">در حال بررسی آدرس...</p>
           ) : null}
           {slugStatus === "ok" ? (
-            <p className="mt-2 text-xs text-emerald-600 dark:text-emerald-400">این آدرس آزاد است.</p>
+            <p className="mt-2 text-xs text-brand-600 dark:text-brand-400">این آدرس آزاد است.</p>
           ) : null}
           {slugStatus === "taken" ? (
             <p className="mt-2 text-xs text-red-500 dark:text-red-400">این آدرس قبلاً ثبت شده — نام دیگری انتخاب کنید.</p>
@@ -195,14 +195,14 @@ export default function MyEventRegisterPage() {
         <button
           type="submit"
           disabled={loading || slugStatus !== "ok"}
-          className="w-full rounded-xl bg-emerald-600 py-3 font-black text-white hover:bg-emerald-500 disabled:opacity-60"
+          className="w-full rounded-xl bg-brand-600 py-3 font-black text-white hover:bg-brand-500 disabled:opacity-60"
         >
           {loading ? "در حال ثبت..." : "ثبت‌نام"}
         </button>
 
         <p className="text-center text-sm text-neutral-500 dark:text-slate-400">
           قبلاً تأیید شده‌اید؟{" "}
-          <Link href="/my-event/login" className="font-bold text-emerald-600 dark:text-emerald-300">
+          <Link href="/my-event/login" className="font-bold text-brand-600 dark:text-brand-300">
             ورود
           </Link>
         </p>

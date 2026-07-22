@@ -33,7 +33,7 @@ const ADMIN_STATUS_STYLES: Record<AdminEventStatusTone, string> = {
   active: "bg-green-100 text-green-700",
   past: "bg-slate-200 text-slate-700 ring-1 ring-slate-300",
   sold_out: "bg-orange-100 text-orange-700",
-  cancelled: "bg-red-100 text-red-700",
+  cancelled: "bg-brand-100 text-brand-700",
   draft: "bg-amber-100 text-amber-700",
 };
 

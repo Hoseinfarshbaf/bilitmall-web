@@ -27,6 +27,19 @@ html.dark {
 @theme inline {
   --font-heading: Vazirmatn, Arial, sans-serif;
   --font-sans: Vazirmatn, Arial, sans-serif;
+  /* StubHub-inspired organizational purple */
+  --color-brand-50: #f5f0ff;
+  --color-brand-100: #ebe3fe;
+  --color-brand-200: #d4c4fd;
+  --color-brand-300: #b3aef8;
+  --color-brand-400: #9b7afd;
+  --color-brand-500: #8647fd;
+  --color-brand-600: #7135e8;
+  --color-brand-700: #5c28c4;
+  --color-brand-800: #3f1d75;
+  --color-brand-900: #2d1554;
+  --color-brand-950: #1a0c33;
+  --color-brand: #8647fd;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -68,24 +81,28 @@ html.dark {
 }
 
 :root {
+  /* Brand: StubHub purple #8647FD / deep #3F1D75 / soft #B3AEF8 */
+  --brand: #8647fd;
+  --brand-deep: #3f1d75;
+  --brand-soft: #b3aef8;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
+  --primary: #8647fd;
+  --primary-foreground: #ffffff;
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.97 0 0);
   --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
+  --accent: #f5f0ff;
+  --accent-foreground: #3f1d75;
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  --ring: #8647fd;
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
@@ -94,33 +111,36 @@ html.dark {
   --radius: 0.625rem;
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-primary: #8647fd;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f5f0ff;
+  --sidebar-accent-foreground: #3f1d75;
   --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --sidebar-ring: #8647fd;
 }
 
 .dark {
+  --brand: #9b7afd;
+  --brand-deep: #b3aef8;
+  --brand-soft: #5c28c4;
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.205 0 0);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
+  --primary: #9b7afd;
+  --primary-foreground: #1a0c33;
   --secondary: oklch(0.269 0 0);
   --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.269 0 0);
   --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
+  --accent: #2d1554;
+  --accent-foreground: #ebe3fe;
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
+  --ring: #9b7afd;
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
@@ -128,12 +148,12 @@ html.dark {
   --chart-5: oklch(0.269 0 0);
   --sidebar: oklch(0.205 0 0);
   --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-primary: #9b7afd;
+  --sidebar-primary-foreground: #1a0c33;
+  --sidebar-accent: #2d1554;
+  --sidebar-accent-foreground: #ebe3fe;
   --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --sidebar-ring: #9b7afd;
 }
 
 /* Unlayered + !important: wins over Tailwind utilities and browser defaults site-wide. */

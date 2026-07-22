@@ -20,7 +20,7 @@ async function uploadImage(file: File): Promise<string> {
 }
 
 const inputClass =
-  "w-full rounded-xl border border-neutral-300 bg-white px-4 py-3 text-neutral-900 outline-none focus:border-emerald-500 dark:border-white/10 dark:bg-slate-900 dark:text-white";
+  "w-full rounded-xl border border-neutral-300 bg-white px-4 py-3 text-neutral-900 outline-none focus:border-brand-500 dark:border-white/10 dark:bg-slate-900 dark:text-white";
 const labelClass = "mb-2 block text-sm font-bold text-neutral-700 dark:text-slate-300";
 
 export default function MyEventProfilePage() {
@@ -271,7 +271,7 @@ export default function MyEventProfilePage() {
               <p className="mt-2 text-xs text-neutral-400 dark:text-slate-400">در حال بررسی...</p>
             ) : null}
             {slugStatus === "ok" && slug !== originalSlug ? (
-              <p className="mt-2 text-xs text-emerald-600 dark:text-emerald-400">این آدرس آزاد است.</p>
+              <p className="mt-2 text-xs text-brand-600 dark:text-brand-400">این آدرس آزاد است.</p>
             ) : null}
             {slugStatus === "taken" ? (
               <p className="mt-2 text-xs text-red-500 dark:text-red-400">این آدرس قبلاً ثبت شده است.</p>
@@ -280,8 +280,8 @@ export default function MyEventProfilePage() {
               <p className="mt-2 text-xs text-red-500 dark:text-red-400">فرمت آدرس معتبر نیست.</p>
             ) : null}
             {previewHost ? (
-              <div className="mt-3 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3">
-                <p className="text-xs font-bold text-emerald-700 dark:text-emerald-300">
+              <div className="mt-3 rounded-xl border border-brand-500/30 bg-brand-500/10 px-4 py-3">
+                <p className="text-xs font-bold text-brand-700 dark:text-brand-300">
                   پیش‌نمایش ساب‌دامین بلیت‌مال
                 </p>
                 <p className="mt-1 font-mono text-sm text-neutral-900 dark:text-white" dir="ltr">
@@ -330,7 +330,7 @@ export default function MyEventProfilePage() {
                 type="button"
                 onClick={() => logoInputRef.current?.click()}
                 disabled={uploading === "logo"}
-                className="inline-flex items-center gap-2 rounded-xl border border-dashed border-neutral-300 px-4 py-2 text-sm font-bold text-neutral-700 hover:border-emerald-500/50 disabled:opacity-60 dark:border-white/20 dark:text-slate-200"
+                className="inline-flex items-center gap-2 rounded-xl border border-dashed border-neutral-300 px-4 py-2 text-sm font-bold text-neutral-700 hover:border-brand-500/50 disabled:opacity-60 dark:border-white/20 dark:text-slate-200"
               >
                 <Upload className="h-4 w-4" />
                 {uploading === "logo" ? "در حال آپلود..." : "آپلود لوگو"}
@@ -368,7 +368,7 @@ export default function MyEventProfilePage() {
                 type="button"
                 onClick={() => coverInputRef.current?.click()}
                 disabled={uploading === "cover"}
-                className="inline-flex items-center gap-2 rounded-xl border border-dashed border-neutral-300 px-4 py-2 text-sm font-bold text-neutral-700 hover:border-emerald-500/50 disabled:opacity-60 dark:border-white/20 dark:text-slate-200"
+                className="inline-flex items-center gap-2 rounded-xl border border-dashed border-neutral-300 px-4 py-2 text-sm font-bold text-neutral-700 hover:border-brand-500/50 disabled:opacity-60 dark:border-white/20 dark:text-slate-200"
               >
                 <Upload className="h-4 w-4" />
                 {uploading === "cover" ? "در حال آپلود..." : "آپلود کاور"}
@@ -419,7 +419,7 @@ export default function MyEventProfilePage() {
         <button
           type="submit"
           disabled={saving || slugStatus === "taken" || slugStatus === "invalid"}
-          className="w-full rounded-xl bg-emerald-600 py-3 font-black text-white hover:bg-emerald-500 disabled:opacity-60"
+          className="w-full rounded-xl bg-brand-600 py-3 font-black text-white hover:bg-brand-500 disabled:opacity-60"
         >
           {saving ? "در حال ذخیره..." : "ذخیره پروفایل"}
         </button>

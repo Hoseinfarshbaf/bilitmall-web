@@ -600,7 +600,7 @@ export default function EventForm({
                 handleImageSelect(null);
                 if (fileInputRef.current) fileInputRef.current.value = "";
               }}
-              className="inline-flex items-center gap-1 text-sm font-bold text-red-600 hover:text-red-700"
+              className="inline-flex items-center gap-1 text-sm font-bold text-brand-600 hover:text-brand-700"
             >
               <X className="h-4 w-4" />
               حذف فایل انتخاب‌شده
@@ -711,14 +711,14 @@ export default function EventForm({
                     <button
                       type="button"
                       onClick={() => addSession(dayIndex)}
-                      className="shrink-0 rounded-lg bg-emerald-50 px-2 py-1 text-[11px] font-bold text-emerald-700 hover:bg-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-300"
+                      className="shrink-0 rounded-lg bg-brand-50 px-2 py-1 text-[11px] font-bold text-brand-700 hover:bg-brand-100 dark:bg-brand-500/10 dark:text-brand-300"
                     >
                       + سانس
                     </button>
                     <button
                       type="button"
                       onClick={() => removeDay(dayIndex)}
-                      className="shrink-0 rounded-lg p-1 text-red-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-500/10"
+                      className="shrink-0 rounded-lg p-1 text-brand-400 hover:bg-brand-50 hover:text-brand-600 dark:hover:bg-brand-500/10"
                       title="حذف این روز"
                     >
                       <X className="h-4 w-4" />
@@ -747,7 +747,7 @@ export default function EventForm({
                           <button
                             type="button"
                             onClick={() => removeSession(dayIndex, sessionIndex)}
-                            className="mr-auto rounded p-0.5 text-red-400 hover:text-red-600"
+                            className="mr-auto rounded p-0.5 text-brand-400 hover:text-brand-600"
                             title="حذف سانس"
                           >
                             <X className="h-3.5 w-3.5" />
@@ -846,7 +846,7 @@ export default function EventForm({
                     handleBannerImageSelect(null);
                     if (bannerFileInputRef.current) bannerFileInputRef.current.value = "";
                   }}
-                  className="inline-flex items-center gap-1 text-sm font-bold text-red-600 hover:text-red-700"
+                  className="inline-flex items-center gap-1 text-sm font-bold text-brand-600 hover:text-brand-700"
                 >
                   <X className="h-4 w-4" />
                   حذف بنر انتخاب‌شده

@@ -73,7 +73,7 @@ export default function AccountPaymentsPage() {
                           ? "bg-green-100 text-green-700"
                           : order.status === "pending"
                             ? "bg-amber-100 text-amber-700"
-                            : "bg-red-100 text-red-700"
+                            : "bg-brand-100 text-brand-700"
                       }`}
                     >
                       {ORDER_STATUS_LABELS[order.status] ?? order.status}

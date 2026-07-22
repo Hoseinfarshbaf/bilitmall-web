@@ -9,7 +9,7 @@ export default function Footer() {
       <div className="mx-auto max-w-6xl px-4 py-12">
         <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
           <div className="lg:col-span-1">
-            <Link href="/" className="inline-flex items-center gap-2 text-xl font-black text-red-600">
+            <Link href="/" className="inline-flex items-center gap-2 text-xl font-black text-brand-600">
               <Ticket className="h-7 w-7" />
               <span>بلیت‌مال</span>
             </Link>
@@ -22,17 +22,17 @@ export default function Footer() {
             <h3 className="mb-4 text-sm font-black text-neutral-900 dark:text-neutral-100">دسته‌بندی‌ها</h3>
             <ul className="space-y-3 text-sm text-neutral-600 dark:text-neutral-400">
               <li>
-                <Link href="/events/تهران/کنسرت" className="transition hover:text-red-600">
+                <Link href="/events/تهران/کنسرت" className="transition hover:text-brand-600">
                   کنسرت
                 </Link>
               </li>
               <li>
-                <Link href="/events/تهران/تئاتر" className="transition hover:text-red-600">
+                <Link href="/events/تهران/تئاتر" className="transition hover:text-brand-600">
                   تئاتر
                 </Link>
               </li>
               <li>
-                <Link href="/events/تهران/ایونت" className="transition hover:text-red-600">
+                <Link href="/events/تهران/ایونت" className="transition hover:text-brand-600">
                   ایونت
                 </Link>
               </li>
@@ -43,17 +43,17 @@ export default function Footer() {
             <h3 className="mb-4 text-sm font-black text-neutral-900 dark:text-neutral-100">حساب کاربری</h3>
             <ul className="space-y-3 text-sm text-neutral-600 dark:text-neutral-400">
               <li>
-                <Link href="/auth/login" className="transition hover:text-red-600">
+                <Link href="/auth/login" className="transition hover:text-brand-600">
                   ورود
                 </Link>
               </li>
               <li>
-                <Link href="/auth/register" className="transition hover:text-red-600">
+                <Link href="/auth/register" className="transition hover:text-brand-600">
                   ثبت‌نام
                 </Link>
               </li>
               <li>
-                <Link href="/account" className="transition hover:text-red-600">
+                <Link href="/account" className="transition hover:text-brand-600">
                   پنل کاربری
                 </Link>
               </li>
@@ -66,18 +66,18 @@ export default function Footer() {
               <li>
                 <Link
                   href="/contact"
-                  className="inline-flex items-center gap-2 font-bold text-neutral-700 transition hover:text-red-600 dark:text-neutral-300 dark:hover:text-red-400"
+                  className="inline-flex items-center gap-2 font-bold text-neutral-700 transition hover:text-brand-600 dark:text-neutral-300 dark:hover:text-brand-400"
                 >
-                  <Headset className="h-4 w-4 shrink-0 text-red-500" />
+                  <Headset className="h-4 w-4 shrink-0 text-brand-500" />
                   تماس و پشتیبانی
                 </Link>
               </li>
               <li className="flex items-center gap-2">
-                <Phone className="h-4 w-4 shrink-0 text-red-500" />
+                <Phone className="h-4 w-4 shrink-0 text-brand-500" />
                 <span dir="ltr">021-91000000</span>
               </li>
               <li className="flex items-center gap-2">
-                <Mail className="h-4 w-4 shrink-0 text-red-500" />
+                <Mail className="h-4 w-4 shrink-0 text-brand-500" />
                 <span dir="ltr">support@bilitmall.com</span>
               </li>
               <li className="flex items-start gap-2">
@@ -94,7 +94,7 @@ export default function Footer() {
           </p>
           <p className="text-xs text-neutral-400 dark:text-neutral-500">
             برگزارکننده هستید؟{" "}
-            <Link href="/my-event" className="font-bold text-neutral-600 hover:text-red-600 dark:text-neutral-300 dark:hover:text-red-400">
+            <Link href="/my-event" className="font-bold text-neutral-600 hover:text-brand-600 dark:text-neutral-300 dark:hover:text-brand-400">
               My Event Studio
             </Link>
           </p>

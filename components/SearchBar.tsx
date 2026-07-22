@@ -144,7 +144,7 @@ export default function SearchBar() {
     <div ref={containerRef} className="relative mx-auto w-full max-w-2xl">
       <form onSubmit={handleSubmit}>
         <div className="relative">
-          <Search className="pointer-events-none absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 text-red-600" />
+          <Search className="pointer-events-none absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 text-brand-600" />
           <input
             type="text"
             value={query}
@@ -158,7 +158,7 @@ export default function SearchBar() {
             placeholder={`جستجوی رویداد در ${selectedCity}...`}
             aria-label="جستجوی رویداد"
             autoComplete="off"
-            className={`w-full border border-neutral-200 bg-white py-3.5 pr-12 pl-11 text-base text-neutral-800 shadow-sm outline-none transition focus:border-red-500 focus:ring-2 focus:ring-red-100 md:py-4 md:text-sm dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:focus:border-red-500 dark:focus:ring-red-500/20 ${
+            className={`w-full border border-neutral-200 bg-white py-3.5 pr-12 pl-11 text-base text-neutral-800 shadow-sm outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-100 md:py-4 md:text-sm dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:focus:border-brand-500 dark:focus:ring-brand-500/20 ${
               showDropdown && suggestions.length > 0
                 ? "rounded-t-3xl rounded-b-none border-b-transparent"
                 : "rounded-full"
@@ -196,7 +196,7 @@ export default function SearchBar() {
                     }}
                     className={`flex w-full min-h-14 items-center gap-3 px-3 py-3 text-right transition md:min-h-0 md:py-2.5 ${
                       index === activeIndex
-                        ? "bg-red-50 dark:bg-red-500/10"
+                        ? "bg-brand-50 dark:bg-brand-500/10"
                         : "hover:bg-neutral-50 dark:hover:bg-neutral-800"
                     }`}
                   >
@@ -234,7 +234,7 @@ export default function SearchBar() {
           <button
             type="button"
             onClick={() => goToSearchPage(query)}
-            className="flex w-full items-center justify-between gap-2 border-t border-neutral-100 bg-neutral-50 px-4 py-3 text-sm font-bold text-red-600 transition hover:bg-red-50 dark:border-neutral-800 dark:bg-neutral-900/80 dark:text-red-400 dark:hover:bg-red-500/10"
+            className="flex w-full items-center justify-between gap-2 border-t border-neutral-100 bg-neutral-50 px-4 py-3 text-sm font-bold text-brand-600 transition hover:bg-brand-50 dark:border-neutral-800 dark:bg-neutral-900/80 dark:text-brand-400 dark:hover:bg-brand-400/10"
           >
             <span className="inline-flex items-center gap-2">
               <Search className="h-4 w-4" />

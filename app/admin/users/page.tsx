@@ -32,11 +32,11 @@ const inputClass =
 function roleBadgeClass(slug: string) {
   switch (slug) {
     case "admin":
-      return "bg-red-100 text-red-800 dark:bg-red-500/20 dark:text-red-300";
+      return "bg-brand-100 text-brand-800 dark:bg-brand-500/20 dark:text-brand-300";
     case "manager":
       return "bg-violet-100 text-violet-800 dark:bg-violet-500/20 dark:text-violet-300";
     case "organizer":
-      return "bg-emerald-100 text-emerald-800 dark:bg-emerald-500/20 dark:text-emerald-300";
+      return "bg-brand-100 text-brand-800 dark:bg-brand-500/20 dark:text-brand-300";
     case "user":
       return "bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-200";
     default:
@@ -346,7 +346,7 @@ export default function AdminUsersPage() {
                             "inline-block rounded-full px-2 py-1 text-xs font-bold",
                             user.source === "bilitmall"
                               ? "bg-blue-50 text-blue-700 dark:bg-blue-500/15 dark:text-blue-300"
-                              : "bg-emerald-50 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300"
+                              : "bg-brand-50 text-brand-700 dark:bg-brand-500/15 dark:text-brand-300"
                           )}
                         >
                           {user.source === "bilitmall" ? "بلیت‌مال" : "My Event"}
@@ -396,7 +396,7 @@ export default function AdminUsersPage() {
                               <button
                                 type="button"
                                 onClick={() => handleDelete(user)}
-                                className="rounded-lg bg-red-50 px-3 py-1 text-xs font-bold text-red-700 dark:bg-red-500/15 dark:text-red-300"
+                                className="rounded-lg bg-brand-50 px-3 py-1 text-xs font-bold text-brand-700 dark:bg-brand-500/15 dark:text-brand-300"
                               >
                                 حذف
                               </button>
@@ -404,7 +404,7 @@ export default function AdminUsersPage() {
                           ) : (
                             <Link
                               href="/admin/my-event"
-                              className="rounded-lg bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300"
+                              className="rounded-lg bg-brand-50 px-3 py-1 text-xs font-bold text-brand-700 dark:bg-brand-500/15 dark:text-brand-300"
                             >
                               برگزارکنندگان
                             </Link>
@@ -584,7 +584,7 @@ export default function AdminUsersPage() {
                         <button
                           type="button"
                           onClick={() => handleDeleteRole(role)}
-                          className="rounded-lg bg-red-50 px-3 py-1 text-xs font-bold text-red-700 dark:bg-red-500/15 dark:text-red-300"
+                          className="rounded-lg bg-brand-50 px-3 py-1 text-xs font-bold text-brand-700 dark:bg-brand-500/15 dark:text-brand-300"
                         >
                           حذف
                         </button>
