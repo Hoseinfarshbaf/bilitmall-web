@@ -2,6 +2,8 @@ import {
   CANVAS_SEAT_SIZE,
   DEFAULT_CANVAS_HEIGHT,
   DEFAULT_CANVAS_WIDTH,
+  resolveStagePlacement,
+  stageFocusPoint,
 } from "@/lib/seating/layout";
 import type { SeatCell, SeatingLayout } from "@/lib/seating/types";
 
@@ -36,18 +38,16 @@ export type Hall3DModel = {
   overviewPosition: [number, number, number];
 };
 
-function canvasToWorld(
+function canvasPointToWorld(
   x: number,
   y: number,
-  canvasWidth: number,
-  canvasHeight: number
+  canvasWidth: number
 ): { wx: number; wz: number } {
   const cx = canvasWidth / 2;
-  // Stage sits near the bottom of the 2D canvas → world −Z.
-  const stageLineY = canvasHeight * 0.92;
   return {
-    wx: (x + CANVAS_SEAT_SIZE / 2 - cx) * WORLD_SCALE,
-    wz: (stageLineY - (y + CANVAS_SEAT_SIZE / 2)) * WORLD_SCALE,
+    wx: (x - cx) * WORLD_SCALE,
+    // Canvas +Y down → world −Z toward typical stage-at-bottom layouts.
+    wz: -((y - 0) * WORLD_SCALE),
   };
 }
 
@@ -57,10 +57,17 @@ export function buildHall3D(layout: SeatingLayout): Hall3DModel {
   const canvasHeight = layout.canvasHeight ?? DEFAULT_CANVAS_HEIGHT;
   const width = canvasWidth * WORLD_SCALE;
   const depth = canvasHeight * WORLD_SCALE;
+  const placed = resolveStagePlacement(layout);
+  const focus = stageFocusPoint(layout);
+  const stageWorld = canvasPointToWorld(focus.x, focus.y, canvasWidth);
 
-  const stageCenter: [number, number, number] = [0, STAGE_HEIGHT / 2, -STAGE_DEPTH * 0.35];
+  const stageCenter: [number, number, number] = [
+    stageWorld.wx,
+    STAGE_HEIGHT / 2,
+    stageWorld.wz,
+  ];
   const stageSize: [number, number, number] = [
-    Math.max(width * 0.72, 8),
+    Math.max(placed.stageWidth * WORLD_SCALE, 6),
     STAGE_HEIGHT,
     STAGE_DEPTH,
   ];
@@ -70,8 +77,11 @@ export function buildHall3D(layout: SeatingLayout): Hall3DModel {
     .map((cell) => {
       const x = typeof cell.x === "number" ? cell.x : 0;
       const y = typeof cell.y === "number" ? cell.y : 0;
-      const { wx, wz } = canvasToWorld(x, y, canvasWidth, canvasHeight);
-      // 2D rotation is degrees; seats face stage (−Z) when rotation ≈ 0.
+      const { wx, wz } = canvasPointToWorld(
+        x + CANVAS_SEAT_SIZE / 2,
+        y + CANVAS_SEAT_SIZE / 2,
+        canvasWidth
+      );
       const yaw = ((cell.rotation ?? 0) * Math.PI) / 180;
       const position: [number, number, number] = [wx, SEAT_MESH_HEIGHT / 2, wz];
       const eye: [number, number, number] = [wx, SEAT_EYE_HEIGHT, wz];
@@ -85,11 +95,15 @@ export function buildHall3D(layout: SeatingLayout): Hall3DModel {
       };
     });
 
-  const overviewTarget: [number, number, number] = [0, 0.5, depth * 0.15];
+  const overviewTarget: [number, number, number] = [
+    stageCenter[0],
+    0.5,
+    stageCenter[2] + depth * 0.2,
+  ];
   const overviewPosition: [number, number, number] = [
-    width * 0.15,
+    stageCenter[0] + width * 0.12,
     Math.max(8, depth * 0.55),
-    depth * 0.75,
+    stageCenter[2] + depth * 0.65,
   ];
 
   return {

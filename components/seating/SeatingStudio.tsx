@@ -16,14 +16,11 @@ import {
   X,
 } from "lucide-react";
 import {
-  addAngledSeatBlock,
-  addArcSeatRow,
   addCanvasSeat,
   addRowMarker,
   addSeatToRow,
   alignSeatsToNeighbors,
   applyClassicGridToCanvas,
-  applyStagePosition,
   countBookableSeats,
   ensureRowLabels,
   faceSeatsTowardStage,
@@ -31,10 +28,14 @@ import {
   listOccupiedRows,
   moveCanvasSeats,
   moveRowMarker,
+  moveStage,
   normalizeLayout,
   removeCanvasSeats,
   removeRowMarkers,
   removeRowSeats,
+  resizeStage,
+  resolveSeatDisplay,
+  resolveStagePlacement,
   rotateCanvasSeats,
   rowLabel,
   seatsInRow,
@@ -42,7 +43,7 @@ import {
   syncRowMarkersFromSeats,
   updateRowMarkerLabel,
 } from "@/lib/seating/layout";
-import type { SeatCell, SeatingLayout, StagePosition } from "@/lib/seating/types";
+import type { SeatCell, SeatingLayout } from "@/lib/seating/types";
 import { seatingLayoutIsFree } from "@/lib/events/pricing";
 import { SeatStatusLegend } from "@/components/seating/SeatMapVisuals";
 import { SeatMapViewport } from "@/components/seating/SeatMapViewport";
@@ -77,13 +78,6 @@ type SeatingStudioProps = {
   readOnly?: boolean;
 };
 
-const STAGE_OPTIONS: { value: StagePosition; label: string }[] = [
-  { value: "top", label: "بالا" },
-  { value: "bottom", label: "پایین" },
-  { value: "left", label: "چپ" },
-  { value: "right", label: "راست" },
-];
-
 const STUDIO_TOOLS: { value: StudioTool; label: string; icon: typeof Armchair }[] = [
   { value: "move", label: "جابه‌جایی", icon: GripVertical },
   { value: "rotate", label: "چرخش", icon: RotateCw },
@@ -109,7 +103,6 @@ export default function SeatingStudio({
   const [rowPrice, setRowPrice] = useState("");
   const [draftRows, setDraftRows] = useState(layout.rows);
   const [draftCols, setDraftCols] = useState(layout.cols);
-  const [blockAngle, setBlockAngle] = useState(-35);
   const [historyIndex, setHistoryIndex] = useState(0);
   const historyRef = useRef<SeatingLayout[]>([cloneLayout(normalizeLayout(layout))]);
   const historyIndexRef = useRef(0);
@@ -412,25 +405,38 @@ export default function SeatingStudio({
             </div>
 
             <p className="mb-2 mt-6 text-xs font-black text-neutral-500">
-              موقعیت بنر صحنه
+              صحنه اجرا (نیم‌دایره)
             </p>
-            <div className="grid grid-cols-2 gap-1.5">
-              {STAGE_OPTIONS.map((o) => (
-                <button
-                  key={o.value}
-                  type="button"
-                  onClick={() => update(applyStagePosition(normalized, o.value))}
-                  className={cn(
-                    "rounded-lg border px-2 py-1.5 text-[11px] font-bold",
-                    normalized.stagePosition === o.value
-                      ? "border-sky-500 bg-sky-50 text-sky-700"
-                      : "border-neutral-200 text-neutral-600"
-                  )}
-                >
-                  {o.label}
-                </button>
-              ))}
-            </div>
+            <p className="mb-2 text-[10px] leading-4 text-neutral-400">
+              صحنه را روی بوم بکشید تا هر جا داخل طرح بگذارید. بیرون از بوم نمی‌رود.
+            </p>
+            <label className="mb-2 block text-[10px] font-bold text-neutral-500">
+              عنوان صحنه
+              <input
+                value={normalized.stageLabel || ""}
+                onChange={(e) =>
+                  update({ ...normalized, stageLabel: e.target.value || "صحنه اجرا" })
+                }
+                className="mt-1 w-full rounded-lg border border-neutral-300 px-2 py-1.5 text-sm font-black outline-none focus:border-brand-500"
+              />
+            </label>
+            <label className="mb-3 block text-[10px] font-bold text-neutral-500">
+              عرض صحنه: {resolveStagePlacement(normalized).stageWidth}px
+              <input
+                type="range"
+                min={160}
+                max={Math.max(200, (normalized.canvasWidth ?? 960) - 16)}
+                step={8}
+                value={resolveStagePlacement(normalized).stageWidth}
+                onChange={(e) =>
+                  update(resizeStage(normalized, Number(e.target.value)), {
+                    coalesce: true,
+                  })
+                }
+                onPointerUp={commitGesture}
+                className="mt-1 w-full accent-amber-500"
+              />
+            </label>
 
             <p className="mb-2 mt-6 text-xs font-black text-neutral-500">
               ردیف‌ها — کلیک برای ویرایش
@@ -496,81 +502,10 @@ export default function SeatingStudio({
               />
               چسبیدن به نقاط (Snap)
             </label>
-            <label className="mt-3 flex items-center gap-2 text-xs font-bold text-neutral-600">
-              <input
-                type="checkbox"
-                checked={normalized.stageStyle !== "banner"}
-                onChange={(e) =>
-                  update({
-                    ...normalized,
-                    stageStyle: e.target.checked ? "semicircle" : "banner",
-                  })
-                }
-                className="accent-brand-500"
-              />
-              صحنه نیم‌دایره تئاتری
-            </label>
-
-            <p className="mb-2 mt-6 text-xs font-black text-neutral-500">
-              بلوک زاویه‌دار (مثل عکس)
-            </p>
-            <label className="mb-2 block text-[10px] font-bold text-neutral-500">
-              زاویه بلوک: {blockAngle}°
-              <input
-                type="range"
-                min={-75}
-                max={75}
-                step={5}
-                value={blockAngle}
-                onChange={(e) => setBlockAngle(Number(e.target.value))}
-                className="mt-1 w-full accent-brand-500"
-              />
-            </label>
-            <button
-              type="button"
-              onClick={() => {
-                const w = normalized.canvasWidth ?? 960;
-                const h = normalized.canvasHeight ?? 720;
-                update(
-                  addAngledSeatBlock(normalized, {
-                    rows: Math.min(4, draftRows),
-                    cols: Math.min(8, draftCols),
-                    originX: w / 2 - 120,
-                    originY: h / 2 - 80,
-                    rotation: blockAngle,
-                    sectionColor: SECTION_COLORS[Math.abs(blockAngle) > 20 ? 1 : 2],
-                  })
-                );
-              }}
-              className="w-full rounded-xl border border-brand-200 bg-brand-50 py-2 text-xs font-bold text-brand-700"
-            >
-              افزودن بلوک چرخیده
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                const w = normalized.canvasWidth ?? 960;
-                const h = normalized.canvasHeight ?? 720;
-                update(
-                  addArcSeatRow(normalized, {
-                    centerX: w / 2,
-                    centerY: h - 40,
-                    radius: Math.min(w, h) * 0.42,
-                    startDeg: 200,
-                    endDeg: 340,
-                    count: Math.max(8, draftCols),
-                    sectionColor: SECTION_COLORS[3],
-                  })
-                );
-              }}
-              className="mt-2 w-full rounded-xl border border-teal-200 bg-teal-50 py-2 text-xs font-bold text-teal-800"
-            >
-              افزودن ردیف قوسی
-            </button>
             <button
               type="button"
               onClick={() => update(syncRowMarkersFromSeats(normalized))}
-              className="mt-2 w-full rounded-xl border border-neutral-200 py-2 text-xs font-bold text-neutral-600 hover:border-brand-300"
+              className="mt-4 w-full rounded-xl border border-neutral-200 py-2 text-xs font-bold text-neutral-600 hover:border-brand-300"
             >
               نشانه ردیف‌ها از صندلی‌ها
             </button>
@@ -720,6 +655,9 @@ export default function SeatingStudio({
                   update(removeRowMarkers(normalized, ids));
                   setSelectedMarkerId(null);
                 }}
+                onMoveStage={(x, y) =>
+                  update(moveStage(normalized, x, y), { coalesce: true })
+                }
                 onGestureEnd={commitGesture}
               />
             </SeatMapViewport>
@@ -983,7 +921,47 @@ export default function SeatingStudio({
                 <div className="mt-4 space-y-3">
                   <div>
                     <label className="mb-1 block text-[10px] font-bold text-neutral-500">
-                      برچسب
+                      شماره صندلی (روی نقشه)
+                    </label>
+                    <input
+                      value={
+                        selected.seatNumber ??
+                        resolveSeatDisplay(selected, normalized)
+                      }
+                      onChange={(e) => {
+                        const seatNumber = e.target.value;
+                        const ids = new Set(
+                          selectedIds.length ? selectedIds : [selected.id]
+                        );
+                        update({
+                          ...normalized,
+                          cells: normalized.cells.map((c) => {
+                            if (!ids.has(c.id)) return c;
+                            const display =
+                              seatNumber.trim() ||
+                              resolveSeatDisplay(
+                                { ...c, seatNumber: undefined },
+                                normalized
+                              );
+                            return {
+                              ...c,
+                              seatNumber: seatNumber.trim() || undefined,
+                              label: `${rowLabel(c.row, normalized)}-${display}`,
+                            };
+                          }),
+                        });
+                      }}
+                      className="w-full rounded-lg border border-brand-300 bg-brand-50/40 px-2 py-1.5 text-sm font-black outline-none focus:border-brand-500"
+                      dir="ltr"
+                      placeholder="مثلاً ۱ یا A12"
+                    />
+                    <p className="mt-1 text-[10px] text-neutral-400">
+                      هر شماره‌ای بگذارید؛ روی خود صندلی نمایش داده می‌شود.
+                    </p>
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-[10px] font-bold text-neutral-500">
+                      برچسب کامل
                     </label>
                     <input
                       value={selected.label}
@@ -1055,7 +1033,10 @@ export default function SeatingStudio({
                   کلیک روی صندلی = ویرایش همان صندلی؛ دابل‌کلیک یا لیست ردیف = کل ردیف.
                 </li>
                 <li>
-                  وقتی ردیف انتخاب است، بکشید تا جابه‌جا شود؛ کلیک روی یک صندلی برای ویرایش تکی.
+                  صحنه نیم‌دایره را روی بوم بکشید و هر جا داخل طرح بگذارید.
+                </li>
+                <li>
+                  با انتخاب صندلی می‌توانید شماره دلخواه روی آن بگذارید.
                 </li>
                 <li>
                   <strong>Ctrl+Z</strong> برای بازگشت یک قدم.

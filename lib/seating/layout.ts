@@ -23,6 +23,8 @@ export const DEFAULT_CANVAS_WIDTH = 960;
 export const DEFAULT_CANVAS_HEIGHT = 720;
 export const CANVAS_STAGE_BAND = 72;
 export const CANVAS_PADDING = 48;
+export const DEFAULT_STAGE_HEIGHT = 80;
+export const DEFAULT_STAGE_WIDTH = 320;
 
 export function rowLabel(row: number, layout?: Pick<SeatingLayout, "rowLabels">): string {
   const custom = layout?.rowLabels?.[row]?.trim();
@@ -57,6 +59,93 @@ export function seatDisplayNumber(
   // col 0 is always the left seat in storage/layout.
   // RTL (HonarTicket): numbers increase right→left → rightmost seat is 1.
   return seatNumbersRtl ? cols - col : col + 1;
+}
+
+/** Number shown on the seat — custom seatNumber wins over auto col number. */
+export function resolveSeatDisplay(
+  cell: Pick<SeatCell, "type" | "col" | "seatNumber">,
+  layout: Pick<SeatingLayout, "cols" | "seatNumbersRtl">
+): string {
+  if (cell.type === "blocked") return "—";
+  const custom = cell.seatNumber?.trim();
+  if (custom) return custom;
+  return String(
+    seatDisplayNumber(cell.col, layout.cols, layout.seatNumbersRtl !== false)
+  );
+}
+
+export function resolveStagePlacement(layout: SeatingLayout): {
+  stageX: number;
+  stageY: number;
+  stageWidth: number;
+  stageHeight: number;
+} {
+  const w = layout.canvasWidth ?? DEFAULT_CANVAS_WIDTH;
+  const h = layout.canvasHeight ?? DEFAULT_CANVAS_HEIGHT;
+  const stageWidth = Math.min(
+    w - 16,
+    Math.max(120, layout.stageWidth ?? Math.round(Math.min(w * 0.52, 480)))
+  );
+  const stageHeight = DEFAULT_STAGE_HEIGHT;
+  const stageX =
+    typeof layout.stageX === "number"
+      ? layout.stageX
+      : Math.round((w - stageWidth) / 2);
+  const stageY =
+    typeof layout.stageY === "number"
+      ? layout.stageY
+      : Math.round(h - stageHeight - 16);
+  return {
+    stageX: Math.min(Math.max(0, stageX), Math.max(0, w - stageWidth)),
+    stageY: Math.min(Math.max(0, stageY), Math.max(0, h - stageHeight)),
+    stageWidth,
+    stageHeight,
+  };
+}
+
+export function stageFocusPoint(layout: SeatingLayout): { x: number; y: number } {
+  const { stageX, stageY, stageWidth, stageHeight } = resolveStagePlacement(layout);
+  return {
+    x: stageX + stageWidth / 2,
+    // Curved edge faces the audience (top of the semicircle block).
+    y: stageY + stageHeight * 0.2,
+  };
+}
+
+export function moveStage(
+  layout: SeatingLayout,
+  stageX: number,
+  stageY: number
+): SeatingLayout {
+  const w = layout.canvasWidth ?? DEFAULT_CANVAS_WIDTH;
+  const h = layout.canvasHeight ?? DEFAULT_CANVAS_HEIGHT;
+  const { stageWidth, stageHeight } = resolveStagePlacement(layout);
+  return normalizeLayout({
+    ...layout,
+    mode: "canvas",
+    stageStyle: "semicircle",
+    stageX: Math.min(Math.max(0, Math.round(stageX)), Math.max(0, w - stageWidth)),
+    stageY: Math.min(Math.max(0, Math.round(stageY)), Math.max(0, h - stageHeight)),
+    stageWidth,
+  });
+}
+
+export function resizeStage(
+  layout: SeatingLayout,
+  stageWidth: number
+): SeatingLayout {
+  const w = layout.canvasWidth ?? DEFAULT_CANVAS_WIDTH;
+  const placed = resolveStagePlacement(layout);
+  const nextW = Math.min(w - 16, Math.max(140, Math.round(stageWidth)));
+  const cx = placed.stageX + placed.stageWidth / 2;
+  return normalizeLayout({
+    ...layout,
+    mode: "canvas",
+    stageStyle: "semicircle",
+    stageWidth: nextW,
+    stageX: Math.min(Math.max(0, Math.round(cx - nextW / 2)), Math.max(0, w - nextW)),
+    stageY: placed.stageY,
+  });
 }
 
 export function ensureRowLabels(layout: SeatingLayout): string[] {
@@ -225,7 +314,13 @@ export function normalizeLayout(layout: SeatingLayout): SeatingLayout {
       ? layout.canvasHeight
       : DEFAULT_CANVAS_HEIGHT;
   const snapEnabled = layout.snapEnabled !== false;
-  const stageStyle = layout.stageStyle ?? "semicircle";
+  const stageStyle = "semicircle" as const;
+  const stagePlace = resolveStagePlacement({
+    ...layout,
+    stageStyle,
+    canvasWidth,
+    canvasHeight,
+  });
 
   let zones = layout.zones ?? [];
   if (zones.length === 0) {
@@ -274,6 +369,9 @@ export function normalizeLayout(layout: SeatingLayout): SeatingLayout {
     canvasHeight,
     snapEnabled,
     stageStyle,
+    stageX: stagePlace.stageX,
+    stageY: stagePlace.stageY,
+    stageWidth: stagePlace.stageWidth,
     stageRect,
     zones,
     seatNumbersRtl: layout.seatNumbersRtl !== false,
@@ -798,37 +896,16 @@ export function defaultSeatRotation(_layout?: SeatingLayout): number {
   return 0;
 }
 
-/** Rotation so the seat front faces the stage (semicircle = bottom of canvas). */
+/** Rotation so the seat front faces the stage. */
 export function stageFacingRotation(
   layout: SeatingLayout,
   x: number,
   y: number
 ): number {
-  const w = layout.canvasWidth ?? DEFAULT_CANVAS_WIDTH;
-  const h = layout.canvasHeight ?? DEFAULT_CANVAS_HEIGHT;
-  let stageX = w / 2;
-  let stageY = h - 18;
-
-  if (layout.stageStyle === "banner") {
-    const pos = layout.stagePosition ?? "top";
-    if (pos === "top") {
-      stageX = w / 2;
-      stageY = 40;
-    } else if (pos === "bottom") {
-      stageX = w / 2;
-      stageY = h - 18;
-    } else if (pos === "left") {
-      stageX = 40;
-      stageY = h / 2;
-    } else {
-      stageX = w - 40;
-      stageY = h / 2;
-    }
-  }
-
+  const focus = stageFocusPoint(layout);
   const cx = x + CANVAS_SEAT_SIZE / 2;
   const cy = y + CANVAS_SEAT_SIZE / 2;
-  const deg = (Math.atan2(stageY - cy, stageX - cx) * 180) / Math.PI;
+  const deg = (Math.atan2(focus.y - cy, focus.x - cx) * 180) / Math.PI;
   // CSS 0° = upright; seat "front" is the bottom edge → face stage
   return normalizeAngle(deg - 90);
 }
@@ -1378,7 +1455,10 @@ export function parseSeatingLayout(raw: unknown): SeatingLayout | null {
     canvasHeight: data.canvasHeight ? Number(data.canvasHeight) : undefined,
     gridSize: data.gridSize ? Number(data.gridSize) : undefined,
     snapEnabled: data.snapEnabled !== false,
-    stageStyle: data.stageStyle === "banner" ? "banner" : data.stageStyle === "semicircle" ? "semicircle" : undefined,
+    stageStyle: "semicircle",
+    stageX: data.stageX != null ? Number(data.stageX) : undefined,
+    stageY: data.stageY != null ? Number(data.stageY) : undefined,
+    stageWidth: data.stageWidth != null ? Number(data.stageWidth) : undefined,
   });
 }
 

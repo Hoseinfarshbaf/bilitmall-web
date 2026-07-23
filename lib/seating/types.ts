@@ -50,6 +50,8 @@ export type SeatCell = {
   y?: number;
   /** Rotation in degrees (0 = upright). Fan layouts use ±15…±75. */
   rotation?: number;
+  /** Custom number shown on the seat box (overrides auto col number). */
+  seatNumber?: string;
   /** Section / category fill color (hex), overrides default status tint when set. */
   sectionColor?: string;
 };
@@ -88,8 +90,14 @@ export type SeatingLayout = {
   gridSize?: number;
   /** When false, freeform seats move with 1px precision. Default true. */
   snapEnabled?: boolean;
-  /** Canvas stage look: banner curve or theater semicircle. */
+  /** Canvas stage look — always semicircle in the freeform studio. */
   stageStyle?: "banner" | "semicircle";
+  /** Semicircle stage top-left X on the canvas (px). */
+  stageX?: number;
+  /** Semicircle stage top-left Y on the canvas (px). */
+  stageY?: number;
+  /** Semicircle stage width on the canvas (px). */
+  stageWidth?: number;
 };
 
 export type VenueTemplateRecord = {

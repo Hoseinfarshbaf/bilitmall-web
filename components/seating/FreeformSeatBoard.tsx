@@ -11,10 +11,10 @@ import {
   CANVAS_GRID_SIZE,
   CANVAS_SEAT_SIZE,
   placedSeats,
-  seatDisplayNumber,
+  resolveSeatDisplay,
+  resolveStagePlacement,
 } from "@/lib/seating/layout";
 import {
-  CurvedStageBanner,
   SeatBox,
   SemicircleStage,
 } from "@/components/seating/SeatMapVisuals";
@@ -53,6 +53,8 @@ type FreeformSeatBoardProps = {
   onAddRowMarker?: (x: number, y: number) => void;
   onMoveRowMarker?: (id: string, x: number, y: number) => void;
   onEraseMarkers?: (ids: string[]) => void;
+  onMoveStage?: (x: number, y: number) => void;
+  onSelectStage?: () => void;
   onGestureEnd?: () => void;
   onToggleSeat?: (seatId: string, cell: SeatCell) => void;
 };
@@ -90,16 +92,20 @@ export default function FreeformSeatBoard({
   onAddRowMarker,
   onMoveRowMarker,
   onEraseMarkers,
+  onMoveStage,
+  onSelectStage,
   onGestureEnd,
   onToggleSeat,
 }: FreeformSeatBoardProps) {
   const boardRef = useRef<HTMLDivElement>(null);
   const [draggingIds, setDraggingIds] = useState<string[]>([]);
   const [draggingMarkerId, setDraggingMarkerId] = useState<string | null>(null);
+  const [draggingStage, setDraggingStage] = useState(false);
   const [rotating, setRotating] = useState(false);
   const dragOrigin = useRef<{ x: number; y: number } | null>(null);
   const seatOrigins = useRef<Map<string, { x: number; y: number }>>(new Map());
   const markerOrigin = useRef<{ x: number; y: number } | null>(null);
+  const stageOrigin = useRef<{ x: number; y: number } | null>(null);
   const rotateStart = useRef<{ angle: number; base: number } | null>(null);
   const didDrag = useRef(false);
   /** Seat id waiting for click-without-drag to leave row mode. */
@@ -110,10 +116,9 @@ export default function FreeformSeatBoard({
   const gridSize = layout.gridSize ?? CANVAS_GRID_SIZE;
   const seats = placedSeats(layout);
   const markers = layout.rowMarkers ?? [];
+  const stage = resolveStagePlacement(layout);
   const selectedSet = new Set(selectedIds);
   const purchaseSet = new Set(purchaseSelectedIds);
-  const rtl = layout.seatNumbersRtl !== false;
-  const useSemicircle = layout.stageStyle !== "banner";
 
   const dotBg = {
     backgroundColor: "#f7f7f8",
@@ -438,17 +443,45 @@ export default function FreeformSeatBoard({
     }
   }
 
+  function onStagePointerDown(e: React.PointerEvent) {
+    e.stopPropagation();
+    if (!interactive || readOnly || !onMoveStage) return;
+    onSelectStage?.();
+    onSelectSeats?.([]);
+    onSelectMarker?.(null);
+    onSelectRow?.(null);
+    const { x, y } = clientToBoard(e.clientX, e.clientY);
+    dragOrigin.current = { x, y };
+    stageOrigin.current = { x: stage.stageX, y: stage.stageY };
+    didDrag.current = false;
+    setDraggingStage(true);
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+  }
+
+  function onStagePointerMove(e: React.PointerEvent) {
+    if (!draggingStage || !dragOrigin.current || !stageOrigin.current) return;
+    didDrag.current = true;
+    const pos = clientToBoard(e.clientX, e.clientY);
+    onMoveStage?.(
+      stageOrigin.current.x + (pos.x - dragOrigin.current.x),
+      stageOrigin.current.y + (pos.y - dragOrigin.current.y)
+    );
+  }
+
+  function onStagePointerUp(e: React.PointerEvent) {
+    setDraggingStage(false);
+    dragOrigin.current = null;
+    stageOrigin.current = null;
+    endGesture();
+    try {
+      (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
+    } catch {
+      /* ignore */
+    }
+  }
+
   return (
     <div className="flex w-max flex-col items-center" {...{ [SEAT_ZOOM_ATTR]: "" }}>
-      {!useSemicircle && layout.stagePosition !== "bottom" ? (
-        <div className="mb-2 w-full px-2">
-          <CurvedStageBanner
-            label={layout.stageLabel || "صحنه اجرا"}
-            position={layout.stagePosition}
-          />
-        </div>
-      ) : null}
-
       <div
         ref={boardRef}
         data-board-hit="1"
@@ -468,9 +501,18 @@ export default function FreeformSeatBoard({
       >
         <div data-board-hit="1" className="absolute inset-0" />
 
-        {useSemicircle ? (
-          <SemicircleStage label={layout.stageLabel || "صحنه اجرا"} />
-        ) : null}
+        <SemicircleStage
+          label={layout.stageLabel || "صحنه اجرا"}
+          x={stage.stageX}
+          y={stage.stageY}
+          width={stage.stageWidth}
+          height={stage.stageHeight}
+          draggable={!readOnly && Boolean(onMoveStage)}
+          selected={draggingStage}
+          onPointerDown={onStagePointerDown}
+          onPointerMove={onStagePointerMove}
+          onPointerUp={onStagePointerUp}
+        />
 
         {markers.map((marker) => {
           const active = selectedMarkerId === marker.id;
@@ -501,10 +543,7 @@ export default function FreeformSeatBoard({
             selectedSet.has(cell.id) || selectedRowIndex === cell.row;
           const purchaseSelected = purchaseSet.has(cell.id);
           const status = resolveStatus(cell, purchaseSelected, occupancy);
-          const num =
-            cell.type === "blocked"
-              ? "—"
-              : seatDisplayNumber(cell.col, layout.cols, rtl);
+          const num = resolveSeatDisplay(cell, layout);
 
           const selectable =
             Boolean(onToggleSeat) &&
@@ -578,15 +617,6 @@ export default function FreeformSeatBoard({
           );
         })}
       </div>
-
-      {!useSemicircle && layout.stagePosition === "bottom" ? (
-        <div className="mt-2 w-full px-2">
-          <CurvedStageBanner
-            label={layout.stageLabel || "صحنه اجرا"}
-            position="bottom"
-          />
-        </div>
-      ) : null}
     </div>
   );
 }

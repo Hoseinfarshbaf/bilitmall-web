@@ -1,4 +1,4 @@
-import type { CSSProperties } from "react";
+import type { CSSProperties, PointerEvent as ReactPointerEvent } from "react";
 import { cn } from "@/lib/utils";
 import type { SeatSaleStatus } from "@/lib/seating/types";
 
@@ -203,20 +203,55 @@ export function SeatBox({
 export function SemicircleStage({
   label = "صحنه اجرا",
   className,
+  x,
+  y,
+  width,
+  height = 80,
+  draggable = false,
+  selected = false,
+  onPointerDown,
+  onPointerMove,
+  onPointerUp,
 }: {
   label?: string;
   className?: string;
+  /** Absolute left on the canvas (px). When omitted, sits centered at bottom. */
+  x?: number;
+  y?: number;
+  width?: number;
+  height?: number;
+  draggable?: boolean;
+  selected?: boolean;
+  onPointerDown?: (e: ReactPointerEvent<HTMLDivElement>) => void;
+  onPointerMove?: (e: ReactPointerEvent<HTMLDivElement>) => void;
+  onPointerUp?: (e: ReactPointerEvent<HTMLDivElement>) => void;
 }) {
+  const positioned = typeof x === "number" && typeof y === "number";
+
   return (
     <div
       className={cn(
-        "pointer-events-none absolute inset-x-0 bottom-2 z-0 flex justify-center",
+        "z-[1] flex justify-center",
+        positioned ? "absolute" : "pointer-events-none absolute inset-x-0 bottom-2",
+        draggable && "pointer-events-auto cursor-grab touch-none active:cursor-grabbing",
+        selected && "ring-2 ring-amber-400 ring-offset-2",
         className
       )}
+      style={
+        positioned
+          ? { left: x, top: y, width: width ?? "52%", height }
+          : width
+            ? { width }
+            : undefined
+      }
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={onPointerUp}
+      title={draggable ? "صحنه را بکشید تا جابه‌جا شود" : undefined}
     >
-      <div className="relative w-[52%] max-w-lg">
-        <div className="mx-auto h-20 w-full rounded-t-full bg-gradient-to-b from-amber-300 to-amber-500 shadow-[0_-6px_28px_rgba(245,158,11,0.35)]" />
-        <p className="absolute inset-x-0 bottom-5 text-center text-sm font-black tracking-[0.25em] text-white drop-shadow-sm">
+      <div className="relative h-full w-full">
+        <div className="mx-auto h-full w-full rounded-t-full bg-linear-to-b from-amber-300 to-amber-500 shadow-[0_-6px_28px_rgba(245,158,11,0.35)]" />
+        <p className="absolute inset-x-0 bottom-[22%] text-center text-sm font-black tracking-[0.25em] text-white drop-shadow-sm">
           {label}
         </p>
       </div>
