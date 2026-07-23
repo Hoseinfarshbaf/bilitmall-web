@@ -14,8 +14,8 @@ export type SeatSaleStatus =
 
 export type SeatingZoneType = "floor" | "balcony" | "vip";
 
-/** classic = ردیف×ستون | canvas = بوم نقطه‌ای با جایگذاری آزاد */
-export type SeatingMode = "classic" | "canvas";
+/** Freeform dotted canvas. Legacy "classic" layouts migrate to canvas on normalize. */
+export type SeatingMode = "canvas";
 
 export type StageRect = {
   rowStart: number;
@@ -80,7 +80,7 @@ export type SeatingLayout = {
   rowMarkers?: CanvasRowMarker[];
   /** Seat numbers increase right→left (RTL, HonarTicket-style) when true. */
   seatNumbersRtl?: boolean;
-  /** Placement mode — defaults to classic. */
+  /** Placement mode — always canvas after normalize. */
   mode?: SeatingMode;
   canvasWidth?: number;
   canvasHeight?: number;

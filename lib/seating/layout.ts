@@ -54,6 +54,8 @@ export function seatDisplayNumber(
   cols: number,
   seatNumbersRtl = true
 ): number {
+  // col 0 is always the left seat in storage/layout.
+  // RTL (HonarTicket): numbers increase right→left → rightmost seat is 1.
   return seatNumbersRtl ? cols - col : col + 1;
 }
 
@@ -212,7 +214,7 @@ export function normalizeLayout(layout: SeatingLayout): SeatingLayout {
   // Banner-only stage — never consume a seating row/column.
   const stageRect = defaultStageRect(layout.rows, layout.cols, layout.stagePosition);
   const liberated = liberateStageCells(layout);
-  const mode: SeatingMode = layout.mode === "canvas" ? "canvas" : "classic";
+  const mode: SeatingMode = "canvas";
   const gridSize = layout.gridSize && layout.gridSize > 0 ? layout.gridSize : CANVAS_GRID_SIZE;
   const canvasWidth =
     layout.canvasWidth && layout.canvasWidth > 0
@@ -223,8 +225,7 @@ export function normalizeLayout(layout: SeatingLayout): SeatingLayout {
       ? layout.canvasHeight
       : DEFAULT_CANVAS_HEIGHT;
   const snapEnabled = layout.snapEnabled !== false;
-  const stageStyle =
-    layout.stageStyle ?? (mode === "canvas" ? "semicircle" : "banner");
+  const stageStyle = layout.stageStyle ?? "semicircle";
 
   let zones = layout.zones ?? [];
   if (zones.length === 0) {
@@ -260,12 +261,10 @@ export function normalizeLayout(layout: SeatingLayout): SeatingLayout {
     };
   });
 
-  if (mode === "canvas") {
-    cells = ensureCanvasPositions(
-      { ...layout, mode, gridSize, canvasWidth, canvasHeight, cells },
-      cells
-    );
-  }
+  cells = ensureCanvasPositions(
+    { ...layout, mode, gridSize, canvasWidth, canvasHeight, stageStyle, cells },
+    cells
+  );
 
   return {
     ...layout,
@@ -288,19 +287,75 @@ export function snapToGrid(value: number, gridSize = CANVAS_GRID_SIZE): number {
   return Math.round(value / gridSize) * gridSize;
 }
 
+export function seatGridStep(gridSize = CANVAS_GRID_SIZE): number {
+  const gap = Math.max(4, Math.round(gridSize * 0.15));
+  return CANVAS_SEAT_SIZE + gap;
+}
+
+export function seatBlockSize(
+  rows: number,
+  cols: number,
+  gridSize = CANVAS_GRID_SIZE
+): { width: number; height: number; step: number } {
+  const step = seatGridStep(gridSize);
+  return {
+    step,
+    width: Math.max(CANVAS_SEAT_SIZE, (cols - 1) * step + CANVAS_SEAT_SIZE),
+    height: Math.max(CANVAS_SEAT_SIZE, (rows - 1) * step + CANVAS_SEAT_SIZE),
+  };
+}
+
+/** Space reserved for the semicircle stage at the bottom of the board. */
+export const CANVAS_STAGE_FOOTER = 108;
+
+/**
+ * Place a seat in a rows×cols block that is horizontally centered on the
+ * canvas and sits squarely in front of the stage (above the semicircle).
+ */
 export function seatCanvasPosition(
   row: number,
   col: number,
+  rows: number,
   cols: number,
-  seatNumbersRtl: boolean,
-  gridSize = CANVAS_GRID_SIZE
+  options: {
+    seatNumbersRtl?: boolean;
+    gridSize?: number;
+    canvasWidth?: number;
+    canvasHeight?: number;
+    stageStyle?: "banner" | "semicircle";
+    stagePosition?: StagePosition;
+  } = {}
 ): { x: number; y: number } {
-  const displayCol = seatNumbersRtl ? cols - 1 - col : col;
-  const gap = Math.max(4, Math.round(gridSize * 0.15));
-  const step = CANVAS_SEAT_SIZE + gap;
+  const gridSize = options.gridSize ?? CANVAS_GRID_SIZE;
+  const canvasWidth = options.canvasWidth ?? DEFAULT_CANVAS_WIDTH;
+  const canvasHeight = options.canvasHeight ?? DEFAULT_CANVAS_HEIGHT;
+  const { step, width: blockW, height: blockH } = seatBlockSize(rows, cols, gridSize);
+  // col 0 = left side of the block (numbers handle RTL separately — avoid double-flip)
+  const displayCol = col;
+
+  // Always center the seating block on the stage (horizontal center of canvas).
+  const originX = Math.round((canvasWidth - blockW) / 2);
+
+  let originY: number;
+  const useSemicircle = options.stageStyle !== "banner";
+  const stagePos = options.stagePosition ?? "top";
+
+  if (useSemicircle || stagePos === "bottom") {
+    // Stage at bottom → seats sit just above it, centered as a block.
+    const footer = useSemicircle ? CANVAS_STAGE_FOOTER : CANVAS_STAGE_BAND;
+    originY = Math.round(canvasHeight - footer - blockH - CANVAS_PADDING / 2);
+    originY = Math.max(CANVAS_PADDING, originY);
+  } else if (stagePos === "top") {
+    originY = CANVAS_STAGE_BAND + CANVAS_PADDING;
+  } else {
+    // Side stages: vertically center the block.
+    originY = Math.round((canvasHeight - blockH) / 2);
+    originY = Math.max(CANVAS_PADDING, originY);
+  }
+
   return {
-    x: CANVAS_PADDING + displayCol * step,
-    y: CANVAS_STAGE_BAND + CANVAS_PADDING + row * step,
+    x: originX + displayCol * step,
+    y: originY + row * step,
   };
 }
 
@@ -311,11 +366,25 @@ export function ensureCanvasPositions(
 ): SeatCell[] {
   const gridSize = layout.gridSize ?? CANVAS_GRID_SIZE;
   const rtl = layout.seatNumbersRtl !== false;
+  const opts = {
+    seatNumbersRtl: rtl,
+    gridSize,
+    canvasWidth: layout.canvasWidth ?? DEFAULT_CANVAS_WIDTH,
+    canvasHeight: layout.canvasHeight ?? DEFAULT_CANVAS_HEIGHT,
+    stageStyle: layout.stageStyle,
+    stagePosition: layout.stagePosition,
+  };
   return cells.map((cell) => {
     if (cell.type !== "seat" && cell.type !== "blocked") return cell;
     let next = cell;
     if (typeof cell.x !== "number" || typeof cell.y !== "number") {
-      const pos = seatCanvasPosition(cell.row, cell.col, layout.cols, rtl, gridSize);
+      const pos = seatCanvasPosition(
+        cell.row,
+        cell.col,
+        layout.rows,
+        layout.cols,
+        opts
+      );
       next = { ...cell, x: pos.x, y: pos.y };
     }
     if (typeof next.rotation !== "number") {
@@ -332,82 +401,195 @@ export function placedSeats(layout: SeatingLayout): SeatCell[] {
   return layout.cells.filter((c) => c.type === "seat" || c.type === "blocked");
 }
 
+export function seatsInRow(layout: SeatingLayout, rowIndex: number): SeatCell[] {
+  return placedSeats(layout)
+    .filter((c) => c.row === rowIndex)
+    .sort((a, b) => a.col - b.col);
+}
+
+export function listOccupiedRows(layout: SeatingLayout): number[] {
+  const set = new Set(placedSeats(layout).map((c) => c.row));
+  return [...set].sort((a, b) => a - b);
+}
+
+/** Renumber cols 0..n-1 left→right and refresh labels for a row. */
+export function renumberRowSeats(
+  layout: SeatingLayout,
+  rowIndex: number
+): SeatingLayout {
+  const rowSeats = seatsInRow(layout, rowIndex).sort(
+    (a, b) => (a.x ?? 0) - (b.x ?? 0)
+  );
+  const idToCol = new Map(rowSeats.map((s, i) => [s.id, i]));
+  const cols = Math.max(layout.cols, rowSeats.length);
+
+  return normalizeLayout({
+    ...layout,
+    mode: "canvas",
+    cols: Math.max(layout.cols, cols),
+    cells: placedSeats(layout).map((c) => {
+      if (c.row !== rowIndex) return c;
+      const col = idToCol.get(c.id) ?? c.col;
+      return {
+        ...c,
+        col,
+        label: seatLabel(rowIndex, col, {
+          ...layout,
+          cols: Math.max(layout.cols, rowSeats.length),
+        }),
+      };
+    }),
+  });
+}
+
+/** Append one seat to the end of a row (RTL-aware: after the last visual seat). */
+export function addSeatToRow(
+  layout: SeatingLayout,
+  rowIndex: number
+): SeatingLayout {
+  const rowSeats = seatsInRow(layout, rowIndex);
+  const step = seatGridStep(layout.gridSize ?? CANVAS_GRID_SIZE);
+  const rotation = defaultSeatRotation(layout);
+
+  let x: number;
+  let y: number;
+
+  if (rowSeats.length === 0) {
+    const pos = seatCanvasPosition(rowIndex, 0, Math.max(layout.rows, rowIndex + 1), 1, {
+      seatNumbersRtl: layout.seatNumbersRtl !== false,
+      gridSize: layout.gridSize,
+      canvasWidth: layout.canvasWidth,
+      canvasHeight: layout.canvasHeight,
+      stageStyle: layout.stageStyle ?? "semicircle",
+      stagePosition: layout.stagePosition,
+    });
+    x = pos.x;
+    y = pos.y;
+  } else {
+    // Place to the left of the leftmost seat (RTL: new highest number on the left)
+    // or to the right of rightmost — for LTR append to the right.
+    const sortedByX = [...rowSeats].sort((a, b) => (a.x ?? 0) - (b.x ?? 0));
+    const leftmost = sortedByX[0]!;
+    const rightmost = sortedByX[sortedByX.length - 1]!;
+    const rtl = layout.seatNumbersRtl !== false;
+    if (rtl) {
+      x = (leftmost.x ?? 0) - step;
+      y = leftmost.y ?? 0;
+    } else {
+      x = (rightmost.x ?? 0) + step;
+      y = rightmost.y ?? 0;
+    }
+  }
+
+  const col = rowSeats.length;
+  const id = `seat-row${rowIndex}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+  const cell: SeatCell = {
+    id,
+    row: rowIndex,
+    col,
+    x: Math.round(x),
+    y: Math.round(y),
+    rotation,
+    label: seatLabel(rowIndex, col, {
+      ...layout,
+      cols: Math.max(layout.cols, col + 1),
+    }),
+    type: "seat",
+    priceRial: layout.defaultPriceRial,
+    priceLabel: formatPriceLabel(layout.defaultPriceRial),
+    available: true,
+  };
+
+  const next = normalizeLayout({
+    ...layout,
+    mode: "canvas",
+    rows: Math.max(layout.rows, rowIndex + 1),
+    cols: Math.max(layout.cols, col + 1),
+    cells: [...placedSeats(layout), cell],
+  });
+
+  return renumberRowSeats(next, rowIndex);
+}
+
+/** Remove an entire row of seats. */
+export function removeRowSeats(
+  layout: SeatingLayout,
+  rowIndex: number
+): SeatingLayout {
+  return normalizeLayout({
+    ...layout,
+    mode: "canvas",
+    cells: placedSeats(layout).filter((c) => c.row !== rowIndex),
+    rowMarkers: (layout.rowMarkers ?? []).filter((m) => m.rowIndex !== rowIndex),
+  });
+}
+
+/** Move every seat in a row by the same delta (used when dragging the row). */
+export function moveRowByDelta(
+  layout: SeatingLayout,
+  rowIndex: number,
+  dx: number,
+  dy: number
+): SeatingLayout {
+  const seats = placedSeats(layout);
+  return normalizeLayout({
+    ...layout,
+    mode: "canvas",
+    cells: seats.map((c) =>
+      c.row === rowIndex
+        ? {
+            ...c,
+            x: Math.round((c.x ?? 0) + dx),
+            y: Math.round((c.y ?? 0) + dy),
+          }
+        : c
+    ),
+    rowMarkers: (layout.rowMarkers ?? []).map((m) =>
+      m.rowIndex === rowIndex
+        ? { ...m, x: Math.round(m.x + dx), y: Math.round(m.y + dy) }
+        : m
+    ),
+  });
+}
+
 export function switchToCanvasMode(layout: SeatingLayout): SeatingLayout {
-  const base = normalizeLayout({ ...layout, mode: "classic" });
+  const base = normalizeLayout({ ...layout, mode: "canvas" });
+  const stageStyle = base.stageStyle ?? "semicircle";
+  const canvasWidth = base.canvasWidth ?? DEFAULT_CANVAS_WIDTH;
+  const canvasHeight = base.canvasHeight ?? DEFAULT_CANVAS_HEIGHT;
+  const posOpts = {
+    seatNumbersRtl: base.seatNumbersRtl !== false,
+    gridSize: base.gridSize ?? CANVAS_GRID_SIZE,
+    canvasWidth,
+    canvasHeight,
+    stageStyle,
+    stagePosition: base.stagePosition,
+  };
+
   const seats = base.cells
     .filter((c) => c.type === "seat" || c.type === "blocked")
     .map((c) => {
-      const pos = seatCanvasPosition(
-        c.row,
-        c.col,
-        base.cols,
-        base.seatNumbersRtl !== false,
-        base.gridSize
-      );
+      const pos = seatCanvasPosition(c.row, c.col, base.rows, base.cols, posOpts);
       return {
         ...c,
-        x: typeof c.x === "number" ? c.x : pos.x,
-        y: typeof c.y === "number" ? c.y : pos.y,
-        rotation:
-          typeof c.rotation === "number"
-            ? c.rotation
-            : defaultSeatRotation({ ...base, mode: "canvas", stageStyle: "semicircle" }),
+        x: pos.x,
+        y: pos.y,
+        rotation: defaultSeatRotation({
+          ...base,
+          mode: "canvas",
+          stageStyle,
+        }),
       };
     });
-
-  // Expand canvas to fit seats
-  let maxX = DEFAULT_CANVAS_WIDTH;
-  let maxY = DEFAULT_CANVAS_HEIGHT;
-  for (const s of seats) {
-    maxX = Math.max(maxX, (s.x ?? 0) + CANVAS_SEAT_SIZE + CANVAS_PADDING);
-    maxY = Math.max(maxY, (s.y ?? 0) + CANVAS_SEAT_SIZE + CANVAS_PADDING);
-  }
 
   return normalizeLayout({
     ...base,
     mode: "canvas",
-    stageStyle: base.stageStyle ?? "semicircle",
-    canvasWidth: Math.ceil(maxX / (base.gridSize ?? CANVAS_GRID_SIZE)) * (base.gridSize ?? CANVAS_GRID_SIZE),
-    canvasHeight: Math.ceil(maxY / (base.gridSize ?? CANVAS_GRID_SIZE)) * (base.gridSize ?? CANVAS_GRID_SIZE),
+    stageStyle,
+    canvasWidth,
+    canvasHeight,
     cells: seats,
   });
-}
-
-export function switchToClassicMode(layout: SeatingLayout): SeatingLayout {
-  const base = normalizeLayout(layout);
-  const next = createEmptyLayout(
-    base.name,
-    base.rows,
-    base.cols,
-    base.stagePosition,
-    base.defaultPriceRial
-  );
-  next.stageLabel = base.stageLabel;
-  next.seatNumbersRtl = base.seatNumbersRtl;
-  next.rowLabels = base.rowLabels;
-  next.zones = base.zones;
-
-  const byKey = new Map(
-    placedSeats(base).map((c) => [`${c.row},${c.col}`, c])
-  );
-
-  next.cells = next.cells.map((cell) => {
-    const prev = byKey.get(`${cell.row},${cell.col}`);
-    if (!prev) {
-      return { ...cell, type: "empty" as const, available: false, label: "" };
-    }
-    return {
-      ...cell,
-      type: prev.type === "blocked" ? ("blocked" as const) : ("seat" as const),
-      available: prev.type === "seat" ? prev.available : false,
-      label: prev.label || cell.label,
-      priceRial: prev.priceRial,
-      priceLabel: prev.priceLabel,
-      zoneId: prev.zoneId,
-    };
-  });
-
-  return normalizeLayout({ ...next, mode: "classic" });
 }
 
 /** Rebuild a regular rows×cols seat grid on the freeform canvas. */
@@ -418,25 +600,47 @@ export function applyClassicGridToCanvas(
 ): SeatingLayout {
   const gridSize = layout.gridSize ?? CANVAS_GRID_SIZE;
   const rtl = layout.seatNumbersRtl !== false;
+  const stageStyle = layout.stageStyle ?? "semicircle";
   const rowLabels = Array.from({ length: rows }, (_, i) =>
     layout.rowLabels?.[i] ?? String(i + 1)
   );
-  const cells: SeatCell[] = [];
 
+  const { width: blockW, height: blockH } = seatBlockSize(rows, cols, gridSize);
+  const canvasWidth = Math.max(
+    DEFAULT_CANVAS_WIDTH,
+    snapToGrid(blockW + CANVAS_PADDING * 2, gridSize)
+  );
+  const canvasHeight = Math.max(
+    DEFAULT_CANVAS_HEIGHT,
+    snapToGrid(blockH + CANVAS_STAGE_FOOTER + CANVAS_PADDING * 2, gridSize)
+  );
+
+  const posOpts = {
+    seatNumbersRtl: rtl,
+    gridSize,
+    canvasWidth,
+    canvasHeight,
+    stageStyle,
+    stagePosition: layout.stagePosition,
+  };
+
+  const rotation = defaultSeatRotation({
+    ...layout,
+    mode: "canvas",
+    stageStyle,
+  });
+
+  const cells: SeatCell[] = [];
   for (let row = 0; row < rows; row += 1) {
     for (let col = 0; col < cols; col += 1) {
-      const pos = seatCanvasPosition(row, col, cols, rtl, gridSize);
+      const pos = seatCanvasPosition(row, col, rows, cols, posOpts);
       cells.push({
         id: `seat-${row}-${col}-${Date.now()}-${col}`,
         row,
         col,
         x: pos.x,
         y: pos.y,
-        rotation: defaultSeatRotation({
-          ...layout,
-          mode: "canvas",
-          stageStyle: layout.stageStyle ?? "semicircle",
-        }),
+        rotation,
         label: seatLabel(row, col, { cols, seatNumbersRtl: rtl, rowLabels }),
         type: "seat",
         priceRial: layout.defaultPriceRial,
@@ -446,22 +650,16 @@ export function applyClassicGridToCanvas(
     }
   }
 
-  let maxX = DEFAULT_CANVAS_WIDTH;
-  let maxY = DEFAULT_CANVAS_HEIGHT;
-  for (const s of cells) {
-    maxX = Math.max(maxX, (s.x ?? 0) + CANVAS_SEAT_SIZE + CANVAS_PADDING * 2);
-    maxY = Math.max(maxY, (s.y ?? 0) + CANVAS_SEAT_SIZE + CANVAS_PADDING * 2);
-  }
-
   return normalizeLayout({
     ...layout,
     mode: "canvas",
+    stageStyle,
     rows,
     cols,
     rowLabels,
     cells,
-    canvasWidth: Math.max(DEFAULT_CANVAS_WIDTH, snapToGrid(maxX, gridSize)),
-    canvasHeight: Math.max(DEFAULT_CANVAS_HEIGHT, snapToGrid(maxY, gridSize)),
+    canvasWidth,
+    canvasHeight,
   });
 }
 
@@ -595,16 +793,8 @@ export function normalizeAngle(deg: number): number {
   return Math.round(a * 10) / 10;
 }
 
-/** Default upright facing for canvas — seats look at the stage, not sideways. */
-export function defaultSeatRotation(layout: SeatingLayout): number {
-  if (layout.stageStyle === "banner") {
-    const pos = layout.stagePosition ?? "top";
-    if (pos === "left") return 90;
-    if (pos === "right") return -90;
-    if (pos === "top") return 180;
-    return 0;
-  }
-  // Semicircle stage sits at the bottom of the board → upright seats face it.
+/** Default canvas seat rotation — numbers stay upright for the viewer. */
+export function defaultSeatRotation(_layout?: SeatingLayout): number {
   return 0;
 }
 
@@ -649,17 +839,36 @@ export function faceSeatsTowardStage(
   mode: "upright" | "radial" = "upright"
 ): SeatingLayout {
   const idSet = seatIds?.length ? new Set(seatIds) : null;
+  const posOpts = {
+    seatNumbersRtl: layout.seatNumbersRtl !== false,
+    gridSize: layout.gridSize ?? CANVAS_GRID_SIZE,
+    canvasWidth: layout.canvasWidth ?? DEFAULT_CANVAS_WIDTH,
+    canvasHeight: layout.canvasHeight ?? DEFAULT_CANVAS_HEIGHT,
+    stageStyle: layout.stageStyle ?? "semicircle",
+    stagePosition: layout.stagePosition,
+  };
+
   return normalizeLayout({
     ...layout,
     mode: "canvas",
+    stageStyle: layout.stageStyle ?? "semicircle",
     cells: placedSeats(layout).map((c) => {
       if (idSet && !idSet.has(c.id)) return c;
       if (c.type !== "seat" && c.type !== "blocked") return c;
+
+      // When fixing ALL seats to face stage, also re-center the classic grid.
+      const shouldRecenter = !idSet && mode === "upright";
+      const pos = shouldRecenter
+        ? seatCanvasPosition(c.row, c.col, layout.rows, layout.cols, posOpts)
+        : { x: c.x ?? 0, y: c.y ?? 0 };
+
       return {
         ...c,
+        x: shouldRecenter ? pos.x : c.x,
+        y: shouldRecenter ? pos.y : c.y,
         rotation:
           mode === "radial"
-            ? stageFacingRotation(layout, c.x ?? 0, c.y ?? 0)
+            ? stageFacingRotation(layout, pos.x, pos.y)
             : defaultSeatRotation(layout),
       };
     }),
@@ -1121,44 +1330,28 @@ export function createEmptyLayout(
   defaultPriceRial = 350_000
 ): SeatingLayout {
   const rowLabels = Array.from({ length: rows }, (_, i) => String(i + 1));
-  const cells: SeatCell[] = [];
-
-  for (let row = 0; row < rows; row += 1) {
-    for (let col = 0; col < cols; col += 1) {
-      cells.push({
-        id: cellId(row, col),
-        row,
-        col,
-        label: seatLabel(row, col, {
-          cols,
-          seatNumbersRtl: true,
-          rowLabels,
-        }),
-        type: "seat",
-        priceRial: defaultPriceRial,
-        priceLabel: formatPriceLabel(defaultPriceRial),
-        available: true,
-      });
-    }
-  }
-
-  return {
-    name,
+  return applyClassicGridToCanvas(
+    {
+      name,
+      rows,
+      cols,
+      stagePosition,
+      stageLabel: "صحنه اجرا",
+      stageRect: defaultStageRect(rows, cols, stagePosition),
+      zones: [],
+      defaultPriceRial,
+      seatNumbersRtl: true,
+      rowLabels,
+      cells: [],
+      mode: "canvas",
+      gridSize: CANVAS_GRID_SIZE,
+      canvasWidth: DEFAULT_CANVAS_WIDTH,
+      canvasHeight: DEFAULT_CANVAS_HEIGHT,
+      stageStyle: "semicircle",
+    },
     rows,
-    cols,
-    stagePosition,
-    stageLabel: "صحنه اجرا",
-    stageRect: defaultStageRect(rows, cols, stagePosition),
-    zones: [],
-    defaultPriceRial,
-    seatNumbersRtl: true,
-    rowLabels,
-    cells,
-    mode: "classic",
-    gridSize: CANVAS_GRID_SIZE,
-    canvasWidth: DEFAULT_CANVAS_WIDTH,
-    canvasHeight: DEFAULT_CANVAS_HEIGHT,
-  };
+    cols
+  );
 }
 
 export function parseSeatingLayout(raw: unknown): SeatingLayout | null {
@@ -1180,7 +1373,7 @@ export function parseSeatingLayout(raw: unknown): SeatingLayout | null {
       ? (data.rowMarkers as CanvasRowMarker[])
       : undefined,
     seatNumbersRtl: data.seatNumbersRtl !== false,
-    mode: data.mode === "canvas" ? "canvas" : "classic",
+    mode: "canvas",
     canvasWidth: data.canvasWidth ? Number(data.canvasWidth) : undefined,
     canvasHeight: data.canvasHeight ? Number(data.canvasHeight) : undefined,
     gridSize: data.gridSize ? Number(data.gridSize) : undefined,
@@ -1218,22 +1411,5 @@ export function resizeLayout(
   rows: number,
   cols: number
 ): SeatingLayout {
-  if (layout.mode === "canvas") {
-    return applyClassicGridToCanvas(layout, rows, cols);
-  }
-
-  const next = createEmptyLayout(layout.name, rows, cols, layout.stagePosition, layout.defaultPriceRial);
-  next.stageLabel = layout.stageLabel;
-  next.seatNumbersRtl = layout.seatNumbersRtl;
-  next.rowLabels = layout.rowLabels;
-
-  const oldMap = new Map(layout.cells.map((c) => [`${c.row},${c.col}`, c]));
-
-  next.cells = next.cells.map((cell) => {
-    const prev = oldMap.get(`${cell.row},${cell.col}`);
-    if (!prev) return cell;
-    return { ...prev, id: cell.id, row: cell.row, col: cell.col, x: undefined, y: undefined };
-  });
-
-  return normalizeLayout({ ...next, mode: "classic", zones: layout.zones });
+  return applyClassicGridToCanvas(layout, rows, cols);
 }

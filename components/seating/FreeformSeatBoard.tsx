@@ -34,12 +34,17 @@ type FreeformSeatBoardProps = {
   layout: SeatingLayout;
   selectedIds?: string[];
   selectedMarkerId?: string | null;
+  /** When set, this row is active for group edit (highlight + drag together). */
+  selectedRowIndex?: number | null;
   readOnly?: boolean;
   interactive?: boolean;
   tool?: FreeformTool;
+  /** When onSelectRow is set: double-click / Alt+click selects whole row; single click selects one seat. */
+  enableRowSelection?: boolean;
   occupancy?: Record<string, Exclude<SeatSaleStatus, "available" | "selected">>;
   purchaseSelectedIds?: string[];
   onSelectSeats?: (ids: string[]) => void;
+  onSelectRow?: (rowIndex: number | null) => void;
   onSelectMarker?: (id: string | null) => void;
   onMoveSeats?: (moves: { id: string; x: number; y: number }[]) => void;
   onRotateSeats?: (ids: string[], rotation: number, mode: "absolute" | "delta") => void;
@@ -48,7 +53,6 @@ type FreeformSeatBoardProps = {
   onAddRowMarker?: (x: number, y: number) => void;
   onMoveRowMarker?: (id: string, x: number, y: number) => void;
   onEraseMarkers?: (ids: string[]) => void;
-  /** Fired when a drag/rotate gesture ends — for undo history commit. */
   onGestureEnd?: () => void;
   onToggleSeat?: (seatId: string, cell: SeatCell) => void;
 };
@@ -69,12 +73,15 @@ export default function FreeformSeatBoard({
   layout,
   selectedIds = [],
   selectedMarkerId = null,
+  selectedRowIndex = null,
   readOnly = false,
   interactive = true,
   tool = "move",
+  enableRowSelection = false,
   occupancy,
   purchaseSelectedIds = [],
   onSelectSeats,
+  onSelectRow,
   onSelectMarker,
   onMoveSeats,
   onRotateSeats,
@@ -95,6 +102,8 @@ export default function FreeformSeatBoard({
   const markerOrigin = useRef<{ x: number; y: number } | null>(null);
   const rotateStart = useRef<{ angle: number; base: number } | null>(null);
   const didDrag = useRef(false);
+  /** Seat id waiting for click-without-drag to leave row mode. */
+  const pendingRowDrillId = useRef<string | null>(null);
 
   const width = layout.canvasWidth ?? 960;
   const height = layout.canvasHeight ?? 720;
@@ -154,6 +163,7 @@ export default function FreeformSeatBoard({
       if (e.key === "Escape") {
         onSelectSeats?.([]);
         onSelectMarker?.(null);
+        onSelectRow?.(null);
       }
     }
     window.addEventListener("keydown", onKey);
@@ -167,6 +177,7 @@ export default function FreeformSeatBoard({
     onEraseMarkers,
     onSelectSeats,
     onSelectMarker,
+    onSelectRow,
   ]);
 
   function endGesture() {
@@ -192,20 +203,36 @@ export default function FreeformSeatBoard({
     } else {
       onSelectSeats?.([]);
       onSelectMarker?.(null);
+      onSelectRow?.(null);
     }
+  }
+
+  function rowSeatIds(rowIndex: number) {
+    return seats.filter((s) => s.row === rowIndex).map((s) => s.id);
   }
 
   function selectSeat(cell: SeatCell, additive: boolean) {
     onSelectMarker?.(null);
+
     if (additive) {
+      onSelectRow?.(null);
       if (selectedSet.has(cell.id)) {
         onSelectSeats?.(selectedIds.filter((id) => id !== cell.id));
       } else {
         onSelectSeats?.([...selectedIds, cell.id]);
       }
-    } else if (!selectedSet.has(cell.id)) {
-      onSelectSeats?.([cell.id]);
+      return;
     }
+
+    onSelectRow?.(null);
+    onSelectSeats?.([cell.id]);
+  }
+
+  function selectWholeRow(rowIndex: number) {
+    onSelectMarker?.(null);
+    const ids = rowSeatIds(rowIndex);
+    onSelectRow?.(rowIndex);
+    onSelectSeats?.(ids);
   }
 
   function onSeatPointerDown(e: React.PointerEvent, cell: SeatCell) {
@@ -220,11 +247,42 @@ export default function FreeformSeatBoard({
     if (tool === "label") return;
 
     const additive = e.shiftKey || e.metaKey || e.ctrlKey;
-    selectSeat(cell, additive);
+    const wantWholeRow =
+      enableRowSelection &&
+      !additive &&
+      (e.detail >= 2 || e.altKey);
+    const keepRowDrag =
+      enableRowSelection &&
+      !additive &&
+      !wantWholeRow &&
+      selectedRowIndex === cell.row;
 
-    const idsForDrag = selectedSet.has(cell.id) && !additive ? selectedIds : [cell.id];
-    const dragIds =
-      !additive && selectedSet.has(cell.id) ? selectedIds : idsForDrag.length ? idsForDrag : [cell.id];
+    let dragIds: string[];
+
+    if (wantWholeRow) {
+      pendingRowDrillId.current = null;
+      selectWholeRow(cell.row);
+      dragIds = rowSeatIds(cell.row);
+    } else if (keepRowDrag) {
+      // Row already selected — drag the whole row; drill-in happens on click without drag.
+      pendingRowDrillId.current = cell.id;
+      dragIds = rowSeatIds(cell.row);
+    } else if (additive) {
+      pendingRowDrillId.current = null;
+      selectSeat(cell, true);
+      dragIds = selectedSet.has(cell.id)
+        ? selectedIds.filter((id) => id !== cell.id)
+        : [...selectedIds, cell.id];
+      if (!dragIds.length) dragIds = [cell.id];
+    } else if (!additive && selectedSet.has(cell.id) && selectedIds.length > 1) {
+      pendingRowDrillId.current = null;
+      // Keep multi-selection and drag all selected seats together.
+      dragIds = selectedIds;
+    } else {
+      pendingRowDrillId.current = null;
+      selectSeat(cell, false);
+      dragIds = [cell.id];
+    }
 
     if (tool === "rotate") {
       const { x, y } = clientToBoard(e.clientX, e.clientY);
@@ -243,7 +301,7 @@ export default function FreeformSeatBoard({
     const { x, y } = clientToBoard(e.clientX, e.clientY);
     dragOrigin.current = { x, y };
     const origins = new Map<string, { x: number; y: number }>();
-    const group = seats.filter((s) => dragIds.includes(s.id) || s.id === cell.id);
+    const group = seats.filter((s) => dragIds.includes(s.id));
     const groupIds = group.map((s) => s.id);
     for (const s of group) {
       origins.set(s.id, { x: s.x ?? 0, y: s.y ?? 0 });
@@ -260,6 +318,7 @@ export default function FreeformSeatBoard({
 
     if (rotating && rotateStart.current) {
       didDrag.current = true;
+      pendingRowDrillId.current = null;
       const cx = (cell.x ?? 0) + CANVAS_SEAT_SIZE / 2;
       const cy = (cell.y ?? 0) + CANVAS_SEAT_SIZE / 2;
       const angle = (Math.atan2(pos.y - cy, pos.x - cx) * 180) / Math.PI;
@@ -271,6 +330,7 @@ export default function FreeformSeatBoard({
 
     if (!draggingIds.length || !dragOrigin.current) return;
     didDrag.current = true;
+    pendingRowDrillId.current = null;
     const dx = pos.x - dragOrigin.current.x;
     const dy = pos.y - dragOrigin.current.y;
     const moves = draggingIds.map((id) => {
@@ -280,7 +340,13 @@ export default function FreeformSeatBoard({
     onMoveSeats?.(moves);
   }
 
-  function onSeatPointerUp(e: React.PointerEvent) {
+  function onSeatPointerUp(e: React.PointerEvent, cell: SeatCell) {
+    const drilled =
+      enableRowSelection &&
+      !didDrag.current &&
+      pendingRowDrillId.current === cell.id;
+
+    pendingRowDrillId.current = null;
     setDraggingIds([]);
     setRotating(false);
     dragOrigin.current = null;
@@ -291,11 +357,19 @@ export default function FreeformSeatBoard({
     } catch {
       /* ignore */
     }
+
+    // Click (no drag) on a seat inside an active row → edit that seat alone.
+    if (drilled) {
+      onSelectMarker?.(null);
+      onSelectRow?.(null);
+      onSelectSeats?.([cell.id]);
+    }
   }
 
   function onRotateHandleDown(e: React.PointerEvent, cell: SeatCell) {
     e.stopPropagation();
     if (readOnly) return;
+    pendingRowDrillId.current = null;
     onSelectSeats?.(selectedIds.includes(cell.id) ? selectedIds : [cell.id]);
     const { x, y } = clientToBoard(e.clientX, e.clientY);
     const cx = (cell.x ?? 0) + CANVAS_SEAT_SIZE / 2;
@@ -423,13 +497,14 @@ export default function FreeformSeatBoard({
         })}
 
         {seats.map((cell) => {
-          const studioSelected = selectedSet.has(cell.id);
+          const studioSelected =
+            selectedSet.has(cell.id) || selectedRowIndex === cell.row;
           const purchaseSelected = purchaseSet.has(cell.id);
           const status = resolveStatus(cell, purchaseSelected, occupancy);
           const num =
             cell.type === "blocked"
               ? "—"
-              : seatDisplayNumber(cell.col, Math.max(layout.cols, cell.col + 1), rtl);
+              : seatDisplayNumber(cell.col, layout.cols, rtl);
 
           const selectable =
             Boolean(onToggleSeat) &&
@@ -454,7 +529,7 @@ export default function FreeformSeatBoard({
               }}
               onPointerDown={(e) => onSeatPointerDown(e, cell)}
               onPointerMove={(e) => onSeatPointerMove(e, cell)}
-              onPointerUp={onSeatPointerUp}
+              onPointerUp={(e) => onSeatPointerUp(e, cell)}
             >
               <div
                 className={cn(
@@ -476,6 +551,8 @@ export default function FreeformSeatBoard({
                   draggable={!readOnly && tool === "move"}
                   title={`${cell.label}${rotation ? ` · ${Math.round(rotation)}°` : ""}${cell.priceLabel ? ` — ${cell.priceLabel}` : ""}`}
                   className="h-full w-full"
+                  /* Keep digits readable for the viewer even if the seat box is angled */
+                  style={{ transform: `rotate(${-rotation}deg)` }}
                   onClick={() => {
                     if (selectable) onToggleSeat?.(cell.id, cell);
                   }}
@@ -492,7 +569,7 @@ export default function FreeformSeatBoard({
                   title="چرخش — بکشید · کلید [ ]"
                   onPointerDown={(e) => onRotateHandleDown(e, cell)}
                   onPointerMove={(e) => onRotateHandleMove(e, cell)}
-                  onPointerUp={onSeatPointerUp}
+                  onPointerUp={(e) => onSeatPointerUp(e, cell)}
                 >
                   <RotateCw className="h-3.5 w-3.5" />
                 </button>
