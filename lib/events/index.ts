@@ -103,7 +103,10 @@ function dbRecordToManagedEvent(record: {
     published: record.published,
     popular: record.popular,
     featured: record.featured,
-    ticketingType: record.ticketingType as ManagedEvent["ticketingType"],
+    ticketingType:
+      source === "my_event"
+        ? "INTERNAL"
+        : (record.ticketingType as ManagedEvent["ticketingType"]),
     hasAssignedSeating: record.hasAssignedSeating === true,
     status: record.status as ManagedEvent["status"],
     createdAt: record.createdAt.toISOString(),

@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { normalizeEventDays, parseDaysFromRecord } from "@/lib/events/date-utils";
-import { resolveTicketingType } from "@/lib/events/types";
 import { isValidMyEventCategory } from "@/lib/my-event/categories";
 import { getMyEventSession } from "@/lib/my-event/session";
 import {
@@ -218,7 +217,9 @@ export async function PATCH(request: Request, context: RouteContext) {
     data: {
       ...(title ? { title } : {}),
       ...(city ? { city } : {}),
-      ...(category ? { category, ticketingType: resolveTicketingType(category) } : {}),
+      ...(category ? { category } : {}),
+      // برگزارکننده My Event همیشه فروش داخلی بلیت‌مال است (نه لینک خارجی).
+      ticketingType: "INTERNAL",
       ...(place ? { place } : {}),
       ...(resolvedPlaceAddress !== undefined ? { placeAddress: resolvedPlaceAddress } : {}),
       ...(body.venueTemplateId !== undefined

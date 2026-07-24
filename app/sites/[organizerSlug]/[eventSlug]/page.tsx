@@ -40,7 +40,7 @@ export default async function OrganizerEventSitePage({ params }: PageProps) {
     published: page.event.published,
     popular: page.event.popular,
     featured: page.event.featured,
-    ticketingType: page.event.ticketingType as "INTERNAL" | "EXTERNAL_LINK",
+    ticketingType: "INTERNAL",
     hasAssignedSeating: page.event.hasAssignedSeating,
     status: page.event.status as "active",
     createdAt: page.event.createdAt.toISOString(),

@@ -9,7 +9,6 @@ import {
   seatingLayoutIsFree,
   validateMyEventPricing,
 } from "@/lib/events/pricing";
-import { resolveTicketingType } from "@/lib/events/types";
 import { getMyEventSession } from "@/lib/my-event/session";
 import {
   getMyEventOrganizerEvents,
@@ -194,7 +193,7 @@ export async function POST(request: Request) {
       publicCitySlug,
       days: JSON.stringify(days),
       published: false,
-      ticketingType: resolveTicketingType(category),
+      ticketingType: "INTERNAL",
       hasAssignedSeating: body.hasAssignedSeating === true,
       listOnBilitmallRequested: body.listOnBilitmall === true,
       source: MY_EVENT_EVENT_SOURCE,

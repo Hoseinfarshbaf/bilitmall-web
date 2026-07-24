@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import type {
   CanvasRowMarker,
   SeatCell,
@@ -107,6 +107,7 @@ export default function FreeformSeatBoard({
   const markerOrigin = useRef<{ x: number; y: number } | null>(null);
   const stageOrigin = useRef<{ x: number; y: number } | null>(null);
   const rotateStart = useRef<{ angle: number; base: number } | null>(null);
+  const rotateTargetIds = useRef<string[]>([]);
   const didDrag = useRef(false);
   /** Seat id waiting for click-without-drag to leave row mode. */
   const pendingRowDrillId = useRef<string | null>(null);
@@ -141,49 +142,6 @@ export default function FreeformSeatBoard({
   const primarySelected =
     seats.find((s) => selectedSet.has(s.id)) ??
     (selectedIds[0] ? seats.find((s) => s.id === selectedIds[0]) : null);
-
-  useEffect(() => {
-    if (readOnly) return;
-    function onKey(e: KeyboardEvent) {
-      const tag = (e.target as HTMLElement)?.tagName;
-      if (tag === "INPUT" || tag === "TEXTAREA") return;
-
-      if (selectedMarkerId && (e.key === "Delete" || e.key === "Backspace")) {
-        e.preventDefault();
-        onEraseMarkers?.([selectedMarkerId]);
-        return;
-      }
-
-      if (!selectedIds.length) return;
-
-      if (e.key === "[" || e.key === "]") {
-        e.preventDefault();
-        const delta = e.key === "]" ? 5 : -5;
-        onRotateSeats?.(selectedIds, delta, "delta");
-      }
-      if (e.key === "Delete" || e.key === "Backspace") {
-        e.preventDefault();
-        onEraseSeats?.(selectedIds);
-      }
-      if (e.key === "Escape") {
-        onSelectSeats?.([]);
-        onSelectMarker?.(null);
-        onSelectRow?.(null);
-      }
-    }
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [
-    readOnly,
-    selectedIds,
-    selectedMarkerId,
-    onRotateSeats,
-    onEraseSeats,
-    onEraseMarkers,
-    onSelectSeats,
-    onSelectMarker,
-    onSelectRow,
-  ]);
 
   function endGesture() {
     if (didDrag.current) onGestureEnd?.();
@@ -294,6 +252,13 @@ export default function FreeformSeatBoard({
       const cx = (cell.x ?? 0) + CANVAS_SEAT_SIZE / 2;
       const cy = (cell.y ?? 0) + CANVAS_SEAT_SIZE / 2;
       const angle = (Math.atan2(y - cy, x - cx) * 180) / Math.PI;
+      rotateTargetIds.current = dragIds.length ? dragIds : [cell.id];
+      if (
+        rotateTargetIds.current.length > 1 &&
+        rotateTargetIds.current.some((id) => !selectedSet.has(id))
+      ) {
+        onSelectSeats?.(rotateTargetIds.current);
+      }
       rotateStart.current = { angle, base: cell.rotation ?? 0 };
       setRotating(true);
       didDrag.current = false;
@@ -328,7 +293,12 @@ export default function FreeformSeatBoard({
       const cy = (cell.y ?? 0) + CANVAS_SEAT_SIZE / 2;
       const angle = (Math.atan2(pos.y - cy, pos.x - cx) * 180) / Math.PI;
       const delta = angle - rotateStart.current.angle;
-      const ids = selectedIds.includes(cell.id) ? selectedIds : [cell.id];
+      const ids =
+        rotateTargetIds.current.length > 0
+          ? rotateTargetIds.current
+          : selectedIds.includes(cell.id)
+            ? selectedIds
+            : [cell.id];
       onRotateSeats?.(ids, rotateStart.current.base + delta, "absolute");
       return;
     }
@@ -356,6 +326,7 @@ export default function FreeformSeatBoard({
     setRotating(false);
     dragOrigin.current = null;
     rotateStart.current = null;
+    rotateTargetIds.current = [];
     endGesture();
     try {
       (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
@@ -375,7 +346,9 @@ export default function FreeformSeatBoard({
     e.stopPropagation();
     if (readOnly) return;
     pendingRowDrillId.current = null;
-    onSelectSeats?.(selectedIds.includes(cell.id) ? selectedIds : [cell.id]);
+    const ids = selectedIds.includes(cell.id) ? selectedIds : [cell.id];
+    rotateTargetIds.current = ids;
+    onSelectSeats?.(ids);
     const { x, y } = clientToBoard(e.clientX, e.clientY);
     const cx = (cell.x ?? 0) + CANVAS_SEAT_SIZE / 2;
     const cy = (cell.y ?? 0) + CANVAS_SEAT_SIZE / 2;
@@ -394,7 +367,12 @@ export default function FreeformSeatBoard({
     const cy = (cell.y ?? 0) + CANVAS_SEAT_SIZE / 2;
     const angle = (Math.atan2(pos.y - cy, pos.x - cx) * 180) / Math.PI;
     const delta = angle - rotateStart.current.angle;
-    const ids = selectedIds.includes(cell.id) ? selectedIds : [cell.id];
+    const ids =
+      rotateTargetIds.current.length > 0
+        ? rotateTargetIds.current
+        : selectedIds.includes(cell.id)
+          ? selectedIds
+          : [cell.id];
     onRotateSeats?.(ids, rotateStart.current.base + delta, "absolute");
   }
 
@@ -519,6 +497,8 @@ export default function FreeformSeatBoard({
           return (
             <div
               key={marker.id}
+              data-row-marker=""
+              data-canvas-draggable=""
               className={cn(
                 "absolute z-10 flex h-8 w-8 touch-none items-center justify-center rounded-full border-2 text-xs font-black shadow-sm",
                 active
@@ -555,6 +535,7 @@ export default function FreeformSeatBoard({
           return (
             <div
               key={cell.id}
+              data-canvas-draggable=""
               className={cn(
                 "absolute touch-none",
                 draggingIds.includes(cell.id) && "z-20",
@@ -588,10 +569,9 @@ export default function FreeformSeatBoard({
                   disabled={Boolean(onToggleSeat) && !selectable}
                   dragging={draggingIds.includes(cell.id)}
                   draggable={!readOnly && tool === "move"}
+                  numberUprightBy={rotation}
                   title={`${cell.label}${rotation ? ` · ${Math.round(rotation)}°` : ""}${cell.priceLabel ? ` — ${cell.priceLabel}` : ""}`}
                   className="h-full w-full"
-                  /* Keep digits readable for the viewer even if the seat box is angled */
-                  style={{ transform: `rotate(${-rotation}deg)` }}
                   onClick={() => {
                     if (selectable) onToggleSeat?.(cell.id, cell);
                   }}

@@ -353,6 +353,7 @@ export function normalizeLayout(layout: SeatingLayout): SeatingLayout {
         cell.label ||
         (cell.type === "seat" ? seatLabel(cell.row, cell.col, withLabelsBase) : cell.label),
       zoneId: zone?.id,
+      priceLabel: formatPriceLabel(cell.priceRial ?? 0),
     };
   });
 
@@ -383,6 +384,95 @@ export function normalizeLayout(layout: SeatingLayout): SeatingLayout {
 
 export function snapToGrid(value: number, gridSize = CANVAS_GRID_SIZE): number {
   return Math.round(value / gridSize) * gridSize;
+}
+
+/** Keep a seat box fully inside the dotted canvas. */
+export function clampSeatOnCanvas(
+  x: number,
+  y: number,
+  layout: Pick<SeatingLayout, "canvasWidth" | "canvasHeight">
+): { x: number; y: number } {
+  const w = layout.canvasWidth ?? DEFAULT_CANVAS_WIDTH;
+  const h = layout.canvasHeight ?? DEFAULT_CANVAS_HEIGHT;
+  const maxX = Math.max(0, w - CANVAS_SEAT_SIZE);
+  const maxY = Math.max(0, h - CANVAS_SEAT_SIZE);
+  return {
+    x: Math.min(Math.max(0, x), maxX),
+    y: Math.min(Math.max(0, y), maxY),
+  };
+}
+
+/** Keep a point/marker inside the dotted canvas. */
+export function clampPointOnCanvas(
+  x: number,
+  y: number,
+  layout: Pick<SeatingLayout, "canvasWidth" | "canvasHeight">,
+  size = 32
+): { x: number; y: number } {
+  const w = layout.canvasWidth ?? DEFAULT_CANVAS_WIDTH;
+  const h = layout.canvasHeight ?? DEFAULT_CANVAS_HEIGHT;
+  const maxX = Math.max(0, w - size);
+  const maxY = Math.max(0, h - size);
+  return {
+    x: Math.min(Math.max(0, x), maxX),
+    y: Math.min(Math.max(0, y), maxY),
+  };
+}
+
+const MIN_CANVAS_WIDTH = 480;
+const MIN_CANVAS_HEIGHT = 360;
+const MAX_CANVAS_WIDTH = 4000;
+const MAX_CANVAS_HEIGHT = 3000;
+
+/** Manually grow/shrink the dotted canvas (seats stay inside bounds). */
+export function resizeCanvas(
+  layout: SeatingLayout,
+  canvasWidth: number,
+  canvasHeight: number
+): SeatingLayout {
+  const gridSize = layout.gridSize ?? CANVAS_GRID_SIZE;
+  const nextW = Math.min(
+    MAX_CANVAS_WIDTH,
+    Math.max(MIN_CANVAS_WIDTH, snapToGrid(canvasWidth, gridSize))
+  );
+  const nextH = Math.min(
+    MAX_CANVAS_HEIGHT,
+    Math.max(MIN_CANVAS_HEIGHT, snapToGrid(canvasHeight, gridSize))
+  );
+  const sized = {
+    ...layout,
+    mode: "canvas" as const,
+    canvasWidth: nextW,
+    canvasHeight: nextH,
+  };
+
+  const cells = placedSeats(layout).map((c) => {
+    const clamped = clampSeatOnCanvas(c.x ?? 0, c.y ?? 0, sized);
+    return { ...c, x: clamped.x, y: clamped.y };
+  });
+
+  const rowMarkers = (layout.rowMarkers ?? []).map((m) => {
+    const clamped = clampPointOnCanvas(m.x, m.y, sized);
+    return { ...m, x: clamped.x, y: clamped.y };
+  });
+
+  // Keep stage inside the new bounds via moveStage / resolveStagePlacement.
+  const stage = resolveStagePlacement({
+    ...sized,
+    stageX: layout.stageX,
+    stageY: layout.stageY,
+    stageWidth: layout.stageWidth,
+  });
+
+  return normalizeLayout({
+    ...sized,
+    cells,
+    rowMarkers,
+    stageX: stage.stageX,
+    stageY: stage.stageY,
+    stageWidth: stage.stageWidth,
+    stageStyle: "semicircle",
+  });
 }
 
 export function seatGridStep(gridSize = CANVAS_GRID_SIZE): number {
@@ -770,8 +860,9 @@ export function addCanvasSeat(
 ): SeatingLayout {
   const snap = layout.snapEnabled !== false;
   const gridSize = layout.gridSize ?? CANVAS_GRID_SIZE;
-  const sx = snap ? snapToGrid(x, gridSize) : Math.round(x);
-  const sy = snap ? snapToGrid(y, gridSize) : Math.round(y);
+  const rawX = snap ? snapToGrid(x, gridSize) : Math.round(x);
+  const rawY = snap ? snapToGrid(y, gridSize) : Math.round(y);
+  const { x: sx, y: sy } = clampSeatOnCanvas(rawX, rawY, layout);
   const seats = placedSeats(layout);
 
   if (
@@ -828,8 +919,9 @@ export function moveCanvasSeat(
 ): SeatingLayout {
   const snap = options?.snap ?? layout.snapEnabled !== false;
   const gridSize = layout.gridSize ?? CANVAS_GRID_SIZE;
-  const sx = snap ? snapToGrid(x, gridSize) : Math.round(x);
-  const sy = snap ? snapToGrid(y, gridSize) : Math.round(y);
+  const rawX = snap ? snapToGrid(x, gridSize) : Math.round(x);
+  const rawY = snap ? snapToGrid(y, gridSize) : Math.round(y);
+  const { x: sx, y: sy } = clampSeatOnCanvas(rawX, rawY, layout);
   const seats = placedSeats(layout);
 
   return normalizeLayout({
@@ -846,7 +938,45 @@ export function moveCanvasSeats(
 ): SeatingLayout {
   const snap = options?.snap ?? layout.snapEnabled !== false;
   const gridSize = layout.gridSize ?? CANVAS_GRID_SIZE;
-  const map = new Map(moves.map((m) => [m.id, m]));
+  const w = layout.canvasWidth ?? DEFAULT_CANVAS_WIDTH;
+  const h = layout.canvasHeight ?? DEFAULT_CANVAS_HEIGHT;
+  const maxX = Math.max(0, w - CANVAS_SEAT_SIZE);
+  const maxY = Math.max(0, h - CANVAS_SEAT_SIZE);
+
+  // Snap first, then shift the whole group so every seat stays on the dotted board.
+  const prepared = moves.map((m) => ({
+    id: m.id,
+    x: snap ? snapToGrid(m.x, gridSize) : Math.round(m.x),
+    y: snap ? snapToGrid(m.y, gridSize) : Math.round(m.y),
+  }));
+
+  let minX = Infinity;
+  let minY = Infinity;
+  let maxXp = -Infinity;
+  let maxYp = -Infinity;
+  for (const m of prepared) {
+    minX = Math.min(minX, m.x);
+    minY = Math.min(minY, m.y);
+    maxXp = Math.max(maxXp, m.x);
+    maxYp = Math.max(maxYp, m.y);
+  }
+
+  let shiftX = 0;
+  let shiftY = 0;
+  if (minX < 0) shiftX = -minX;
+  if (maxXp + shiftX > maxX) shiftX = maxX - maxXp;
+  if (minY < 0) shiftY = -minY;
+  if (maxYp + shiftY > maxY) shiftY = maxY - maxYp;
+
+  const map = new Map(
+    prepared.map((m) => [
+      m.id,
+      {
+        x: Math.min(Math.max(0, m.x + shiftX), maxX),
+        y: Math.min(Math.max(0, m.y + shiftY), maxY),
+      },
+    ])
+  );
   const seats = placedSeats(layout);
 
   return normalizeLayout({
@@ -855,9 +985,7 @@ export function moveCanvasSeats(
     cells: seats.map((c) => {
       const m = map.get(c.id);
       if (!m) return c;
-      const x = snap ? snapToGrid(m.x, gridSize) : Math.round(m.x);
-      const y = snap ? snapToGrid(m.y, gridSize) : Math.round(m.y);
-      return { ...c, x, y };
+      return { ...c, x: m.x, y: m.y };
     }),
   });
 }
@@ -870,16 +998,73 @@ export function rotateCanvasSeats(
 ): SeatingLayout {
   const idSet = new Set(seatIds);
   const seats = placedSeats(layout);
+  const targets = seats.filter((c) => idSet.has(c.id));
+  if (!targets.length) return layout;
+
+  const referenceRot = targets[0]?.rotation ?? 0;
+  const deltaDeg =
+    mode === "delta" ? rotation : rotation - referenceRot;
+
+  // One seat: only spin in place (no orbital move).
+  if (targets.length === 1 || Math.abs(deltaDeg) < 0.0001) {
+    return normalizeLayout({
+      ...layout,
+      mode: "canvas",
+      cells: seats.map((c) => {
+        if (!idSet.has(c.id)) return c;
+        const next =
+          mode === "delta"
+            ? (c.rotation ?? 0) + rotation
+            : targets.length === 1
+              ? rotation
+              : (c.rotation ?? 0) + deltaDeg;
+        return { ...c, rotation: normalizeAngle(next) };
+      }),
+    });
+  }
+
+  // Several seats: rotate the whole group around its center so seats don't stack.
+  const centers = targets.map((c) => ({
+    id: c.id,
+    cx: (c.x ?? 0) + CANVAS_SEAT_SIZE / 2,
+    cy: (c.y ?? 0) + CANVAS_SEAT_SIZE / 2,
+    rot: c.rotation ?? 0,
+  }));
+  const pivotX = centers.reduce((sum, c) => sum + c.cx, 0) / centers.length;
+  const pivotY = centers.reduce((sum, c) => sum + c.cy, 0) / centers.length;
+  const rad = (deltaDeg * Math.PI) / 180;
+  const cos = Math.cos(rad);
+  const sin = Math.sin(rad);
+
+  const moved = new Map(
+    centers.map((c) => {
+      const dx = c.cx - pivotX;
+      const dy = c.cy - pivotY;
+      const nx = pivotX + dx * cos - dy * sin;
+      const ny = pivotY + dx * sin + dy * cos;
+      const clamped = clampSeatOnCanvas(
+        nx - CANVAS_SEAT_SIZE / 2,
+        ny - CANVAS_SEAT_SIZE / 2,
+        layout
+      );
+      return [
+        c.id,
+        {
+          x: clamped.x,
+          y: clamped.y,
+          rotation: normalizeAngle(c.rot + deltaDeg),
+        },
+      ] as const;
+    })
+  );
+
   return normalizeLayout({
     ...layout,
     mode: "canvas",
     cells: seats.map((c) => {
-      if (!idSet.has(c.id)) return c;
-      const next =
-        mode === "delta"
-          ? (c.rotation ?? 0) + rotation
-          : rotation;
-      return { ...c, rotation: normalizeAngle(next) };
+      const m = moved.get(c.id);
+      if (!m) return c;
+      return { ...c, x: m.x, y: m.y, rotation: m.rotation };
     }),
   });
 }
@@ -1264,8 +1449,9 @@ export function addRowMarker(
 ): SeatingLayout {
   const snap = layout.snapEnabled !== false;
   const gridSize = layout.gridSize ?? CANVAS_GRID_SIZE;
-  const sx = snap ? snapToGrid(x, gridSize) : Math.round(x);
-  const sy = snap ? snapToGrid(y, gridSize) : Math.round(y);
+  const rawX = snap ? snapToGrid(x, gridSize) : Math.round(x);
+  const rawY = snap ? snapToGrid(y, gridSize) : Math.round(y);
+  const { x: sx, y: sy } = clampPointOnCanvas(rawX, rawY, layout);
   const markers = [...(layout.rowMarkers ?? [])];
   const rowIndex = markers.length;
   const autoLabel =
@@ -1304,8 +1490,9 @@ export function moveRowMarker(
 ): SeatingLayout {
   const snap = layout.snapEnabled !== false;
   const gridSize = layout.gridSize ?? CANVAS_GRID_SIZE;
-  const sx = snap ? snapToGrid(x, gridSize) : Math.round(x);
-  const sy = snap ? snapToGrid(y, gridSize) : Math.round(y);
+  const rawX = snap ? snapToGrid(x, gridSize) : Math.round(x);
+  const rawY = snap ? snapToGrid(y, gridSize) : Math.round(y);
+  const { x: sx, y: sy } = clampPointOnCanvas(rawX, rawY, layout);
   return normalizeLayout({
     ...layout,
     mode: "canvas",
@@ -1389,14 +1576,30 @@ export function syncRowMarkersFromSeats(layout: SeatingLayout): SeatingLayout {
   });
 }
 
-export function formatPriceLabel(rial: number): string {
-  if (rial <= 0) return "رایگان";
-  if (rial >= 1_000_000) {
-    const millions = rial / 1_000_000;
-    return millions % 1 === 0 ? `${millions} میلیون` : `${millions.toFixed(1)} میلیون`;
-  }
-  const thousands = Math.round(rial / 1000);
-  return `${thousands} هزار`;
+/**
+ * Seat price label in Iranian Toman with thousands separators.
+ * e.g. 500000 → "500,000 تومان", 1000000 → "1,000,000 تومان"
+ */
+export function formatPriceLabel(toman: number): string {
+  if (toman <= 0) return "رایگان";
+  return `${Math.round(toman).toLocaleString("en-US")} تومان`;
+}
+
+/** Parse a toman input that may include commas / spaces. */
+export function parseTomanInput(value: string): number {
+  const digits = value.replace(/\D/g, "");
+  if (!digits) return 0;
+  return Number(digits);
+}
+
+/** Format digits with thousands separators for price inputs (e.g. "500,000"). */
+export function formatTomanInput(value: string | number): string {
+  const digits =
+    typeof value === "number"
+      ? String(Math.max(0, Math.round(value)))
+      : value.replace(/\D/g, "");
+  if (!digits) return "";
+  return Number(digits).toLocaleString("en-US");
 }
 
 export function createEmptyLayout(

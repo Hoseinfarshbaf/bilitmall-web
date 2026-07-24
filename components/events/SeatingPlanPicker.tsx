@@ -74,7 +74,7 @@ export default function SeatingPlanPicker({
           </div>
           <span className="text-neutral-500 dark:text-white/60">
             {selectedIds.length > 0
-              ? `${selectedIds.length.toLocaleString("fa-IR")} صندلی — ${totalRial.toLocaleString("fa-IR")} تومان`
+              ? `${selectedIds.length.toLocaleString("fa-IR")} صندلی — ${totalRial.toLocaleString("en-US")} تومان`
               : "صندلی مورد نظر را انتخاب کنید"}
           </span>
         </div>

@@ -148,6 +148,8 @@ type SeatBoxProps = {
   /** Custom section color (hex). Used when status is available. */
   fillColor?: string;
   style?: CSSProperties;
+  /** Keep digit upright while the seat shell is rotated (deg to counter-rotate text only). */
+  numberUprightBy?: number;
 };
 
 export function SeatBox({
@@ -164,6 +166,7 @@ export function SeatBox({
   disabled,
   fillColor,
   style,
+  numberUprightBy = 0,
 }: SeatBoxProps) {
   const resolved: SeatSaleStatus = selected ? "selected" : status;
   const useCustom =
@@ -173,9 +176,15 @@ export function SeatBox({
   return (
     <button
       type="button"
+      tabIndex={-1}
+      data-seat-box=""
       title={title}
       disabled={disabled}
       onClick={onClick}
+      onMouseDown={(e) => {
+        // Prevent focus steal so studio keyboard shortcuts keep working.
+        e.preventDefault();
+      }}
       style={{
         ...style,
         ...(useCustom && resolved === "available"
@@ -195,7 +204,16 @@ export function SeatBox({
         className
       )}
     >
-      {number}
+      <span
+        className="inline-flex"
+        style={
+          numberUprightBy
+            ? { transform: `rotate(${-numberUprightBy}deg)` }
+            : undefined
+        }
+      >
+        {number}
+      </span>
     </button>
   );
 }
@@ -237,6 +255,8 @@ export function SemicircleStage({
         selected && "ring-2 ring-amber-400 ring-offset-2",
         className
       )}
+      data-stage=""
+      data-canvas-draggable=""
       style={
         positioned
           ? { left: x, top: y, width: width ?? "52%", height }
